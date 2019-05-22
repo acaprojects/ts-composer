@@ -4,6 +4,9 @@
 
 import "core-js/fn/promise";
 
-export default class DummyClass {
+export default class Composer {
 
 }
+
+export const ACAComposer = Composer;
+export const ACA_Composer = Composer;
