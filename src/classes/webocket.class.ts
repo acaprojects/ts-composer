@@ -1,102 +1,46 @@
-import { webSocket, WebSocketSubject } from 'rxjs/webSocket'
-import { BehaviorSubject, Subscription, Observable } from 'rxjs'
-import { log } from '../utilities/general.utilities'
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 
-export type EngineCommand = 'bind' | 'unbind' | 'debug' | 'ignore' | 'exec'
+import {
+    EngineCommandRequest,
+    EngineCommandRequestMetadata,
+    EngineErrorCodes,
+    EngineExecRequestOptions,
+    EngineRequestOptions,
+    EngineResponse,
+    EngineWebsocketOptions,
+} from '../interfaces/websocket.interfaces';
 
-export interface EngineCommandRequest {
-    /** Unique request identifier */
-    id: string | number
-    /** Type of the command to send to engine */
-    cmd: EngineCommand
-    /** System ID to perform the command  */
-    sys: string
-    /** Module on the given system to perform the command */
-    mod: string
-    /** Index of the module in the system */
-    index: number
-    /** Name of variable to `bind` or method to `exec` on the given module */
-    name: string
-    /** Aruguments to pass to the method executed on the module */
-    args?: any[]
-}
+import { log } from '../utilities/general.utilities';
 
-export interface EngineRequestOptions {
-    /** System ID to perform the command  */
-    sys: string
-    /** Module on the given system to perform the command */
-    mod: string
-    /** Index of the module in the system */
-    index: number
-    /** Name of variable to `bind` or method to `exec` on the given module */
-    name: string
-}
+/** Time in seconds to ping the server to keep the websocket connection alive */
+const KEEP_ALIVE = 20;
+/** Global counter for websocket request IDs */
+let REQUEST_COUNT = 0;
 
-export interface EngineExecRequestOptions extends EngineRequestOptions {
-    args: any[]
-}
-
-let REQUEST_COUNT = 0
-
-export interface EngineWebsocketOptions {
-    /** Auth token for the engine websocket endpoint */
-    token: string
-    /** Domain, protocol and port of the engine server */
-    host?: string
-    /** Whether this endpoint is a fixed device */
-    fixed?: boolean
-}
-
-export enum EngineErrorCodes {
-    PARSE_ERROR = 0,
-    BAD_REQUEST = 1,
-    ACCESS_DENIED = 2,
-    REQUEST_FAILED = 3,
-    UNKNOWN_CMD = 4,
-    SYS_NOT_FOUND = 5,
-    MOD_NOT_FOUND = 6,
-    UNEXPECTED_FAILURE = 7
-}
-
-export interface EngineResponse {
-    /** ID of the associated request */
-    id: string | number
-    /** Response type */
-    type: 'success' | 'error' | 'notify' | 'debug'
-    /** Error code */
-    code?: number
-    /** New value of binding if `notify` or return value from an `exec */
-    value?: any
-    /** Request metadata */
-    meta?: EngineRequestOptions
-    /** Debug module */
-    mod?: string
-    /** Debug module */
-    klass?: string
-    /** Log message level */
-    level?: string
-    /** Debug message */
-    msg?: string
-}
+export let engine = { websocket: webSocket,log };
 
 export class EngineWebsocket {
     /** Websocket for connecting to engine */
-    protected websocket: WebSocketSubject<any> | undefined
+    protected websocket: WebSocketSubject<any> | undefined;
     /** Request promises */
-    protected promises: { [id: string]: Promise<any> } = {}
+    protected requests: { [id: string]: EngineCommandRequestMetadata } = {};
     /** Subjects for listening to values of bindings */
-    protected binding: { [id: string]: BehaviorSubject<any> } = {}
+    protected binding: { [id: string]: BehaviorSubject<any> } = {};
     /** Observers for the binding subjects */
-    protected observers: { [id: string]: Observable<any> } = {}
+    protected observers: { [id: string]: Observable<any> } = {};
     /** Request responders */
     protected promise_callbacks: {
-        [id: string]: { resolve: (_: any) => void; reject: (_: any) => void }
-    } = {}
+        [id: string]: { resolve: (_?: any) => void; reject: (_?: any) => void },
+    } = {};
     /** Whether the websocket is connected or not */
-    private connected: boolean = false
+    private connected: boolean = false;
+    /** Interval ID for the server ping callback */
+    private keep_alive: number | undefined;
 
     constructor(private options: EngineWebsocketOptions) {
-        this.connect()
+        REQUEST_COUNT = 0;
+        this.connect();
     }
 
     /**
@@ -104,8 +48,8 @@ export class EngineWebsocket {
      * @param token New access token
      */
     public updateToken(token: string) {
-        this.options.token = token
-        this.reconnect()
+        this.options.token = token;
+        this.reconnect();
     }
 
     /**
@@ -114,12 +58,23 @@ export class EngineWebsocket {
      * @param next Callback for value changes
      */
     public listen<T = any>(options: EngineRequestOptions, next: (value: T) => void): Subscription {
-        const key = `${options.sys}|${options.mod}_${options.index}|${options.name}`
+        const key = `${options.sys}|${options.mod}_${options.index}|${options.name}`;
         if (!this.binding[key]) {
-            this.binding[key] = new BehaviorSubject<T>(null as any)
-            this.observers[key] = this.binding[key].asObservable()
+            this.binding[key] = new BehaviorSubject<T>(null as any);
+            this.observers[key] = this.binding[key].asObservable();
         }
-        return this.observers[key].subscribe(next)
+        return this.observers[key].subscribe(next);
+    }
+
+    /**
+     * Get current binding value
+     * @param options Binding details
+     */
+    public value<T = any>(options: EngineRequestOptions): T | undefined {
+        const key = `${options.sys}|${options.mod}_${options.index}|${options.name}`;
+        if (this.binding[key]) {
+            return this.binding[key].getValue() as T;
+        }
     }
 
     /**
@@ -127,53 +82,105 @@ export class EngineWebsocket {
      * @param options Binding request options
      */
     public bind(options: EngineRequestOptions): Promise<void> {
-        const request: EngineCommandRequest = { id: ++REQUEST_COUNT, cmd: 'bind', ...options }
-        return this.send(request)
+        const request: EngineCommandRequest = { id: ++REQUEST_COUNT, cmd: 'bind', ...options };
+        return this.send(request);
+    }
+
+    /**
+     * Unbind from a status variable on the given system module
+     * @param options Unbind request options
+     */
+    public unbind(options: EngineRequestOptions): Promise<void> {
+        const request: EngineCommandRequest = { id: ++REQUEST_COUNT, cmd: 'unbind', ...options };
+        return this.send(request);
+    }
+
+    /**
+     * Execute method on the given system module
+     * @param options Exec request options
+     */
+    public exec(options: EngineExecRequestOptions): Promise<any> {
+        const request: EngineCommandRequest = { id: ++REQUEST_COUNT, cmd: 'exec', ...options };
+        return this.send(request);
+    }
+
+    /**
+     * Listen to debug logging for on the given system module binding
+     * @param options Debug request options
+     */
+    public debug(options: EngineRequestOptions): Promise<void> {
+        const request: EngineCommandRequest = { id: ++REQUEST_COUNT, cmd: 'debug', ...options };
+        return this.send(request);
+    }
+
+    /**
+     * Stop listen to debug logging for on the given system module binding
+     * @param options Debug request options
+     */
+    public ignore(options: EngineRequestOptions): Promise<void> {
+        const request: EngineCommandRequest = { id: ++REQUEST_COUNT, cmd: 'ignore', ...options };
+        return this.send(request);
     }
 
     /**
      * Send request to engine through the websocket connection
-     * @param request
+     * @param request New request to post to the server
      */
-    protected send(request: EngineCommandRequest, tries: number = 0) {
-        const key = `bind|${request.sys}|${request.mod}${request.index}|${request.name}`
-        if (!this.promises[key]) {
-            this.promises[key] = new Promise((resolve, reject) => {
-                this.promise_callbacks[`${request.id}`] = { resolve, reject }
+    protected send(request: EngineCommandRequest, tries: number = 0): Promise<any> {
+        const key = `${request.cmd}|${request.sys}|${request.mod}${request.index}|${request.name}`;
+        if (!this.requests[key]) {
+            const req: EngineCommandRequestMetadata = { ...request, key };
+            req.promise = new Promise((resolve, reject) => {
                 if (this.websocket) {
-                    const bind = `${request.sys}, ${request.mod}_${request.index}, ${request.name}`
-                    log('WS', `[${request.cmd.toUpperCase()}] ${bind}`, request.args)
+                    req.resolve = (d) => resolve(d);
+                    req.reject = (e) => reject(e);
+                    const bind = `${request.sys}, ${request.mod}_${request.index}, ${request.name}`;
+                    engine.log('WS', `[${request.cmd.toUpperCase()}] ${bind}`, request.args);
                     this.websocket.next(JSON.stringify(request));
                 } else {
                     setTimeout(() => {
-                        this.send(request, tries).then(_ => resolve(_), _ => reject(_))
-                    }, 300 * Math.min(20, ++tries))
+                        delete this.requests[key];
+                        this.send(request, tries).then((_) => resolve(_), (_) => reject(_));
+                    }, 300 * Math.min(20, ++tries));
                 }
-            })
+            });
+            this.requests[key] = req;
         }
-        return this.promises[key]
+        return this.requests[key].promise as Promise<any>;
     }
 
     /**
      * Callback for messages from the server
-     * @param message
+     * @param message Message from the engine server
      */
-    protected onMessage(message: EngineResponse) {
-        if (message.type === 'notify' && message.meta) {
-            this.update(message.meta, message.value)
-        } else if (message.type === 'success') {
-            log('WS', `[SUCCESS] ${message.id}`)
-            if (this.promise_callbacks[`${message.id}`]) {
-                const resp = this.promise_callbacks[`${message.id}`]
-                resp.resolve(message.value)
-                delete this.promise_callbacks[`${message.id}`]
+    protected onMessage(message: EngineResponse | 'pong'): void {
+        if (message !== 'pong' && message instanceof Object) {
+            if (message.type === 'notify' && message.meta) {
+                this.handleNotify(message.meta, message.value);
+            } else if (message.type === 'success') {
+                this.handleSuccess(message);
+            } else if (message.type === 'debug') {
+                engine.log('WS', `[Debug] ${message.mod}${message.klass} →`, message.msg);
+            } else if (message.type === 'error') {
+                this.handleError(message);
+            } else {
+                engine.log('WS', 'Invalid websocket message', message, 'error');
             }
-        } else if (message.type === 'debug') {
-            log('WS', `[DEBUG] ${message.mod}${message.klass} → ${message.msg}`)
-        } else if (message.type === 'error') {
-            this.handleError(message)
-        } else {
-            log('WS', 'Invalid websocket message', message, 'error')
+        }
+    }
+
+    /**
+     * Handle websocket success response
+     * @param message Success message
+     */
+    protected handleSuccess(message: EngineResponse) {
+        const request = Object.keys(this.requests)
+            .map((i) => this.requests[i])
+            .find((i) => i.id === message.id);
+        engine.log('WS', `[SUCCESS] ${message.id}`);
+        if (request && request.resolve) {
+            request.resolve(message.value);
+            delete this.requests[request.key];
         }
     }
 
@@ -182,31 +189,38 @@ export class EngineWebsocket {
      * @param message Error response
      */
     protected handleError(message: EngineResponse) {
-        let type = 'UNEXPECTED FAILURE'
+        let type = 'UNEXPECTED FAILURE';
         switch (message.code) {
             case EngineErrorCodes.ACCESS_DENIED:
-                type = 'ACCESS DENIED'
-                break
+                type = 'ACCESS DENIED';
+                break;
             case EngineErrorCodes.BAD_REQUEST:
-                type = 'BAD REQUEST'
-                break
+                type = 'BAD REQUEST';
+                break;
             case EngineErrorCodes.MOD_NOT_FOUND:
-                type = 'MODULE NOT FOUND'
-                break
+                type = 'MODULE NOT FOUND';
+                break;
             case EngineErrorCodes.SYS_NOT_FOUND:
-                type = 'SYSTEM NOT FOUND'
-                break
+                type = 'SYSTEM NOT FOUND';
+                break;
             case EngineErrorCodes.PARSE_ERROR:
-                type = 'PARSE ERROR'
-                break
+                type = 'PARSE ERROR';
+                break;
             case EngineErrorCodes.REQUEST_FAILED:
-                type = 'REQUEST FAILED'
-                break
+                type = 'REQUEST FAILED';
+                break;
             case EngineErrorCodes.UNKNOWN_CMD:
-                type = 'UNKNOWN COMMAND'
-                break
+                type = 'UNKNOWN COMMAND';
+                break;
         }
-        log('WS', `[Error] ${type}(${message.id}): ${message.msg}`, null, 'error')
+        engine.log('WS', `[Error] ${type}(${message.id}): ${message.msg}`, null, 'error');
+        const request = Object.keys(this.requests)
+            .map((i) => this.requests[i])
+            .find((i) => i.id === message.id);
+        if (request && request.reject) {
+            request.reject(message);
+            delete this.requests[request.key];
+        }
     }
 
     /**
@@ -214,15 +228,15 @@ export class EngineWebsocket {
      * @param options Binding details
      * @param value New binding value
      */
-    protected update<T = any>(options: EngineRequestOptions, value: T): void {
-        const key = `${options.sys}|${options.mod}_${options.index}|${options.name}`
+    protected handleNotify<T = any>(options: EngineRequestOptions, value: T): void {
+        const key = `${options.sys}|${options.mod}_${options.index}|${options.name}`;
         if (!this.binding[key]) {
-            this.binding[key] = new BehaviorSubject<T>(null as any)
-            this.observers[key] = this.binding[key].asObservable()
+            this.binding[key] = new BehaviorSubject<T>(null as any);
+            this.observers[key] = this.binding[key].asObservable();
         }
-        const bind = `${options.sys}, ${options.mod}_${options.index}, ${options.name}`
-        log('WS', `[Notify] ${bind} |`, [this.binding[key].getValue(), '→', value])
-        this.binding[key].next(value)
+        const bind = `${options.sys}, ${options.mod}_${options.index}, ${options.name}`;
+        engine.log('WS', `[Notify] ${bind} |`, [this.binding[key].getValue(), '→', value]);
+        this.binding[key].next(value);
     }
 
     /**
@@ -230,31 +244,35 @@ export class EngineWebsocket {
      */
     protected connect(tries: number = 0) {
         if (tries > 4) {
-            return
+            return;
         }
         if (!this.options || !this.options.token) {
-            throw new Error('No token is set for engine websocket')
+            throw new Error('No token is set for engine websocket');
         }
-        const secure = location.protocol.indexOf('https') >= 0
-        const host = this.options.host || location.host
+        const secure = location.protocol.indexOf('https') >= 0;
+        const host = this.options.host || location.host;
         const url = `ws${secure ? 's' : ''}://${host}/control/websocket?bearer=${
             this.options.token
-        }`
-        this.websocket = webSocket(url)
+        }${this.options.fixed ? '&fixed_device=true' : ''}`;
+        this.websocket = engine.websocket(url);
         if (this.websocket) {
             this.websocket.subscribe(
                 (resp: EngineResponse) => {
-                    this.connected = true
-                    this.onMessage(resp)
+                    this.connected = true;
+                    this.onMessage(resp);
                 },
-                err => {
-                    this.connected = false
-                    log('WS', 'Websocket error:', err)
+                (err) => {
+                    this.connected = false;
+                    engine.log('WS', 'Websocket error:', err);
                 },
-                () => (this.connected = false)
-            )
+                () => (this.connected = false),
+            );
+            if (this.keep_alive) {
+                clearInterval(this.keep_alive);
+            }
+            this.keep_alive = setInterval(() => this.ping(), KEEP_ALIVE * 1000) as any;
         } else {
-            setTimeout(() => this.connect(tries), 300 * ++tries)
+            setTimeout(() => this.connect(tries), 300 * ++tries);
         }
     }
 
@@ -263,8 +281,17 @@ export class EngineWebsocket {
      */
     protected reconnect() {
         if (this.websocket && this.connected) {
-            this.websocket.complete()
+            this.websocket.complete();
         }
-        this.connect()
+        this.connect();
+    }
+
+    /**
+     * Send ping through the websocket
+     */
+    protected ping() {
+        if (this.websocket && this.connected) {
+            this.websocket.next('ping');
+        }
     }
 }
