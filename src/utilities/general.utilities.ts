@@ -1,3 +1,5 @@
+import { HashMap } from "./types.utilities";
+
 declare global {
     interface Window {
         debug: boolean;
@@ -46,4 +48,53 @@ export function log(
 export function consoleHasColours() {
     const doc = document as any;
     return !(doc.documentMode || /Edge/.test(navigator.userAgent));
+}
+
+/**
+ * Get URL paramters from hash or query string
+ */
+export function getFragments(): HashMap<string> {
+    const hash = location.hash ? location.hash.slice(1) : '';
+    const query = location.search ? location.search.slice(1) : '';
+    if (hash) {
+        if (hash.indexOf('?')) {
+            return convertPairStringToMap(hash.split('?')[1]);
+        } else {
+            return convertPairStringToMap(hash);
+        }
+    } else if (query) {
+        if (query.indexOf('#')) {
+            return convertPairStringToMap(query.split('#')[1]);
+        } else {
+            return convertPairStringToMap(query);
+        }
+    }
+    return {};
+}
+
+/**
+ * Convert string of key value pairs to a dictionary object
+ * @param str String of values
+ */
+export function convertPairStringToMap(str: string): HashMap<string> {
+    const map: HashMap<string> = {};
+    const str_pairs = str.split('&');
+    for (const str_pair of str_pairs) {
+        const split_pair = str_pair.split('=');
+        map[decodeURIComponent(split_pair[0])] = decodeURIComponent(split_pair[1]);
+    }
+    return map;
+}
+
+/**
+ * Create a nonce with the given length
+ * @param length Length of the nonce string. Defaults to 40 characters
+ */
+export function generateNonce(length: number = 40): string {
+    const allowed_characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let nonce = '';
+    for (let i = 0; i < length; i++) {
+        nonce += allowed_characters.charAt(Math.floor(Math.random() * allowed_characters.length));
+    }
+    return nonce;
 }
