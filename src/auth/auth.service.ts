@@ -1,12 +1,12 @@
 
-import { ajax } from 'rxjs/ajax';
-import { Md5 } from 'ts-md5/dist/md5';
+import { ajax } from './node_modules/rxjs/ajax';
+import { Md5 } from './node_modules/ts-md5/dist/md5';
 
 import { log, getFragments, generateNonce } from '../utilities/general.utilities';
-import { EngineAuthority, EngineTokenResponse } from '../interfaces/auth.interfaces';
+import { EngineAuthority, EngineTokenResponse } from './auth.interfaces';
 import { HashMap } from '../utilities/types.utilities';
 
-import * as dayjs from 'dayjs';
+import * as dayjs from './node_modules/dayjs';
 
 export interface EngineAuthOptions {
     /** URI for generating new tokens */
@@ -29,6 +29,10 @@ export const engine = { ajax, log };
 /** Variable to hold the singleton of the auth service */
 let SERVICE_SINGLETON: EngineAuthService;
 
+/**
+ * Grab existing engine auth service or create a new one with the given options
+ * @param options Service configuration options
+ */
 export function getEngineAuthService(options?: EngineAuthOptions): EngineAuthService {
     if (!SERVICE_SINGLETON) {
         if (!options) {
@@ -67,11 +71,6 @@ export class EngineAuthService {
     /** OAuth 2 client ID for the application */
     public get client_id(): string {
         return this._client_id;
-    }
-
-    /** Whether the local user is authenticated with engine */
-    public get is_authorised(): boolean {
-        return false;
     }
 
     /** Bearer token for authenticating requests to engine */

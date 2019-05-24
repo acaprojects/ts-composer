@@ -1,5 +1,5 @@
-import { BehaviorSubject, Observable, Subscription } from 'rxjs';
-import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
+import { BehaviorSubject, Observable, Subscription } from './node_modules/rxjs';
+import { webSocket, WebSocketSubject } from './node_modules/rxjs/webSocket';
 
 import {
     EngineCommandRequest,
@@ -34,11 +34,11 @@ export class EngineWebsocket {
         [id: string]: { resolve: (_?: any) => void; reject: (_?: any) => void },
     } = {};
     /** Whether the websocket is connected or not */
-    private connected: boolean = false;
+    protected connected: boolean = false;
     /** Interval ID for the server ping callback */
-    private keep_alive: number | undefined;
+    protected keep_alive: number | undefined;
 
-    constructor(private options: EngineWebsocketOptions) {
+    constructor(protected options: EngineWebsocketOptions) {
         REQUEST_COUNT = 0;
         this.connect();
     }
