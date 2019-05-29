@@ -1,7 +1,7 @@
 import { Subject } from 'rxjs';
 
-import { engine, EngineWebsocket } from '../../src/classes/webocket.class';
-import { EngineResponse } from '../../src/interfaces/websocket.interfaces';
+import { engine, EngineWebsocket } from '../../src/websocket/webocket.class';
+import { EngineResponse } from '../../src/websocket/websocket.interfaces';
 
 describe('EngineWebsocket', () => {
     let websocket: EngineWebsocket;

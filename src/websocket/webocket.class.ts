@@ -1,5 +1,5 @@
-import { BehaviorSubject, Observable, Subscription } from './node_modules/rxjs';
-import { webSocket, WebSocketSubject } from './node_modules/rxjs/webSocket';
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 
 import {
     EngineCommandRequest,
@@ -9,7 +9,7 @@ import {
     EngineRequestOptions,
     EngineResponse,
     EngineWebsocketOptions,
-} from '../interfaces/websocket.interfaces';
+} from './websocket.interfaces';
 
 import { log } from '../utilities/general.utilities';
 
