@@ -1,6 +1,6 @@
 {
   "name": "ts-composer",
-    "version": "0.1.0",
+  "version": "0.1.0",
   "description": "",
   "keywords": [],
   "main": "dist/ts-composer.umd.js",
@@ -49,7 +49,7 @@
     "transform": {
       ".(ts|tsx)": "ts-jest"
     },
-        "testEnvironment": "jsdom",
+    "testEnvironment": "jsdom",
     "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
     "moduleFileExtensions": [
       "ts",
@@ -81,12 +81,12 @@
       "@commitlint/config-conventional"
     ]
   },
-    "peerDependencies": {
-        "core-js": "^3.1.1",
-        "dayjs": "^1.8.14",
-        "rxjs": "^6.5.2",
-        "ts-md5": "^1.2.4"
-    },
+  "peerDependencies": {
+    "core-js": "^3.1.1",
+    "dayjs": "^1.8.14",
+    "rxjs": "^6.5.2",
+    "ts-md5": "^1.2.4"
+  },
   "devDependencies": {
     "@commitlint/cli": "^7.1.2",
     "@commitlint/config-conventional": "^7.1.2",
@@ -98,7 +98,7 @@
     "coveralls": "^3.0.2",
     "cross-env": "^5.2.0",
     "cz-conventional-changelog": "^2.1.0",
-        "dayjs": "^1.8.14",
+    "dayjs": "^1.8.14",
     "husky": "^1.0.1",
     "jest": "^23.6.0",
     "jest-config": "^23.6.0",
@@ -119,7 +119,7 @@
     "shelljs": "^0.8.3",
     "travis-deploy-once": "^5.0.9",
     "ts-jest": "^23.10.2",
-        "ts-md5": "^1.2.4",
+    "ts-md5": "^1.2.4",
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.15.0",
