@@ -1,20 +1,20 @@
-import { EngineBindingService } from '../binding.service'
-import { EngineSystemBinding } from './engine-system.class'
 import { HashMap } from '../../utilities/types.utilities'
+import { EngineBindingService } from '../binding.service'
 import { EngineVariableBinding } from './engine-status-variable.class'
+import { EngineSystemBinding } from './engine-system.class'
 
 export class EngineModuleBinding {
-    /** Module ID */
-    readonly id: string
     /** Mapping of module bindings */
     private _bindings: HashMap<EngineVariableBinding> = {}
 
     constructor(
         private _service: EngineBindingService,
         private _system: EngineSystemBinding,
-        _id: string
-    ) {
-        this.id = _id
+        private _id: string
+    ) {}
+
+    public get id(): string {
+        return `${this.name}_${this.index}`
     }
 
     /** Parent system of the module */
@@ -24,14 +24,14 @@ export class EngineModuleBinding {
 
     /** Module index */
     public get index(): number {
-        const parts = this.id.split('_')
+        const parts = this._id.split('_')
         const index = parts.pop()
         return parseInt(index || '') || 1
     }
 
     /** Module name */
     public get name(): string {
-        const parts = this.id.split('_')
+        const parts = this._id.split('_')
         parts.pop()
         return parts.join('_')
     }

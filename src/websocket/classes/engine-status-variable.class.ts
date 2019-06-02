@@ -1,11 +1,11 @@
-import { EngineBindingService } from '../binding.service'
-import { EngineModuleBinding } from './engine-module.class'
-import { EngineCommandRequestMetadata, EngineRequestOptions } from '../websocket.interfaces'
 import { Subscription } from 'rxjs'
+import { EngineBindingService } from '../binding.service'
+import { EngineCommandRequestMetadata, EngineRequestOptions } from '../websocket.interfaces'
+import { EngineModuleBinding } from './engine-module.class'
 
 export class EngineVariableBinding {
     /** Status variable name */
-    readonly name: string
+    public readonly name: string
     /** Number of active bindings to this variable */
     private _binding_count: number = 0
     /** Number of bindings to restore on reconnection */
@@ -30,7 +30,6 @@ export class EngineVariableBinding {
 
     /** Number of bindings to this status variable */
     public get count(): number {
-        console.log('Count:', this._binding_count)
         return this._binding_count
     }
 
@@ -55,7 +54,6 @@ export class EngineVariableBinding {
         if (this._binding_count <= 0) {
             this._service.engine.bind(this.binding()).then(() => {
                 this._binding_count++
-                console.log('Bind:', this._binding_count)
             })
         }
         return () => this.unbind()
