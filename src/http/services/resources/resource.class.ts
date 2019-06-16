@@ -11,7 +11,7 @@ export abstract class EngineResource {
     private _changes: HashMap = {}
 
     constructor(protected service: IResourceService<EngineResource>, raw_data: HashMap) {
-        this.id = raw_data.id || raw_data.zone_id || raw_data.email
+        this.id = raw_data.id
         this._name = raw_data.name
     }
 
@@ -21,7 +21,7 @@ export abstract class EngineResource {
     }
     /** Setter for name property. The value needs to be saved before it can be used */
     public set name(value: string) {
-        this._changes.name = value
+        this.change('name', value)
     }
 
     /**
@@ -48,7 +48,7 @@ export abstract class EngineResource {
      * Get map of changes to the resources
      */
     public get changes(): HashMap {
-        return { ...this.changes }
+        return { ...this._changes }
     }
 
     /**
