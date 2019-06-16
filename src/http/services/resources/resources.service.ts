@@ -4,8 +4,10 @@ import { toQueryString } from '../../../utilities/api.utilities'
 import { EngineBaseClass } from '../../../utilities/base.class'
 import { HashMap } from '../../../utilities/types.utilities'
 import { EngineHttpClient, HttpError } from '../../http.service'
+import { IResourceService } from './resources.interface'
 
-export abstract class EngineResourceService<T> extends EngineBaseClass {
+export abstract class EngineResourceService<T> extends EngineBaseClass
+    implements IResourceService<T> {
     /** Whether service has been initialised */
     public get initialised() {
         return this._initialised
@@ -41,7 +43,7 @@ export abstract class EngineResourceService<T> extends EngineBaseClass {
      * Query the index of the API route associated with this service
      * @param query_params Map of query paramaters to add to the request URL
      */
-    public query(query_params: HashMap = {}): Promise<T[] | HashMap[]> {
+    public query(query_params: HashMap = {}): Promise<T[]> {
         let engine = false
         let cache = 1000
         /* istanbul ignore else */

@@ -16,7 +16,7 @@ describe('EngineResourceService', () => {
         test1: any[],
         test2: any[]
     ) {
-        const item = result.results ? result.results : result
+        const item = result.hasOwnProperty('results') ? result.results : result
         http[method]
             .mockReturnValueOnce(of(result))
             .mockReturnValueOnce(of(result))
