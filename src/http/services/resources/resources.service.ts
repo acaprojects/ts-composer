@@ -44,7 +44,7 @@ export abstract class EngineResourceService<T> extends EngineBaseClass
      * @param query_params Map of query paramaters to add to the request URL
      */
     public query(query_params: HashMap = {}): Promise<T[]> {
-        let engine = false
+        const engine = false
         let cache = 1000
         /* istanbul ignore else */
         if (query_params) {

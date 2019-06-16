@@ -2,7 +2,7 @@ import { HashMap } from '../../../utilities/types.utilities'
 
 import { IResourceService } from './resources.interface'
 
-export abstract class EngineResource<T = any> {
+export abstract class EngineResource<T = IResourceService<any>> {
     /** Unique Identifier of the object */
     public readonly id: string
     /** Human readable name of the object */
@@ -10,7 +10,7 @@ export abstract class EngineResource<T = any> {
     /** Map of unsaved property changes */
     private _changes: HashMap = {}
 
-    constructor(protected service: IResourceService<T>, raw_data: HashMap) {
+    constructor(protected service: T, raw_data: HashMap) {
         this.id = raw_data.id
         this._name = raw_data.name
     }
@@ -30,8 +30,8 @@ export abstract class EngineResource<T = any> {
     public async save(): Promise<T> {
         if (Object.keys(this._changes).length > 0) {
             return this.id
-                ? this.service.update(this.id, { ...this, ...this._changes })
-                : this.service.add({ ...this, ...this._changes })
+                ? (this.service as any).update(this.id, { ...this, ...this._changes })
+                : (this.service as any).add({ ...this, ...this._changes })
         } else {
             return Promise.reject('No changes have been made')
         }
@@ -41,7 +41,7 @@ export abstract class EngineResource<T = any> {
      * Make request to delete the resource on the server
      */
     public delete(): Promise<void> {
-        return this.service.delete(this.id)
+        return (this.service as any).delete(this.id)
     }
 
     /**
