@@ -83,9 +83,14 @@ export class EngineSystem extends EngineResource<EngineSystemsService> {
     public get zones(): string[] {
         return [...this._zones]
     }
+
     /** Map of user settings for the system */
     public get settings(): HashMap {
-        return { ...this._settings }
+        return JSON.parse(JSON.stringify(this._settings))
+    }
+
+    public set settings(value: HashMap) {
+        this.change('settings', value)
     }
 
     /** Time at which the system was created in ms since UTC epoch */

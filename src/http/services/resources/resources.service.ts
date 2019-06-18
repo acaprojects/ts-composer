@@ -64,7 +64,7 @@ export abstract class EngineResourceService<T> extends EngineBaseClass
                             d && d instanceof Array
                                 ? d.map(i => this.process(i))
                                 : d && !(d instanceof Array) && d.results
-                                ? (d.results as HashMap[])
+                                ? (d.results as HashMap[]).map(i => this.process(i))
                                 : []
                     },
                     (e: any) => {
