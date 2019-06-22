@@ -1,5 +1,5 @@
+import { EngineDriverRole } from '../../../../src/http/services/drivers/drivers.enums'
 import { EngineModule } from '../../../../src/http/services/modules/module.class'
-import { EngineModuleRole } from '../../../../src/http/services/modules/module.interfaces'
 
 describe('EngineModule', () => {
     let module: EngineModule
@@ -14,7 +14,10 @@ describe('EngineModule', () => {
             stop: jest.fn(),
             types: jest.fn(),
             remove: jest.fn(),
-            update: jest.fn()
+            update: jest.fn(),
+            ping: jest.fn(),
+            state: jest.fn(),
+            internalState: jest.fn()
         }
         module = new EngineModule(service, {
             id: 'mod_test',
@@ -29,7 +32,7 @@ describe('EngineModule', () => {
             uri: 'test.com',
             custom_name: 'mi-name',
             settings: { star: 'death' },
-            role: EngineModuleRole.Device,
+            role: EngineDriverRole.Device,
             notes: 'Clone wars',
             ignore_connected: false
         })
@@ -215,20 +218,20 @@ describe('EngineModule', () => {
     })
 
     it('should expose role', () => {
-        expect(module.role).toBe(EngineModuleRole.Device)
+        expect(module.role).toBe(EngineDriverRole.Device)
     })
 
     it('should allow setting role on new modules', () => {
         try {
-            module.role = EngineModuleRole.SSH
+            module.role = EngineDriverRole.SSH
             throw Error('Failed to throw error')
         } catch (e) {
             expect(e).not.toEqual(new Error('Failed to throw error'))
         }
         const new_mod = new EngineModule(service, {})
-        new_mod.role = EngineModuleRole.Logic
-        expect(new_mod.role).not.toBe(EngineModuleRole.Logic)
-        expect(new_mod.changes.role).toBe(EngineModuleRole.Logic)
+        new_mod.role = EngineDriverRole.Logic
+        expect(new_mod.role).not.toBe(EngineDriverRole.Logic)
+        expect(new_mod.changes.role).toBe(EngineDriverRole.Logic)
     })
 
     it('should expose notes', () => {
@@ -243,7 +246,7 @@ describe('EngineModule', () => {
     })
 
     it('should expose ignore connected', () => {
-        expect(module.ignore_connected).toBe('test.com')
+        expect(module.ignore_connected).toBe(false)
     })
 
     it('should allow setting ignore connected on new modules', () => {
@@ -257,5 +260,75 @@ describe('EngineModule', () => {
         new_mod.ignore_connected = true
         expect(new_mod.ignore_connected).not.toBe(true)
         expect(new_mod.changes.ignore_connected).toBe(true)
+    })
+
+    it('should allow starting the module', async () => {
+        service.start.mockReturnValue(Promise.resolve())
+        await module.start()
+        expect(service.start).toBeCalledWith('mod_test')
+        const new_mod = new EngineModule(service, {})
+        try {
+            new_mod.start()
+            throw new Error('Failed to error')
+        } catch (e) {
+            expect(e).not.toEqual(new Error('Failed to error'))
+        }
+    })
+
+    it('should allow stopping the module', async () => {
+        service.stop.mockReturnValue(Promise.resolve())
+        await module.stop()
+        expect(service.stop).toBeCalledWith('mod_test')
+        const new_mod = new EngineModule(service, {})
+        try {
+            new_mod.stop()
+            throw new Error('Failed to error')
+        } catch (e) {
+            expect(e).not.toEqual(new Error('Failed to error'))
+        }
+    })
+
+    it('should allow pinging the module', async () => {
+        service.ping.mockReturnValue(Promise.resolve({}))
+        const response = await module.ping()
+        expect(service.ping).toBeCalledWith('mod_test')
+        expect(response).toEqual({})
+        const new_mod = new EngineModule(service, {})
+        try {
+            new_mod.ping()
+            throw new Error('Failed to error')
+        } catch (e) {
+            expect(e).not.toEqual(new Error('Failed to error'))
+        }
+    })
+
+    it('should allow getting state of the module', async () => {
+        service.state.mockReturnValue(Promise.resolve({}))
+        let response = await module.state()
+        expect(service.state).toBeCalledWith('mod_test', undefined)
+        expect(response).toEqual({})
+        response = await module.state('lookup_value')
+        expect(service.state).toBeCalledWith('mod_test', 'lookup_value')
+        const new_mod = new EngineModule(service, {})
+        try {
+            new_mod.state()
+            throw new Error('Failed to error')
+        } catch (e) {
+            expect(e).not.toEqual(new Error('Failed to error'))
+        }
+    })
+
+    it('should allow getting internal state of the module', async () => {
+        service.internalState.mockReturnValue(Promise.resolve({}))
+        const response = await module.internalState()
+        expect(service.internalState).toBeCalledWith('mod_test')
+        expect(response).toEqual({})
+        const new_mod = new EngineModule(service, {})
+        try {
+            new_mod.internalState()
+            throw new Error('Failed to error')
+        } catch (e) {
+            expect(e).not.toEqual(new Error('Failed to error'))
+        }
     })
 })

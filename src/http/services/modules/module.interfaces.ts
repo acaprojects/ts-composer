@@ -31,11 +31,3 @@ export interface IEngineModulePing {
     /** Any exception thrown from the ping attempt */
     exception?: string
 }
-
-/** Allowed roles for Engine Modules */
-export enum EngineModuleRole {
-    SSH = 0,
-    Device = 1,
-    Service = 2,
-    Logic = 3
-}

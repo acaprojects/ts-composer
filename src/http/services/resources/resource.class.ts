@@ -6,9 +6,9 @@ export abstract class EngineResource<T = IResourceService<any>> {
     /** Unique Identifier of the object */
     public readonly id: string
     /** Human readable name of the object */
-    private _name: string
+    protected _name: string
     /** Map of unsaved property changes */
-    private _changes: HashMap = {}
+    protected _changes: HashMap = {}
 
     constructor(protected service: T, raw_data: HashMap) {
         this.id = raw_data.id

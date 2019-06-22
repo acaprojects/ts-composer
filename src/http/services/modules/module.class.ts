@@ -1,6 +1,7 @@
 import { HashMap } from '../../../utilities/types.utilities'
+import { EngineDriverRole } from '../drivers/drivers.enums'
 import { EngineResource } from '../resources/resource.class'
-import { EngineModuleRole } from './module.interfaces'
+import { IEngineModulePing } from './module.interfaces'
 import { EngineModulesService } from './modules.service'
 
 export class EngineModule extends EngineResource<EngineModulesService> {
@@ -121,7 +122,7 @@ export class EngineModule extends EngineResource<EngineModulesService> {
         this.change('custom_name', value)
     }
 
-    /** Module settings */
+    /** Local settings for the module */
     public get settings(): HashMap {
         return JSON.parse(JSON.stringify(this._settings))
     }
@@ -131,11 +132,11 @@ export class EngineModule extends EngineResource<EngineModulesService> {
     }
 
     /** Type of module */
-    public get role(): EngineModuleRole {
+    public get role(): EngineDriverRole {
         return this._role
     }
 
-    public set role(value: EngineModuleRole) {
+    public set role(value: EngineDriverRole) {
         if (this.id) {
             throw new Error("Role cannot be changed from it's initial value")
         }
@@ -191,10 +192,10 @@ export class EngineModule extends EngineResource<EngineModulesService> {
     private _uri: string
     /** Custom name of the module */
     private _custom_name: string
-    /** Module settings */
+    /** Local settings for the module */
     private _settings: HashMap
     /** Type of module */
-    private _role: EngineModuleRole
+    private _role: EngineDriverRole
     /** Notes associated with the module */
     private _notes: string
     /** Ignore connection issues */
@@ -220,5 +221,56 @@ export class EngineModule extends EngineResource<EngineModulesService> {
         this.running = raw_data.running
         this.updated_at = raw_data.updated_at
         this.created_at = raw_data.created_at
+    }
+
+    /**
+     * Start the module and clears any existing caches
+     */
+    public start(): Promise<void> {
+        if (!this.id) {
+            throw new Error('You must save the module before it can be started')
+        }
+        return this.service.start(this.id)
+    }
+
+    /**
+     * Stops the module
+     */
+    public stop(): Promise<void> {
+        if (!this.id) {
+            throw new Error('You must save the module before it can be stopped')
+        }
+        return this.service.stop(this.id)
+    }
+
+    /**
+     * Pings the module
+     */
+    public ping(): Promise<IEngineModulePing> {
+        if (!this.id) {
+            throw new Error('You must save the module before it can be pinged')
+        }
+        return this.service.ping(this.id)
+    }
+
+    /**
+     * Get the state of the module
+     * @param lookup Status variable of interest. If set it will return only the state of this variable
+     */
+    public state(lookup?: string): Promise<HashMap> {
+        if (!this.id) {
+            throw new Error("You must save the module before it's state can be grabbed")
+        }
+        return this.service.state(this.id, lookup)
+    }
+
+    /**
+     * Get the internal state of the module
+     */
+    public internalState(): Promise<HashMap> {
+        if (!this.id) {
+            throw new Error("You must save the module before it's internal state can be grabbed")
+        }
+        return this.service.internalState(this.id)
     }
 }
