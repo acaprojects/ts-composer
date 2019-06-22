@@ -7,5 +7,5 @@ export interface IEngineDependencyQuery {
     /** Offset the page of results. Max `10000` */
     offset?: number
     /** Filter result by type of dependency. One of either `ssh`, `device`, `service` or `logic` */
-    role: 'ssh' | 'device' | 'service' | 'logic'
+    role?: 'ssh' | 'device' | 'service' | 'logic'
 }
