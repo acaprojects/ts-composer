@@ -123,12 +123,12 @@ export class EngineHttpClient {
         type: HttpResponseType
     ): Observable<HttpResponse> {
         return new Observable<HttpResponse>(obs => {
-            let ajax_obs: Observable<AjaxResponse | HttpError>
+            let ajax_obs: Observable<HttpResponse | HttpError>
             switch (method) {
                 case 'get':
                 case 'delete':
                     ajax_obs = ajax[method](url, options.headers).pipe(
-                        map(r => this.transform(r, options.response_type)),
+                        map(r => this.transform(r, options.response_type as any)),
                         catchError(e => of(this.error(e)))
                     )
                     break

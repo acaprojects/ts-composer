@@ -27,11 +27,13 @@ export abstract class EngineResource<T = IResourceService<any>> {
     /**
      * Save any changes made to the server
      */
-    public async save(): Promise<T> {
+    public async save(): Promise<EngineResource> {
+        const changes: HashMap = this.changes
+        const me: EngineResource = this as any
         if (Object.keys(this._changes).length > 0) {
             return this.id
-                ? (this.service as any).update(this.id, { ...this, ...this._changes })
-                : (this.service as any).add({ ...this, ...this._changes })
+                ? (this.service as any).update(this.id, { ...me, ...changes })
+                : (this.service as any).add({ ...me, ...changes })
         } else {
             return Promise.reject('No changes have been made')
         }
