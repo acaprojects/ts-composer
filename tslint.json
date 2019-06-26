@@ -12,7 +12,7 @@
         "no-unused-expression": true,
         "one-line": [true, "check-open-brace", "check-whitespace"],
         "quotemark": [true, "single", "backtick"],
-        "semicolon": true,
+        "semicolon": [true, "always"],
         "typedef-whitespace": [
             true,
             {
