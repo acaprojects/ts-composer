@@ -5,47 +5,32 @@ import { ajax, AjaxResponse, AjaxError } from 'rxjs/ajax'
 import { log } from '../utilities/general.utilities'
 import { HashMap } from '../utilities/types.utilities'
 import { EngineAuthService } from '../auth/auth.service'
-
-type HttpResponseType = 'json' | 'text' | 'void'
-
-type HttpResponse = HashMap | string | void
-
-interface HttpOptions {
-    headers?: HashMap<string>
-    body?: any
-    response_type: HttpResponseType
-}
-
-interface HttpJsonOptions extends HttpOptions {
-    response_type: 'json'
-}
-
-interface HttpTextOptions extends HttpOptions {
-    response_type: 'text'
-}
-
-interface HttpVoidOptions extends HttpOptions {
-    response_type: 'void'
-}
-
-enum HttpErrorCode {
-    OK = 200
-}
-
-export interface HttpError {
-    status: HttpErrorCode
-    message: string
-}
+import {
+    HttpJsonOptions,
+    HttpTextOptions,
+    HttpOptions,
+    HttpResponse,
+    HttpVoidOptions,
+    HttpResponseType,
+    HttpError,
+    HttpVerb
+} from './http.interfaces'
 
 export const engine = {
     log,
     ajax
 }
 
-type METHOD = 'get' | 'post' | 'put' | 'patch' | 'delete'
+const REQUEST = {
+    GET: ajax.get,
+    PUT: ajax.put,
+    PATCH: ajax.patch,
+    POST: ajax.post,
+    DELETE: ajax.delete
+}
 
 export class EngineHttpClient {
-    constructor(private _auth: EngineAuthService) {}
+    constructor(protected _auth: EngineAuthService) {}
 
     /**
      *
@@ -58,7 +43,7 @@ export class EngineHttpClient {
         url: string,
         options: HttpOptions = { response_type: 'json' }
     ): Observable<HttpResponse> {
-        return this.request('get', url, options, options.response_type)
+        return this.request('GET', url, options, options.response_type)
     }
 
     public post(url: string, body: any, options?: HttpJsonOptions): Observable<HashMap>
@@ -68,7 +53,7 @@ export class EngineHttpClient {
         body: any,
         options: HttpOptions = { response_type: 'json' }
     ): Observable<HttpResponse> {
-        return this.request('post', url, { body, ...options }, options.response_type)
+        return this.request('POST', url, { body, ...options }, options.response_type)
     }
 
     public put(url: string, body: any, options?: HttpJsonOptions): Observable<HashMap>
@@ -78,11 +63,11 @@ export class EngineHttpClient {
         body: any,
         options: HttpOptions = { response_type: 'json' }
     ): Observable<HttpResponse> {
-        return this.request('put', url, { body, ...options }, options.response_type)
+        return this.request('PUT', url, { body, ...options }, options.response_type)
     }
 
     public patch(url: string, body: any, options: HttpOptions): Observable<HttpResponse> {
-        return this.request('patch', url, { body, ...options }, options.response_type || 'json')
+        return this.request('PATCH', url, { body, ...options }, options.response_type || 'json')
     }
 
     public delete(url: string, options?: HttpJsonOptions): Observable<HashMap>
@@ -92,7 +77,7 @@ export class EngineHttpClient {
         url: string,
         options: HttpOptions = { response_type: 'void' }
     ): Observable<HttpResponse> {
-        return this.request('delete', url, options, options.response_type)
+        return this.request('DELETE', url, options, options.response_type)
     }
 
     private transform(response: AjaxResponse, type: 'json'): HashMap
@@ -117,7 +102,7 @@ export class EngineHttpClient {
     }
 
     private request(
-        method: METHOD,
+        method: HttpVerb,
         url: string,
         options: HttpOptions,
         type: HttpResponseType
@@ -125,17 +110,17 @@ export class EngineHttpClient {
         return new Observable<HttpResponse>(obs => {
             let ajax_obs: Observable<HttpResponse | HttpError>
             switch (method) {
-                case 'get':
-                case 'delete':
-                    ajax_obs = ajax[method](url, options.headers).pipe(
+                case 'GET':
+                case 'DELETE':
+                    ajax_obs = REQUEST[method](url, options.headers).pipe(
                         map(r => this.transform(r, options.response_type as any)),
                         catchError(e => of(this.error(e)))
                     )
                     break
-                case 'patch':
-                case 'put':
-                case 'post':
-                    ajax_obs = ajax[method](url, options.body, options.headers).pipe(
+                case 'PATCH':
+                case 'PUT':
+                case 'POST':
+                    ajax_obs = REQUEST[method](url, options.body, options.headers).pipe(
                         // map(r => this.transform(r, options.response_type || 'json')),
                         catchError(e => of(this.error(e)))
                     )
