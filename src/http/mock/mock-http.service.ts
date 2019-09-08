@@ -4,13 +4,18 @@ import { concatMap, delay } from 'rxjs/operators'
 import { EngineHttpClient } from '../http.service'
 import { HashMap } from '../../utilities/types.utilities'
 import { log, convertPairStringToMap } from '../../utilities/general.utilities'
-import { MockHttpRequestHandler, MockHttpRequest } from './mock-http.interfaces'
+import {
+    MockHttpRequestHandler,
+    MockHttpRequest,
+    MockHttpRequestHandlerOptions
+} from './mock-http.interfaces'
 import {
     HttpOptions,
     HttpResponse,
     HttpVerb,
     HttpJsonOptions,
-    HttpTextOptions
+    HttpTextOptions,
+    HttpVoidOptions
 } from '../http.interfaces'
 import { EngineAuthService } from '../../auth/auth.service'
 
@@ -18,7 +23,7 @@ declare global {
     interface Window {
         control: {
             [name: string]: any
-            handlers: MockHttpRequestHandler[]
+            handlers: MockHttpRequestHandlerOptions[]
         }
     }
 }
@@ -72,10 +77,7 @@ export class MockEngineHttpClient extends EngineHttpClient {
 
     public get(url: string, options?: HttpJsonOptions): Observable<HashMap>
     public get(url: string, options?: HttpTextOptions): Observable<string>
-    public get(
-        url: string,
-        options: HttpOptions = { response_type: 'json' }
-    ): Observable<HttpResponse> {
+    public get(url: string, options?: HttpOptions): Observable<HttpResponse> {
         const handler = this.findRequestHandler('GET', url)
         if (handler) {
             const request = this.processRequest(url, handler)
@@ -86,12 +88,65 @@ export class MockEngineHttpClient extends EngineHttpClient {
         return super.get(url, options as any)
     }
 
+    public post(url: string, body: any, options?: HttpJsonOptions): Observable<HashMap>
+    public post(url: string, body: any, options?: HttpTextOptions): Observable<string>
+    public post(url: string, body: any, options?: HttpOptions): Observable<HttpResponse> {
+        const handler = this.findRequestHandler('POST', url)
+        if (handler) {
+            const request = this.processRequest(url, handler, body)
+            return from([handler.callback(request)]).pipe(
+                concatMap(item => of(item).pipe(delay(Math.floor(Math.random() * 300 + 50))))
+            )
+        }
+        return super.post(url, body, options as any)
+    }
+
+    public put(url: string, body: any, options?: HttpJsonOptions): Observable<HashMap>
+    public put(url: string, body: any, options?: HttpTextOptions): Observable<string>
+    public put(url: string, body: any, options?: HttpOptions): Observable<HttpResponse> {
+        const handler = this.findRequestHandler('PUT', url)
+        if (handler) {
+            const request = this.processRequest(url, handler, body)
+            return from([handler.callback(request)]).pipe(
+                concatMap(item => of(item).pipe(delay(Math.floor(Math.random() * 300 + 50))))
+            )
+        }
+        return super.put(url, body, options as any)
+    }
+
+    public patch(url: string, body: any, options?: HttpJsonOptions): Observable<HashMap>
+    public patch(url: string, body: any, options?: HttpTextOptions): Observable<string>
+    public patch(url: string, body: any, options?: HttpOptions): Observable<HttpResponse> {
+        const handler = this.findRequestHandler('PATCH', url)
+        if (handler) {
+            const request = this.processRequest(url, handler, body)
+            return from([handler.callback(request)]).pipe(
+                concatMap(item => of(item).pipe(delay(Math.floor(Math.random() * 300 + 50))))
+            )
+        }
+        return super.patch(url, body, options as any)
+    }
+
+    public delete(url: string, options?: HttpJsonOptions): Observable<HashMap>
+    public delete(url: string, options?: HttpTextOptions): Observable<string>
+    public delete(url: string, options?: HttpVoidOptions): Observable<void>
+    public delete(url: string, options?: HttpOptions): Observable<HttpResponse> {
+        const handler = this.findRequestHandler('DELETE', url)
+        if (handler) {
+            const request = this.processRequest(url, handler)
+            return from([handler.callback(request)]).pipe(
+                concatMap(item => of(item).pipe(delay(Math.floor(Math.random() * 300 + 50))))
+            )
+        }
+        return super.delete(url, options as any)
+    }
+
     /**
      * Find a request handler for the given URL and method
      * @param method HTTP verb for the request
      * @param url URL of the request
      */
-    private findRequestHandler(method: HttpVerb, url: string): MockHttpRequestHandler | null {
+    public findRequestHandler(method: HttpVerb, url: string): MockHttpRequestHandler | null {
         const path = url.replace(/(http|https):\/\/[a-zA-Z0-9.]*:?([0-9]*)?/g, '').split('?')[0]
         const route_parts = path.split('/')
         const method_handlers: MockHttpRequestHandler[] = Object.keys(this._handlers).reduce<
@@ -126,7 +181,8 @@ export class MockEngineHttpClient extends EngineHttpClient {
      */
     private processRequest<T = any>(
         url: string,
-        handler: MockHttpRequestHandler<T>
+        handler: MockHttpRequestHandler<T>,
+        body?: any
     ): MockHttpRequest<T> {
         const parts = url.replace(/(http|https):\/\/[a-zA-Z0-9.]*:?([0-9]*)?/g, '').split('?')
         const path = parts[0]
@@ -145,7 +201,8 @@ export class MockEngineHttpClient extends EngineHttpClient {
             method: handler.method,
             metadata: handler.metadata,
             route_params,
-            query_params
+            query_params,
+            body
         }
     }
 }
