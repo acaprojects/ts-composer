@@ -1,4 +1,4 @@
-import { Observable, of } from 'rxjs'
+import { Observable, of, throwError } from 'rxjs'
 import { map, catchError } from 'rxjs/operators'
 import { ajax, AjaxResponse, AjaxError } from 'rxjs/ajax'
 
@@ -13,77 +13,151 @@ import {
     HttpVoidOptions,
     HttpResponseType,
     HttpError,
-    HttpVerb
+    HttpVerb,
+    HttpStatusCode
 } from './http.interfaces'
 
-export const engine = {
+export const engine: any = {
     log,
     ajax
-}
-
-const REQUEST = {
-    GET: ajax.get,
-    PUT: ajax.put,
-    PATCH: ajax.patch,
-    POST: ajax.post,
-    DELETE: ajax.delete
 }
 
 export class EngineHttpClient {
     constructor(protected _auth: EngineAuthService) {}
 
     /**
-     *
-     * @param url
-     * @param options
+     * Perform AJAX HTTP GET request
+     * @param url URL of the GET endpoint
+     * @param options Options to add to the request
      */
     public get(url: string, options?: HttpJsonOptions): Observable<HashMap>
     public get(url: string, options?: HttpTextOptions): Observable<string>
-    public get(
-        url: string,
-        options: HttpOptions = { response_type: 'json' }
-    ): Observable<HttpResponse> {
-        return this.request('GET', url, options, options.response_type)
+    public get(url: string, options?: HttpOptions): Observable<HttpResponse> {
+        if (!options) {
+            options = { response_type: 'json' }
+        }
+        if (this._auth.has_token) {
+            return this.request('GET', url, { response_type: 'json', ...options })
+        }
+        return new Observable(obs => {
+            setTimeout(() => {
+                this.get(url, options as any).subscribe(
+                    (resp: HttpResponse) => obs.next(resp),
+                    (err: HttpError) => obs.error(err),
+                    () => obs.complete()
+                )
+            }, 500)
+        })
     }
 
+    /**
+     * Perform AJAX HTTP POST request
+     * @param url URL of the POST endpoint
+     * @param body Body contents of the request
+     * @param options Options to add to the request
+     */
     public post(url: string, body: any, options?: HttpJsonOptions): Observable<HashMap>
     public post(url: string, body: any, options?: HttpTextOptions): Observable<string>
-    public post(
-        url: string,
-        body: any,
-        options: HttpOptions = { response_type: 'json' }
-    ): Observable<HttpResponse> {
-        return this.request('POST', url, { body, ...options }, options.response_type)
+    public post(url: string, body: any, options?: HttpOptions): Observable<HttpResponse> {
+        if (!options) {
+            options = { response_type: 'json' }
+        }
+        if (this._auth.has_token) {
+            return this.request('POST', url, { body, response_type: 'json', ...options })
+        }
+        return new Observable(obs => {
+            setTimeout(() => {
+                this.post(url, body, options as any).subscribe(
+                    (resp: HttpResponse) => obs.next(resp),
+                    (err: HttpError) => obs.error(err),
+                    () => obs.complete()
+                )
+            }, 500)
+        })
     }
 
+    /**
+     * Perform AJAX HTTP PUT request
+     * @param url URL of the PUT endpoint
+     * @param body Body contents of the request
+     * @param options Options to add to the request
+     */
     public put(url: string, body: any, options?: HttpJsonOptions): Observable<HashMap>
     public put(url: string, body: any, options?: HttpTextOptions): Observable<string>
-    public put(
-        url: string,
-        body: any,
-        options: HttpOptions = { response_type: 'json' }
-    ): Observable<HttpResponse> {
-        return this.request('PUT', url, { body, ...options }, options.response_type)
+    public put(url: string, body: any, options?: HttpOptions): Observable<HttpResponse> {
+        if (!options) {
+            options = { response_type: 'json' }
+        }
+        if (this._auth.has_token) {
+            return this.request('PUT', url, { body, response_type: 'json', ...options })
+        }
+        return new Observable(obs => {
+            setTimeout(() => {
+                this.put(url, body, options as any).subscribe(
+                    (resp: HttpResponse) => obs.next(resp),
+                    (err: HttpError) => obs.error(err),
+                    () => obs.complete()
+                )
+            }, 500)
+        })
     }
 
-    public patch(url: string, body: any, options: HttpOptions): Observable<HttpResponse> {
-        return this.request('PATCH', url, { body, ...options }, options.response_type || 'json')
+    /**
+     * Perform AJAX HTTP PATCH request
+     * @param url URL of the PATCH endpoint
+     * @param body Body contents of the request
+     * @param options Options to add to the request
+     */
+    public patch(url: string, body: any, options?: HttpOptions): Observable<HttpResponse> {
+        if (this._auth.has_token) {
+            return this.request('PATCH', url, { body, response_type: 'json', ...options })
+        }
+        return new Observable(obs => {
+            setTimeout(() => {
+                this.patch(url, body, options as any).subscribe(
+                    (resp: HttpResponse) => obs.next(resp),
+                    (err: HttpError) => obs.error(err),
+                    () => obs.complete()
+                )
+            }, 500)
+        })
     }
 
+    /**
+     * Perform AJAX HTTP DELETE request
+     * @param url URL of the DELETE endpoint
+     * @param options Options to add to the request
+     */
     public delete(url: string, options?: HttpJsonOptions): Observable<HashMap>
     public delete(url: string, options?: HttpTextOptions): Observable<string>
     public delete(url: string, options?: HttpVoidOptions): Observable<void>
-    public delete(
-        url: string,
-        options: HttpOptions = { response_type: 'void' }
-    ): Observable<HttpResponse> {
-        return this.request('DELETE', url, options, options.response_type)
+    public delete(url: string, options?: HttpOptions): Observable<HttpResponse> {
+        if (!options) {
+            options = { response_type: 'void' }
+        }
+        if (this._auth.has_token) {
+            return this.request('DELETE', url, { response_type: 'void', ...options })
+        }
+        return new Observable(obs => {
+            setTimeout(() => {
+                this.delete(url, options as any).subscribe(
+                    (resp: HttpResponse) => obs.next(resp),
+                    (err: HttpError) => obs.error(err),
+                    () => obs.complete()
+                )
+            }, 500)
+        })
     }
 
+    /**
+     * Convert response into the format requested
+     * @param response Request response contents
+     * @param type Type of data to return
+     */
     private transform(response: AjaxResponse, type: 'json'): HashMap
     private transform(response: AjaxResponse, type: 'text'): string
     private transform(response: AjaxResponse, type: 'void'): void
-    private transform(response: AjaxResponse, type: HttpResponseType = 'json'): HttpResponse {
+    private transform(response: AjaxResponse, type: HttpResponseType): HttpResponse {
         switch (type) {
             case 'json':
                 return JSON.parse(response.responseText)
@@ -94,35 +168,49 @@ export class EngineHttpClient {
         }
     }
 
+    /**
+     * Format error message
+     * @param error Message to format
+     */
     private error(error: AjaxError): HttpError {
+        if (error.status === HttpStatusCode.UNAUTHORISED) {
+            this._auth.refreshAuthority()
+        }
         return {
             status: error.status,
             message: error.message
         }
     }
 
-    private request(
-        method: HttpVerb,
-        url: string,
-        options: HttpOptions,
-        type: HttpResponseType
-    ): Observable<HttpResponse> {
+    /**
+     * Perform AJAX Request
+     * @param method Request verb. `GET`, `POST`, `PUT`, `PATCH`, or `DELETE`
+     * @param url URL of the request endpoint
+     * @param options Options to add to the request
+     */
+    private request(method: HttpVerb, url: string, options: HttpOptions): Observable<HttpResponse> {
         return new Observable<HttpResponse>(obs => {
             let ajax_obs: Observable<HttpResponse | HttpError>
+            // Add auth header to request
+            if (!options.headers) {
+                options.headers = {}
+            }
+            options.headers.Authorization = this._auth.token
+            const verb = method.toLowerCase()
             switch (method) {
                 case 'GET':
                 case 'DELETE':
-                    ajax_obs = REQUEST[method](url, options.headers).pipe(
-                        map(r => this.transform(r, options.response_type as any)),
-                        catchError(e => of(this.error(e)))
+                    ajax_obs = engine.ajax[verb](url, options.headers).pipe(
+                        map((r: AjaxResponse) => this.transform(r, options.response_type as any)),
+                        catchError(e => throwError(this.error(e)))
                     )
                     break
                 case 'PATCH':
                 case 'PUT':
                 case 'POST':
-                    ajax_obs = REQUEST[method](url, options.body, options.headers).pipe(
-                        // map(r => this.transform(r, options.response_type || 'json')),
-                        catchError(e => of(this.error(e)))
+                    ajax_obs = engine.ajax[verb](url, options.body, options.headers).pipe(
+                        map((r: AjaxResponse) => this.transform(r, options.response_type as any)),
+                        catchError(e => throwError(this.error(e)))
                     )
                     break
             }

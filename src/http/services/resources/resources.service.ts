@@ -3,8 +3,9 @@ import { BehaviorSubject, Observable, Subject, Subscriber } from 'rxjs'
 import { toQueryString } from '../../../utilities/api.utilities'
 import { EngineBaseClass } from '../../../utilities/base.class'
 import { HashMap } from '../../../utilities/types.utilities'
-import { EngineHttpClient, HttpError } from '../../http.service'
+import { EngineHttpClient } from '../../http.service'
 import { IResourceService } from './resources.interface'
+import { HttpError } from '../../http.interfaces'
 
 export abstract class EngineResourceService<T> extends EngineBaseClass
     implements IResourceService<T> {

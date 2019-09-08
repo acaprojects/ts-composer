@@ -10,26 +10,26 @@ export type HttpResponse = HashMap | string | void
 export interface HttpOptions {
     headers?: HashMap<string>
     body?: any
-    response_type: HttpResponseType
+    response_type?: HttpResponseType
 }
 
 export interface HttpJsonOptions extends HttpOptions {
-    response_type: 'json'
+    response_type?: 'json'
 }
 
 export interface HttpTextOptions extends HttpOptions {
-    response_type: 'text'
+    response_type?: 'text'
 }
 
 export interface HttpVoidOptions extends HttpOptions {
-    response_type: 'void'
+    response_type?: 'void'
 }
 
-export enum HttpErrorCode {
-    OK = 200
+export enum HttpStatusCode {
+    UNAUTHORISED = 401
 }
 
 export interface HttpError {
-    status: HttpErrorCode
+    status: HttpStatusCode
     message: string
 }
