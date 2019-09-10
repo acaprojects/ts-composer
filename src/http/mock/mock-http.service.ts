@@ -35,6 +35,7 @@ export class MockEngineHttpClient extends EngineHttpClient {
     constructor(protected _auth: EngineAuthService) {
         super(_auth)
         // Register global space mock request handlers
+        /* istanbul ignore else */
         if (window.control && window.control.handlers) {
             for (const handler of window.control.handlers) {
                 this.register(handler.path, handler.metadata, handler.method, handler.callback)
@@ -73,6 +74,7 @@ export class MockEngineHttpClient extends EngineHttpClient {
             path_structure: path_parts.map(i => (i[0] === ':' ? i.replace(':', '') : ''))
         }
         this._handlers[key] = handler
+        log('HTTP(M)', `Added handler for ${method} ${path}`)
     }
 
     public get(url: string, options?: HttpJsonOptions): Observable<HashMap>
@@ -81,9 +83,7 @@ export class MockEngineHttpClient extends EngineHttpClient {
         const handler = this.findRequestHandler('GET', url)
         if (handler) {
             const request = this.processRequest(url, handler)
-            return from([handler.callback(request)]).pipe(
-                concatMap(item => of(item).pipe(delay(Math.floor(Math.random() * 300 + 50))))
-            )
+            return this.mock_request(handler, request)
         }
         return super.get(url, options as any)
     }
@@ -94,9 +94,7 @@ export class MockEngineHttpClient extends EngineHttpClient {
         const handler = this.findRequestHandler('POST', url)
         if (handler) {
             const request = this.processRequest(url, handler, body)
-            return from([handler.callback(request)]).pipe(
-                concatMap(item => of(item).pipe(delay(Math.floor(Math.random() * 300 + 50))))
-            )
+            return this.mock_request(handler, request)
         }
         return super.post(url, body, options as any)
     }
@@ -107,9 +105,7 @@ export class MockEngineHttpClient extends EngineHttpClient {
         const handler = this.findRequestHandler('PUT', url)
         if (handler) {
             const request = this.processRequest(url, handler, body)
-            return from([handler.callback(request)]).pipe(
-                concatMap(item => of(item).pipe(delay(Math.floor(Math.random() * 300 + 50))))
-            )
+            return this.mock_request(handler, request)
         }
         return super.put(url, body, options as any)
     }
@@ -120,9 +116,7 @@ export class MockEngineHttpClient extends EngineHttpClient {
         const handler = this.findRequestHandler('PATCH', url)
         if (handler) {
             const request = this.processRequest(url, handler, body)
-            return from([handler.callback(request)]).pipe(
-                concatMap(item => of(item).pipe(delay(Math.floor(Math.random() * 300 + 50))))
-            )
+            return this.mock_request(handler, request)
         }
         return super.patch(url, body, options as any)
     }
@@ -134,9 +128,7 @@ export class MockEngineHttpClient extends EngineHttpClient {
         const handler = this.findRequestHandler('DELETE', url)
         if (handler) {
             const request = this.processRequest(url, handler)
-            return from([handler.callback(request)]).pipe(
-                concatMap(item => of(item).pipe(delay(Math.floor(Math.random() * 300 + 50))))
-            )
+            return this.mock_request(handler, request)
         }
         return super.delete(url, options as any)
     }
@@ -204,5 +196,17 @@ export class MockEngineHttpClient extends EngineHttpClient {
             query_params,
             body
         }
+    }
+
+    /**
+     * Perform request and return an observable for the generated response
+     * @param handler Request handler
+     * @param request Request contents
+     */
+    private mock_request(handler: MockHttpRequestHandler, request: MockHttpRequest) {
+        const result = handler.callback(request)
+        return from([result]).pipe(
+            concatMap(item => of(item).pipe(delay(Math.floor(Math.random() * 300 + 50))))
+        )
     }
 }

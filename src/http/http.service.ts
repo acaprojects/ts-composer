@@ -158,11 +158,12 @@ export class EngineHttpClient {
     private transform(response: AjaxResponse, type: 'text'): string
     private transform(response: AjaxResponse, type: 'void'): void
     private transform(response: AjaxResponse, type: HttpResponseType): HttpResponse {
+        const text = response.responseText
         switch (type) {
             case 'json':
-                return JSON.parse(response.responseText)
+                return text ? JSON.parse(text) : {}
             case 'text':
-                return response.responseText
+                return text
             case 'void':
                 return
         }
