@@ -20,7 +20,7 @@ export interface IEngineModuleQuery {
     as_of?: number
 }
 
-/** Engine response from `ping` module task endpoint `/control/api/<mod_id>/ping` */
+/** Engine response from `ping` module task endpoint `/api/engine/v1/<mod_id>/ping` */
 export interface IEngineModulePing {
     /** Host address of the module device */
     host: string

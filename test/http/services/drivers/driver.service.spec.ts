@@ -24,7 +24,7 @@ describe('EngineDriversService', () => {
     it('allow querying dependencies index', async () => {
         http.get.mockReturnValueOnce(of({ results: [{ id: 'test' }], total: 10 }))
         const result = await service.query()
-        expect(http.get).toBeCalledWith('/control/api/dependencies')
+        expect(http.get).toBeCalledWith('/api/engine/v1/dependencies')
         expect(result).toBeInstanceOf(Array)
         expect(result[0]).toBeInstanceOf(EngineDriver)
     })
@@ -32,7 +32,7 @@ describe('EngineDriversService', () => {
     it('allow reloading a driver', async () => {
         http.post.mockReturnValueOnce(of(null))
         await service.reload('test')
-        expect(http.post).toBeCalledWith('/control/api/dependencies/test/reload', {
+        expect(http.post).toBeCalledWith('/api/engine/v1/dependencies/test/reload', {
             _task: 'reload',
             id: 'test'
         })

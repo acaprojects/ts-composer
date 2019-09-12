@@ -24,7 +24,7 @@ describe('EngineSystemsService', () => {
     it('allow querying systems index', async () => {
         http.get.mockReturnValueOnce(of({ results: [{ id: 'test' }], total: 10 }))
         const result = await service.query()
-        expect(http.get).toBeCalledWith('/control/api/systems')
+        expect(http.get).toBeCalledWith('/api/engine/v1/systems')
         expect(result).toBeInstanceOf(Array)
         expect(result[0]).toBeInstanceOf(EngineSystem)
     })
@@ -32,14 +32,14 @@ describe('EngineSystemsService', () => {
     it('allow querying systems show', async () => {
         http.get.mockReturnValueOnce(of({ id: 'test' }))
         const result = await service.show('test')
-        expect(http.get).toBeCalledWith('/control/api/systems/test')
+        expect(http.get).toBeCalledWith('/api/engine/v1/systems/test')
         expect(result).toBeInstanceOf(EngineSystem)
     })
 
     it('allow removing modules', async () => {
         http.post.mockReturnValueOnce(of(null))
         await service.remove('test', 'module_1')
-        expect(http.post).toBeCalledWith('/control/api/systems/test/remove', {
+        expect(http.post).toBeCalledWith('/api/engine/v1/systems/test/remove', {
             module_id: 'module_1',
             _task: 'remove',
             id: 'test'
@@ -49,7 +49,7 @@ describe('EngineSystemsService', () => {
     it('allow starting a system', async () => {
         http.post.mockReturnValueOnce(of(null))
         await service.start('test')
-        expect(http.post).toBeCalledWith('/control/api/systems/test/start', {
+        expect(http.post).toBeCalledWith('/api/engine/v1/systems/test/start', {
             _task: 'start',
             id: 'test'
         })
@@ -58,7 +58,7 @@ describe('EngineSystemsService', () => {
     it('allow stopping a system', async () => {
         http.post.mockReturnValueOnce(of(null))
         await service.stop('test')
-        expect(http.post).toBeCalledWith('/control/api/systems/test/stop', {
+        expect(http.post).toBeCalledWith('/api/engine/v1/systems/test/stop', {
             _task: 'stop',
             id: 'test'
         })
@@ -67,7 +67,7 @@ describe('EngineSystemsService', () => {
     it('allow executing methods on modules', async () => {
         http.post.mockReturnValueOnce(of('test')).mockReturnValueOnce(of('test2'))
         let resp = await service.execute('test', 'module')
-        expect(http.post).toBeCalledWith('/control/api/systems/test/exec', {
+        expect(http.post).toBeCalledWith('/api/engine/v1/systems/test/exec', {
             _task: 'exec',
             id: 'test',
             module: 'module',
@@ -76,7 +76,7 @@ describe('EngineSystemsService', () => {
         })
         expect(resp).toBe('test')
         resp = await service.execute('test', 'module', 2, ['let', 'me', 'go'])
-        expect(http.post).toBeCalledWith('/control/api/systems/test/exec', {
+        expect(http.post).toBeCalledWith('/api/engine/v1/systems/test/exec', {
             _task: 'exec',
             id: 'test',
             module: 'module',
@@ -92,11 +92,11 @@ describe('EngineSystemsService', () => {
             .mockReturnValueOnce(of({ test: 'yeah2' }))
         let value = await service.state('test', 'module', 1, 'look')
         expect(http.get).toBeCalledWith(
-            `/control/api/systems/test/state?module=module&index=1&lookup=look`
+            `/api/engine/v1/systems/test/state?module=module&index=1&lookup=look`
         )
         expect(value).toEqual({ test: 'yeah' })
         value = await service.state('test', 'module')
-        expect(http.get).toBeCalledWith(`/control/api/systems/test/state?module=module&index=1`)
+        expect(http.get).toBeCalledWith(`/api/engine/v1/systems/test/state?module=module&index=1`)
         expect(value).toEqual({ test: 'yeah2' })
     })
 
@@ -105,17 +105,17 @@ describe('EngineSystemsService', () => {
             .mockReturnValueOnce(of({ test: { arity: 1 } }))
             .mockReturnValueOnce(of({ test: { arity: 2 } }))
         let value = await service.functionList('test', 'module')
-        expect(http.get).toBeCalledWith(`/control/api/systems/test/funcs?module=module&index=1`)
+        expect(http.get).toBeCalledWith(`/api/engine/v1/systems/test/funcs?module=module&index=1`)
         expect(value).toEqual({ test: { arity: 1 } })
         value = await service.functionList('test', 'module', 2)
-        expect(http.get).toBeCalledWith(`/control/api/systems/test/funcs?module=module&index=2`)
+        expect(http.get).toBeCalledWith(`/api/engine/v1/systems/test/funcs?module=module&index=2`)
         expect(value).toEqual({ test: { arity: 2 } })
     })
 
     it('allow querying module types', async () => {
         http.get.mockReturnValueOnce(of({ test: 0 }))
         const value = await service.types('test')
-        expect(http.get).toBeCalledWith(`/control/api/systems/test/count`)
+        expect(http.get).toBeCalledWith(`/api/engine/v1/systems/test/count`)
         expect(value).toEqual({ test: 0 })
     })
 })

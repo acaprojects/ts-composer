@@ -16,7 +16,7 @@ export abstract class EngineResourceService<T> extends EngineBaseClass
 
     /** API Route of the service */
     public get api_route() {
-        return `/control/api/${this._api_route}`
+        return `/api/engine/v1/${this._api_route}`
     }
     /** Display name of the service */
     protected _name: string
