@@ -2,45 +2,13 @@ import { ajax } from 'rxjs/ajax'
 import { Md5 } from 'ts-md5/dist/md5'
 
 import { log, getFragments, generateNonce } from '../utilities/general.utilities'
-import { EngineAuthority, EngineTokenResponse } from './auth.interfaces'
+import { EngineAuthority, EngineTokenResponse, EngineAuthOptions } from './auth.interfaces'
 import { HashMap } from '../utilities/types.utilities'
 
 import * as dayjs from 'dayjs'
 
-export interface EngineAuthOptions {
-    /** URI for generating new tokens */
-    token_uri: string
-    /** URI for handling authentication redirects */
-    redirect_uri: string
-    /** Scope of the user permissions needed to access the application  */
-    scope: string
-    /** Which keystore to use localStorage or sessionStorage. Defaults to `'local'' */
-    storage?: 'local' | 'session'
-    /** Whether to perform authentication in an iframe */
-    use_iframe?: boolean
-    /** Whether service should handling user login. Defaults to `true` */
-    handle_login?: boolean
-}
-
 /** Method store to allow attaching spies for testing */
 export const engine = { ajax, log }
-
-/** Variable to hold the singleton of the auth service */
-let SERVICE_SINGLETON: EngineAuthService
-
-/**
- * Grab existing engine auth service or create a new one with the given options
- * @param options Service configuration options
- */
-export function getEngineAuthService(options?: EngineAuthOptions): EngineAuthService {
-    if (!SERVICE_SINGLETON) {
-        if (!options) {
-            throw new Error('[Composer][Auth] Options for intialising service are not defined.')
-        }
-        SERVICE_SINGLETON = new EngineAuthService(options)
-    }
-    return SERVICE_SINGLETON
-}
 
 export class EngineAuthService {
     /** Browser key store to use for authentication credentials. Defaults to localStorage */
@@ -57,12 +25,6 @@ export class EngineAuthService {
     private _code: string = ''
 
     constructor(private options: EngineAuthOptions) {
-        // Prevent duplicate instances of the service
-        if (SERVICE_SINGLETON) {
-            throw new Error(
-                '[Composer][Auth] Service has already been created use `getEngineAuthService` method to get it.'
-            )
-        }
         // Intialise storage
         this._storage = this.options.storage === 'session' ? sessionStorage : localStorage
         this._client_id = Md5.hashStr(this.options.redirect_uri, false) as string
@@ -89,6 +51,11 @@ export class EngineAuthService {
         return !!this.token
     }
 
+    /** Engine Authority details */
+    public get authority(): EngineAuthority | undefined {
+        return this._authority
+    }
+
     /**
      * Refresh authentication
      */
@@ -102,18 +69,24 @@ export class EngineAuthService {
      * @param state Additional state information for auth requests
      */
     public authorise(state?: string): Promise<string> {
-        if (this._promises.authorise) {
+        console.log('Authorise\n\n')
+        if (!this._promises.authorise) {
             this._promises.authorise = new Promise<string>((resolve, reject) => {
+                console.log('Authorising...\n\n')
                 const check_token = () => {
+                    console.log('Check token', this.token, '\n\n')
                     if (this.token) {
                         resolve(this.token)
                     } else {
                         if (this._code || this.refresh_token) {
                             this.generateToken().then(_ => resolve(this.token), _ => reject(_))
                         } else {
-                            const login_url = this.createLoginURL(state)
+                            const login_url = this.createLoginURL(state).replace(
+                                '{{url}}',
+                                encodeURIComponent(location.href)
+                            )
                             if (this.options.handle_login !== false) {
-                                location.href = login_url
+                                window.history.pushState({}, 'Test Title', login_url)
                             }
                         }
                     }
@@ -130,8 +103,8 @@ export class EngineAuthService {
     private loadAuthority(tries: number = 0) {
         engine.log('Auth', 'Loading authority...')
         let authority: EngineAuthority
-        engine.ajax('/auth/authority').subscribe(
-            resp => (authority = resp.response),
+        engine.ajax.get('/auth/authority').subscribe(
+            resp => (authority = JSON.parse(resp.responseText)),
             err => {
                 engine.log('Auth', `Failed to load authority(${err})`)
                 // Retry if authority fails to load
@@ -140,7 +113,7 @@ export class EngineAuthService {
             () => {
                 if (authority) {
                     this._authority = authority
-                    this.authorise()
+                    this.authorise().then(_ => null, _ => null)
                 }
             }
         )
@@ -150,15 +123,20 @@ export class EngineAuthService {
      * Check authentication token
      */
     private checkToken(): Promise<boolean> {
-        if (this._promises.check_token) {
+        console.log('Check token\n\n')
+        if (!this._promises.check_token) {
             this._promises.check_token = new Promise((resolve, reject) => {
                 if (this._authority) {
                     if (this.token) {
+                        console.log('Has token\n\n')
                         resolve()
                     } else {
+                        console.log('Check for auth parameters\n\n')
                         this.checkForAuthParameters().then(_ => resolve(_), _ => reject(_))
                     }
+                    this._promises.check_token = undefined
                 } else {
+                    console.log('No Authority\n\n')
                     setTimeout(() => {
                         this._promises.check_token = undefined
                         this.checkToken().then(_ => resolve(_), _ => reject(_))
@@ -173,7 +151,7 @@ export class EngineAuthService {
      * Check URL for auth parameters
      */
     private checkForAuthParameters(): Promise<boolean> {
-        if (this._promises.check_params) {
+        if (!this._promises.check_params) {
             this._promises.check_params = new Promise((resolve, reject) => {
                 let fragments = getFragments()
                 if ((!fragments || Object.keys(fragments).length <= 0) && sessionStorage) {
@@ -207,7 +185,9 @@ export class EngineAuthService {
                         }
                         // Store token expiry time
                         if (fragments.expires_in) {
-                            const expires_at = dayjs().add(parseInt(fragments.expires_in, 10), 's')
+                            const expires_at = dayjs()
+                                .add(parseInt(fragments.expires_in, 10), 's')
+                                .startOf('s')
                             this._storage.setItem(
                                 `${this._client_id}_expires_at`,
                                 `${expires_at.valueOf()}`
@@ -243,11 +223,11 @@ export class EngineAuthService {
         const response_type = 'token'
         const url =
             `${login_url}${has_query ? '&' : '?'}` +
-            `response_type=${encodeURIComponent(response_type)}`
-        ;+`client_id=${encodeURIComponent(this._client_id)}`
-        ;+`state=${encodeURIComponent(state)}`
-        ;+`redirect_uri=${encodeURIComponent(this.options.redirect_uri)}`
-        ;+`scope=${encodeURIComponent(this.options.scope)}`
+            `response_type=${encodeURIComponent(response_type)}` +
+            `client_id=${encodeURIComponent(this._client_id)}` +
+            `state=${encodeURIComponent(state)}` +
+            `redirect_uri=${encodeURIComponent(this.options.redirect_uri)}` +
+            `scope=${encodeURIComponent(this.options.scope)}`
 
         return url
     }
@@ -277,9 +257,9 @@ export class EngineAuthService {
             this._promises.generate_tokens = new Promise<void>((resolve, reject) => {
                 const token_url = this.createRefreshURL()
                 let tokens: EngineTokenResponse
-                engine.ajax({ url: token_url, method: 'POST' }).subscribe(
+                engine.ajax.post(token_url, '').subscribe(
                     resp => {
-                        tokens = resp.response as EngineTokenResponse
+                        tokens = JSON.parse(resp.responseText) as EngineTokenResponse
                     },
                     err => engine.log('Auth', 'Error generating new tokens.', err),
                     () => {
