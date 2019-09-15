@@ -1,13 +1,13 @@
-import { HashMap } from './types.utilities'
+import { HashMap } from './types.utilities';
 
 declare global {
     interface Window {
-        debug: boolean
+        debug: boolean;
     }
 }
 
-export type ConsoleIOStream = 'log' | 'warn' | 'debug' | 'error'
-
+export type ConsoleIOStream = 'log' | 'warn' | 'debug' | 'error';
+/* istanbul ignore next */
 /**
  * Log message to the console
  * @param type Where the message is from
@@ -24,55 +24,57 @@ export function log(
     color?: string
 ) {
     if (window.debug) {
-        const clr = color ? color : '#009688'
-        const COLOURS = ['color: #0288D1', `color:${clr}`, 'color:rgba(0,0,0,0.87)']
+        const clr = color ? color : '#009688';
+        const COLOURS = ['color: #0288D1', `color:${clr}`, 'color:rgba(0,0,0,0.87)'];
         if (args) {
             if (consoleHasColours()) {
-                console[out](`%c[COMPOSER]%c[${type}] %c${msg}`, ...COLOURS, args)
+                console[out](`%c[COMPOSER]%c[${type}] %c${msg}`, ...COLOURS, args);
             } else {
-                console[out](`[COMPOSER][${type}] ${msg}`, args)
+                console[out](`[COMPOSER][${type}] ${msg}`, args);
             }
         } else {
             if (consoleHasColours()) {
-                console[out](`%c[COMPOSER]%c[${type}] %c${msg}`, ...COLOURS)
+                console[out](`%c[COMPOSER]%c[${type}] %c${msg}`, ...COLOURS);
             } else {
-                console[out](`[COMPOSER][${type}] ${msg}`)
+                console[out](`[COMPOSER][${type}] ${msg}`);
             }
         }
     }
 }
-
+/* istanbul ignore next */
 /**
  * Whether the console has colours
  */
 export function consoleHasColours() {
-    const doc = document as any
-    return !(doc.documentMode || /Edge/.test(navigator.userAgent))
+    const doc = document as any;
+    return !(doc.documentMode || /Edge/.test(navigator.userAgent));
 }
 
 /**
  * Get URL paramters from hash or query string
  */
 export function getFragments(): HashMap<string> {
-    const hash = location.hash ? location.hash.slice(1) : ''
-    const query = location.search ? location.search.slice(1) : ''
-    let hash_fragments = {}
+    const hash = location.hash ? location.hash.slice(1) : '';
+    let query = location.search ? location.search.slice(1) : '';
+    let hash_fragments = {};
     if (hash) {
+        // Hash can also contain the query so we need to check for it
         if (hash.indexOf('?') >= 0) {
-            hash_fragments = convertPairStringToMap(hash.split('?')[1])
+            const parts = hash.split('?');
+            hash_fragments = convertPairStringToMap(parts[0]);
+            /* istanbul ignore else */
+            if (!query) {
+                query = parts[1];
+            }
         } else {
-            hash_fragments = convertPairStringToMap(hash)
+            hash_fragments = convertPairStringToMap(hash);
         }
     }
-    let query_fragments = {}
+    let query_fragments = {};
     if (query) {
-        if (query.indexOf('#') >= 0) {
-            query_fragments = convertPairStringToMap(query.split('#')[1])
-        } else {
-            query_fragments = convertPairStringToMap(query)
-        }
+        query_fragments = convertPairStringToMap(query);
     }
-    return { ...hash_fragments, ...query_fragments }
+    return { ...hash_fragments, ...query_fragments };
 }
 
 /**
@@ -80,13 +82,15 @@ export function getFragments(): HashMap<string> {
  * @param str String of values
  */
 export function convertPairStringToMap(str: string): HashMap<string> {
-    const map: HashMap<string> = {}
-    const str_pairs = str.split('&')
+    const map: HashMap<string> = {};
+    const str_pairs = str.split('&');
     for (const str_pair of str_pairs) {
-        const split_pair = str_pair.split('=')
-        map[decodeURIComponent(split_pair[0])] = decodeURIComponent(split_pair[1])
+        const split_pair = str_pair.split('=');
+        if (split_pair[1]) {
+            map[decodeURIComponent(split_pair[0])] = decodeURIComponent(split_pair[1]);
+        }
     }
-    return map
+    return map;
 }
 
 /**
@@ -94,10 +98,10 @@ export function convertPairStringToMap(str: string): HashMap<string> {
  * @param length Length of the nonce string. Defaults to 40 characters
  */
 export function generateNonce(length: number = 40): string {
-    const allowed_characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-    let nonce = ''
+    const allowed_characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let nonce = '';
     for (let i = 0; i < length; i++) {
-        nonce += allowed_characters.charAt(Math.floor(Math.random() * allowed_characters.length))
+        nonce += allowed_characters.charAt(Math.floor(Math.random() * allowed_characters.length));
     }
-    return nonce
+    return nonce;
 }

@@ -6,8 +6,7 @@ import {
 
 describe('General Utilities', () => {
     beforeEach(() => {
-        location.hash = '';
-        location.search = '';
+        window.history.pushState({}, 'Empty', '');
     });
 
     describe('generateNonce', () => {
@@ -44,13 +43,12 @@ describe('General Utilities', () => {
 
         it('should convert URL hash containing a search string into into a dictionary', () => {
             window.history.pushState({}, 'Test', `#test=false?not_test=true`);
-            expect(getFragments()).toEqual({ not_test: `true` });
+            expect(getFragments()).toEqual({ not_test: `true`, test: 'false' });
             window.history.pushState({}, 'Test', `#test=false?not_test=true&other=value`);
-            expect(getFragments()).toEqual({ not_test: `true`, other: `value` });
+            expect(getFragments()).toEqual({ not_test: `true`, test: 'false', other: `value` });
         });
 
         it('should convert URL query into into a dictionary', () => {
-            location.search = `?test=false`;
             window.history.pushState({}, 'Test', `?test=false`);
             expect(getFragments()).toEqual({ test: `false` });
             window.history.pushState({}, 'Test', `?test=false&other=value`);

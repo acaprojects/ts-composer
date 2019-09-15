@@ -221,7 +221,6 @@ export class EngineAuthService {
                 if ((!fragments || Object.keys(fragments).length <= 0) && sessionStorage) {
                     fragments = JSON.parse(sessionStorage.getItem('ENGINE.auth.params') || '{}');
                 }
-                console.log('Fragments:', fragments, '\n\n\n\n');
                 if (
                     fragments &&
                     (fragments.code || fragments.access_token || fragments.refresh_token)
@@ -240,7 +239,6 @@ export class EngineAuthService {
                     const saved_nonce = this._storage.getItem(`${this._client_id}_nonce`) || '';
                     const state_parts = (fragments.state || '').split(';');
                     const nonce = state_parts[0];
-                    console.log('Nonce:', saved_nonce, nonce, '\n\n\n\n');
                     if (saved_nonce === nonce) {
                         // Store access token
                         if (fragments.access_token) {
