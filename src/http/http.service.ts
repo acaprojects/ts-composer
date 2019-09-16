@@ -1,10 +1,10 @@
-import { Observable, of, throwError } from 'rxjs'
-import { map, catchError } from 'rxjs/operators'
-import { ajax, AjaxResponse, AjaxError } from 'rxjs/ajax'
+import { Observable, of, throwError } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
+import { ajax, AjaxResponse, AjaxError } from 'rxjs/ajax';
 
-import { log } from '../utilities/general.utilities'
-import { HashMap } from '../utilities/types.utilities'
-import { EngineAuthService } from '../auth/auth.service'
+import { log } from '../utilities/general.utilities';
+import { HashMap } from '../utilities/types.utilities';
+import { EngineAuthService } from '../auth/auth.service';
 import {
     HttpJsonOptions,
     HttpTextOptions,
@@ -15,12 +15,12 @@ import {
     HttpError,
     HttpVerb,
     HttpStatusCode
-} from './http.interfaces'
+} from './http.interfaces';
 
-export const engine: any = {
+export const engine_http: any = {
     log,
     ajax
-}
+};
 
 export class EngineHttpClient {
     constructor(protected _auth: EngineAuthService) {}
@@ -30,14 +30,14 @@ export class EngineHttpClient {
      * @param url URL of the GET endpoint
      * @param options Options to add to the request
      */
-    public get(url: string, options?: HttpJsonOptions): Observable<HashMap>
-    public get(url: string, options?: HttpTextOptions): Observable<string>
+    public get(url: string, options?: HttpJsonOptions): Observable<HashMap>;
+    public get(url: string, options?: HttpTextOptions): Observable<string>;
     public get(url: string, options?: HttpOptions): Observable<HttpResponse> {
         if (!options) {
-            options = { response_type: 'json' }
+            options = { response_type: 'json' };
         }
         if (this._auth.has_token) {
-            return this.request('GET', url, { response_type: 'json', ...options })
+            return this.request('GET', url, { response_type: 'json', ...options });
         }
         return new Observable(obs => {
             setTimeout(() => {
@@ -45,9 +45,9 @@ export class EngineHttpClient {
                     (resp: HttpResponse) => obs.next(resp),
                     (err: HttpError) => obs.error(err),
                     () => obs.complete()
-                )
-            }, 500)
-        })
+                );
+            }, 500);
+        });
     }
 
     /**
@@ -56,14 +56,14 @@ export class EngineHttpClient {
      * @param body Body contents of the request
      * @param options Options to add to the request
      */
-    public post(url: string, body: any, options?: HttpJsonOptions): Observable<HashMap>
-    public post(url: string, body: any, options?: HttpTextOptions): Observable<string>
+    public post(url: string, body: any, options?: HttpJsonOptions): Observable<HashMap>;
+    public post(url: string, body: any, options?: HttpTextOptions): Observable<string>;
     public post(url: string, body: any, options?: HttpOptions): Observable<HttpResponse> {
         if (!options) {
-            options = { response_type: 'json' }
+            options = { response_type: 'json' };
         }
         if (this._auth.has_token) {
-            return this.request('POST', url, { body, response_type: 'json', ...options })
+            return this.request('POST', url, { body, response_type: 'json', ...options });
         }
         return new Observable(obs => {
             setTimeout(() => {
@@ -71,9 +71,9 @@ export class EngineHttpClient {
                     (resp: HttpResponse) => obs.next(resp),
                     (err: HttpError) => obs.error(err),
                     () => obs.complete()
-                )
-            }, 500)
-        })
+                );
+            }, 500);
+        });
     }
 
     /**
@@ -82,14 +82,14 @@ export class EngineHttpClient {
      * @param body Body contents of the request
      * @param options Options to add to the request
      */
-    public put(url: string, body: any, options?: HttpJsonOptions): Observable<HashMap>
-    public put(url: string, body: any, options?: HttpTextOptions): Observable<string>
+    public put(url: string, body: any, options?: HttpJsonOptions): Observable<HashMap>;
+    public put(url: string, body: any, options?: HttpTextOptions): Observable<string>;
     public put(url: string, body: any, options?: HttpOptions): Observable<HttpResponse> {
         if (!options) {
-            options = { response_type: 'json' }
+            options = { response_type: 'json' };
         }
         if (this._auth.has_token) {
-            return this.request('PUT', url, { body, response_type: 'json', ...options })
+            return this.request('PUT', url, { body, response_type: 'json', ...options });
         }
         return new Observable(obs => {
             setTimeout(() => {
@@ -97,9 +97,9 @@ export class EngineHttpClient {
                     (resp: HttpResponse) => obs.next(resp),
                     (err: HttpError) => obs.error(err),
                     () => obs.complete()
-                )
-            }, 500)
-        })
+                );
+            }, 500);
+        });
     }
 
     /**
@@ -110,7 +110,7 @@ export class EngineHttpClient {
      */
     public patch(url: string, body: any, options?: HttpOptions): Observable<HttpResponse> {
         if (this._auth.has_token) {
-            return this.request('PATCH', url, { body, response_type: 'json', ...options })
+            return this.request('PATCH', url, { body, response_type: 'json', ...options });
         }
         return new Observable(obs => {
             setTimeout(() => {
@@ -118,9 +118,9 @@ export class EngineHttpClient {
                     (resp: HttpResponse) => obs.next(resp),
                     (err: HttpError) => obs.error(err),
                     () => obs.complete()
-                )
-            }, 500)
-        })
+                );
+            }, 500);
+        });
     }
 
     /**
@@ -128,15 +128,15 @@ export class EngineHttpClient {
      * @param url URL of the DELETE endpoint
      * @param options Options to add to the request
      */
-    public delete(url: string, options?: HttpJsonOptions): Observable<HashMap>
-    public delete(url: string, options?: HttpTextOptions): Observable<string>
-    public delete(url: string, options?: HttpVoidOptions): Observable<void>
+    public delete(url: string, options?: HttpJsonOptions): Observable<HashMap>;
+    public delete(url: string, options?: HttpTextOptions): Observable<string>;
+    public delete(url: string, options?: HttpVoidOptions): Observable<void>;
     public delete(url: string, options?: HttpOptions): Observable<HttpResponse> {
         if (!options) {
-            options = { response_type: 'void' }
+            options = { response_type: 'void' };
         }
         if (this._auth.has_token) {
-            return this.request('DELETE', url, { response_type: 'void', ...options })
+            return this.request('DELETE', url, { response_type: 'void', ...options });
         }
         return new Observable(obs => {
             setTimeout(() => {
@@ -144,9 +144,9 @@ export class EngineHttpClient {
                     (resp: HttpResponse) => obs.next(resp),
                     (err: HttpError) => obs.error(err),
                     () => obs.complete()
-                )
-            }, 500)
-        })
+                );
+            }, 500);
+        });
     }
 
     /**
@@ -154,18 +154,18 @@ export class EngineHttpClient {
      * @param response Request response contents
      * @param type Type of data to return
      */
-    private transform(response: AjaxResponse, type: 'json'): HashMap
-    private transform(response: AjaxResponse, type: 'text'): string
-    private transform(response: AjaxResponse, type: 'void'): void
+    private transform(response: AjaxResponse, type: 'json'): HashMap;
+    private transform(response: AjaxResponse, type: 'text'): string;
+    private transform(response: AjaxResponse, type: 'void'): void;
     private transform(response: AjaxResponse, type: HttpResponseType): HttpResponse {
-        const text = response.responseText
+        const text = response.responseText;
         switch (type) {
             case 'json':
-                return text ? JSON.parse(text) : {}
+                return text ? JSON.parse(text) : {};
             case 'text':
-                return text
+                return text;
             case 'void':
-                return
+                return;
         }
     }
 
@@ -175,12 +175,12 @@ export class EngineHttpClient {
      */
     private error(error: AjaxError): HttpError {
         if (error.status === HttpStatusCode.UNAUTHORISED) {
-            this._auth.refreshAuthority()
+            this._auth.refreshAuthority();
         }
         return {
             status: error.status,
             message: error.message
-        }
+        };
     }
 
     /**
@@ -191,35 +191,35 @@ export class EngineHttpClient {
      */
     private request(method: HttpVerb, url: string, options: HttpOptions): Observable<HttpResponse> {
         return new Observable<HttpResponse>(obs => {
-            let ajax_obs: Observable<HttpResponse | HttpError>
+            let ajax_obs: Observable<HttpResponse | HttpError>;
             // Add auth header to request
             if (!options.headers) {
-                options.headers = {}
+                options.headers = {};
             }
-            options.headers.Authorization = this._auth.token
-            const verb = method.toLowerCase()
+            options.headers.Authorization = this._auth.token;
+            const verb = method.toLowerCase();
             switch (method) {
                 case 'GET':
                 case 'DELETE':
-                    ajax_obs = engine.ajax[verb](url, options.headers).pipe(
+                    ajax_obs = engine_http.ajax[verb](url, options.headers).pipe(
                         map((r: AjaxResponse) => this.transform(r, options.response_type as any)),
                         catchError(e => throwError(this.error(e)))
-                    )
-                    break
+                    );
+                    break;
                 case 'PATCH':
                 case 'PUT':
                 case 'POST':
-                    ajax_obs = engine.ajax[verb](url, options.body, options.headers).pipe(
+                    ajax_obs = engine_http.ajax[verb](url, options.body, options.headers).pipe(
                         map((r: AjaxResponse) => this.transform(r, options.response_type as any)),
                         catchError(e => throwError(this.error(e)))
-                    )
-                    break
+                    );
+                    break;
             }
             ajax_obs!.subscribe(
                 (data: HttpResponse) => obs.next(data),
                 (e: HttpError) => obs.error(e),
                 () => obs.complete()
-            )
-        })
+            );
+        });
     }
 }

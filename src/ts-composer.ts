@@ -1,73 +1,54 @@
-// Import here Polyfills if needed. Recommended core-js (npm i -D core-js)
-// import "core-js/fn/array.find"
-// ...
+export * from './composer';
 
-import 'core-js/es/promise'
+export * from './auth/auth.service';
+export * from './auth/auth.interfaces';
 
-import { EngineAuthService } from './auth/auth.service'
-import { EngineHttpClient } from './http/http.service'
-import { EngineBindingService } from './websocket/binding.service'
-import { EngineWebsocket } from './websocket/webocket.class'
+export * from './http/http.service';
+export * from './http/http.interfaces';
+export * from './http/mock/mock-http.service';
+export * from './http/mock/mock-http.interfaces';
 
-export interface ComposerOptions {}
+export * from './http/services/applications/applications.service';
+export * from './http/services/applications/application.interfaces';
+export * from './http/services/applications/application.class';
 
-export default class Composer {
-    /** HTTP Client for request with composer credentials */
-    private static _http: EngineHttpClient
-    /** Authentication service for Composer */
-    private static _auth_service: EngineAuthService
-    /** Service for binding to engine's realtime API */
-    private static _binding_service: EngineBindingService
-    /** Websocket for engine realtime API communications */
-    private static _websocket: EngineWebsocket
+export * from './http/services/auth-sources/auth-sources.service';
+export * from './http/services/auth-sources/auth-source.interfaces';
+export * from './http/services/auth-sources/auth-source.class';
 
-    constructor() {
-        throw new Error('No new allow for static class')
-    }
+export * from './http/services/domains/domains.service';
+export * from './http/services/domains/domain.interfaces';
+export * from './http/services/domains/domain.class';
 
-    /**
-     * Initialise composer services
-     * @param options
-     */
-    public static init(options: ComposerOptions) {}
+export * from './http/services/drivers/drivers.service';
+export * from './http/services/drivers/drivers.interfaces';
+export * from './http/services/drivers/driver.class';
 
-    /** HTTP Client for making request with composer credentials */
-    public static get http(): EngineHttpClient {
-        if (!this._http) {
-            throw new Error(
-                "Composer hasn't been initialised yet. Call `Composer.init` to initialise composer"
-            )
-        }
-        return this._http
-    }
+export * from './http/services/modules/modules.service';
+export * from './http/services/modules/module.interfaces';
+export * from './http/services/modules/module.class';
 
-    /** Authentication service for Composer */
-    public static get auth(): EngineAuthService {
-        if (!this._auth_service) {
-            throw new Error(
-                "Composer hasn't been initialised yet. Call `Composer.init` to initialise composer"
-            )
-        }
-        return this._auth_service
-    }
+export * from './http/services/systems/systems.service';
+export * from './http/services/systems/system.interfaces';
+export * from './http/services/systems/system.class';
 
-    /** Service for binding to engine's realtime API */
-    public static get bindings(): EngineBindingService {
-        if (!this._binding_service) {
-            throw new Error(
-                "Composer hasn't been initialised yet. Call `Composer.init` to initialise composer"
-            )
-        }
-        return this._binding_service
-    }
+export * from './http/services/users/users.service';
+export * from './http/services/users/user.interfaces';
+export * from './http/services/users/user.class';
 
-    /** Interface for engine realtime API communications */
-    public static get realtime(): EngineWebsocket {
-        if (!this._websocket) {
-            throw new Error(
-                "Composer hasn't been initialised yet. Call `Composer.init` to initialise composer"
-            )
-        }
-        return this._websocket
-    }
-}
+export * from './http/services/zones/zones.service';
+export * from './http/services/zones/zone.interfaces';
+export * from './http/services/zones/zone.class';
+
+export * from './websocket/webocket.class';
+export * from './websocket/websocket.interfaces';
+export * from './websocket/mock/mock-websocket.class';
+export * from './websocket/mock/mock-engine-system.class';
+export * from './websocket/mock/mock-engine-module.class';
+
+export * from './websocket/binding.service';
+export * from './websocket/classes/engine-system.class';
+export * from './websocket/classes/engine-module.class';
+export * from './websocket/classes/engine-status-variable.class';
+
+export * from './utilities/types.utilities';

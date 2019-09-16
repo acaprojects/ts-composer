@@ -13,7 +13,7 @@ import { HashMap } from '../../utilities/types.utilities';
 import { MockEngineWebsocketModule } from './mock-engine-module.class';
 import { MockEngineWebsocketSystem } from './mock-engine-system.class';
 
-export const engine = { log };
+export const engine_mock_socket = { log };
 
 declare global {
     interface Window {

@@ -25,7 +25,7 @@ export class EngineAuthService {
     /** OAuth 2 token generation code */
     private _code: string = '';
     /** Whether engine is online */
-    private _online = new BehaviorSubject(true);
+    private _online = new BehaviorSubject(false);
     /** Observer for the online state of engine */
     private _online_observer = this._online.asObservable();
 
