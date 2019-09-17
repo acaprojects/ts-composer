@@ -20,6 +20,7 @@ import { EngineDriversService } from './http/services/drivers/drivers.service';
 import { EngineModulesService } from './http/services/modules/modules.service';
 import { EngineUsersService } from './http/services/users/users.service';
 import { EngineZonesService } from './http/services/zones/zones.service';
+import { Subscription } from 'rxjs';
 
 export interface ComposerOptions extends EngineAuthOptions {
     /** Host name and port of the engine server */
@@ -53,6 +54,8 @@ export default class Composer {
     private static _users: EngineUsersService;
     /** HTTP service for engine zones */
     private static _zones: EngineZonesService;
+    /** Initialisation subscription */
+    private static _sub: Subscription;
 
     constructor() {
         throw new Error('No constructor for static class');
@@ -65,7 +68,8 @@ export default class Composer {
     public static init(options: ComposerOptions) {
         this.clear();
         this._auth_service = new EngineAuthService(options);
-        const sub = this._auth_service.online_state.subscribe(state => {
+        this._sub = this._auth_service.online_state.subscribe(state => {
+            /* istanbul ignore else */
             if (state) {
                 // Initialise websocket API
                 const websocket_options = {
@@ -92,8 +96,9 @@ export default class Composer {
                 this._systems = new EngineSystemsService(this._http);
                 this._users = new EngineUsersService(this._http);
                 this._zones = new EngineZonesService(this._http);
-
-                sub.unsubscribe();
+                if (this._sub) {
+                    this._sub.unsubscribe();
+                }
             }
         });
     }
@@ -118,7 +123,9 @@ export default class Composer {
         ];
         for (const key of keys) {
             if (key && (this as any)[key]) {
-                (this as any)[key].destroy();
+                if ((this as any)[key].destroy instanceof Function) {
+                    (this as any)[key].destroy();
+                }
                 delete (this as any)[key];
             }
         }
