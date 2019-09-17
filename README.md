@@ -8,15 +8,13 @@ You can build the library from source after installing the dependancies with the
 
 `npm run build`
 
-## Installation
-
 ## Usage
 
 You can install Typescript composer with the npm command
 
 `npm install --save-dev @acaprojects/ts-composer`
 
-After the package is installed you import `Composer` into your application
+After the package is installed you can import `Composer` into your application
 
 ```typescript
 import { Composer } from '@acaprojects/ts-composer'
@@ -28,28 +26,28 @@ Before using composer it will need to be intialised.
 Composer.init(config);
 ```
 
-The init method takes a `config` object
+The init method takes a `config` object with the following properties
 
 |Property|Description|Optional|Type|Example|
 |--------|-----------|--------|----|-------|
-|host|Host name and port of the ACAEngine server|Yes|`string`|`"dev.acaprojects.com:8080"`|
-|mock|Whether to initialise composer with mock services|Yes|`boolean`|`true`|
-|auth_uri|URI for authorising users session|No|`string`|`"/auth/oauth/authorize"`|
-|token_uri|URI for generating new auth tokens|No|`string`|`"/auth/token"`|
-|redirect_uri|URI to redirect user to after authorising session|No|`string`|`"/oauth-resp.html"`|
-|scope|Scope of the user permissions needed by the application|No|`string`|`"admin"`|
-|storage|Browser storage to use for storing user credentials|Yes|`"local" | "session"`| |
-|handle_login|Whether composer should handle user login|Yes|`boolean`|`true`|
+|`host`|Host name and port of the ACAEngine server|Yes|`string`|`"dev.acaprojects.com:8080"`|
+|`mock`|Whether to initialise composer with mock services|Yes|`boolean`|`true`|
+|`auth_uri`|URI for authorising users session|No|`string`|`"/auth/oauth/authorize"`|
+|`token_uri`|URI for generating new auth tokens|No|`string`|`"/auth/token"`|
+|`redirect_uri`|URI to redirect user to after authorising session|No|`string`|`"/oauth-resp.html"`|
+|`scope`|Scope of the user permissions needed by the application|No|`string`|`"admin"`|
+|`storage`|Browser storage to use for storing user credentials|Yes|`"local" \| "session"`| |
+|`handle_login`|Whether composer should handle user login|Yes|`boolean`|`true`|
 
 Once initialised the `Composer` object will expose interfaces to ACAEngine's websocket and http APIs
 
 ### Websocket API
 
-`Composer` exposes ACAEngine's websocket API through the `bindings` property.
+`Composer` exposes ACAEngine's websocket API through the `bindings` service.
 
 The `bindings` service is used to provide real-time interaction with modules running on ACAEngine. It provides an interface to build efficient, responsive user interfaces, monitoring systems and other extensions which require live, two-way or asynchronous interaction.
 
-Listening to modules can be done
+Once composer has initialised you can listen to values on modules
 
 ```typescript
 const my_mod = Composer.bindings.module('sys-death-star', 'TestModule', 3);
@@ -88,40 +86,69 @@ Each service except for `users` provides CRUD methods. `users` provides _RUD.
 
 ```typescript
 // Drivers CRUD
-drivers.add(driver_data).then((new_driver) => doSomething(new_driver));
-drivers.show(driver_id).then((driver) => doSomething(driver));
-drivers.update(driver_id, driver_data).then((updated_driver) => doSomething(updated_driver));
-drivers.delete(driver_id).then(() => doSomething());
+Composer.drivers.add(driver_data).then((new_driver) => doSomething(new_driver));
+Composer.drivers.show(driver_id).then((driver) => doSomething(driver));
+Composer.drivers.update(driver_id, driver_data).then((updated_driver) => doSomething(updated_driver));
+Composer.drivers.delete(driver_id).then(() => doSomething());
 
 // Modules CRUD
-modules.add(module_data).then((new_module) => doSomething(new_module));
-modules.show(module_id).then((mod) => doSomething(mod));
-modules.update(module_id, module_data).then((updated_module) => doSomething(updated_module));
-modules.delete(module_id).then(() => doSomething());
+Composer.modules.add(module_data).then((new_module) => doSomething(new_module));
+Composer.modules.show(module_id).then((mod) => doSomething(mod));
+Composer.modules.update(module_id, module_data).then((updated_module) => doSomething(updated_module));
+Composer.modules.delete(module_id).then(() => doSomething());
 
 // Systems CRUD
-systems.add(system_data).then((new_system) => doSomething(new_system));
-systems.show(system_id).then((system) => doSomething(system));
-systems.update(system_id, system_data).then((updated_system) => doSomething(updated_system));
-systems.delete(system_id).then(() => doSomething());
+Composer.systems.add(system_data).then((new_system) => doSomething(new_system));
+Composer.systems.show(system_id).then((system) => doSomething(system));
+Composer.systems.update(system_id, system_data).then((updated_system) => doSomething(updated_system));
+Composer.systems.delete(system_id).then(() => doSomething());
 
 // Users CRUD
-users.add(user_data).then((new_user) => doSomething(new_user)); // This will error
-users.show(user_id).then((user) => doSomething(user));
-users.update(user_id, user_data).then((updated_user) => doSomething(updated_user));
-users.delete(user_id).then(() => doSomething());
+Composer.users.add(user_data).then((new_user) => doSomething(new_user)); // This will error
+Composer.users.show(user_id).then((user) => doSomething(user));
+Composer.users.update(user_id, user_data).then((updated_user) => doSomething(updated_user));
+Composer.users.delete(user_id).then(() => doSomething());
 
 // Zones CRUD
-zones.add(zone_data).then((new_zone) => doSomething(new_zone));
-zones.show(zone_id).then((zone) => doSomething(zone));
-zones.update(zone_id, zone_data).then((updated_zone) => doSomething(updated_zone));
-zones.delete(zone_id).then(() => doSomething());
+Composer.zones.add(zone_data).then((new_zone) => doSomething(new_zone));
+Composer.zones.show(zone_id).then((zone) => doSomething(zone));
+Composer.zones.update(zone_id, zone_data).then((updated_zone) => doSomething(updated_zone));
+Composer.zones.delete(zone_id).then(() => doSomething());
 ```
 
 The services also provide methods for the various item action endpoints
 
-```typescript
 
+```typescript
+// Driver Actions
+Composer.drivers.reload(driver_id);
+
+// Module Actions
+Composer.module.start(module_id);
+Composer.module.stop(module_id);
+Composer.module.ping(module_id);
+Composer.module.lookup(module_id, lookup);
+Composer.module.internalState(module_id);
+
+// System Actions
+Composer.system.remove(system_id, module_name);
+Composer.system.start(system_id);
+Composer.system.stop(system_id);
+Composer.system.execute(system_id, module_name, index, args);
+Composer.system.state(system_id, module_name, index, lookup);
+Composer.system.functionList(system_id, module_name, index);
+Composer.system.types(system_id, module_name);
+Composer.system.count(system_id);
+
+// User Actions
+Composer.users.current();
 ```
 
+You can find more details about endpoint action on the API docs
+https://app.swaggerhub.com/apis/ACAprojects/ACAEngine/3.5.0#/
+
 ## Writing mocks
+
+### Websockets
+
+### HTTP Requests

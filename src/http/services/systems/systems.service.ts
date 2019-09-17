@@ -1,19 +1,19 @@
-import { EngineResourceService } from '../resources/resources.service'
+import { EngineResourceService } from '../resources/resources.service';
 
-import { HashMap } from '../../../utilities/types.utilities'
-import { EngineHttpClient } from '../../http.service'
-import { EngineSystem } from './system.class'
+import { HashMap } from '../../../utilities/types.utilities';
+import { EngineHttpClient } from '../../http.service';
+import { EngineSystem } from './system.class';
 import {
     IEngineModuleFunctionMap,
     IEngineSystemShow,
     IEngineSystemsQuery
-} from './system.interfaces'
+} from './system.interfaces';
 
 export class EngineSystemsService extends EngineResourceService<EngineSystem> {
     constructor(protected http: EngineHttpClient) {
-        super(http)
-        this._name = 'System'
-        this._api_route = 'systems'
+        super(http);
+        this._name = 'System';
+        this._api_route = 'systems';
     }
 
     /**
@@ -21,7 +21,7 @@ export class EngineSystemsService extends EngineResourceService<EngineSystem> {
      * @param query_params Map of query paramaters to add to the request URL
      */
     public query(query_params?: IEngineSystemsQuery) {
-        return super.query(query_params)
+        return super.query(query_params);
     }
 
     /**
@@ -30,7 +30,7 @@ export class EngineSystemsService extends EngineResourceService<EngineSystem> {
      * @param query_params Map of query paramaters to add to the request URL
      */
     public show(id: string, query_params?: IEngineSystemShow) {
-        return super.show(id, query_params)
+        return super.show(id, query_params);
     }
 
     /**
@@ -39,7 +39,7 @@ export class EngineSystemsService extends EngineResourceService<EngineSystem> {
      * @param module_id ID of the module to remove
      */
     public remove(id: string, module_id: string): Promise<void> {
-        return this.task(id, 'remove', { module_id })
+        return this.task(id, 'remove', { module_id });
     }
 
     /**
@@ -47,7 +47,7 @@ export class EngineSystemsService extends EngineResourceService<EngineSystem> {
      * @param id System ID
      */
     public start(id: string): Promise<void> {
-        return this.task(id, 'start')
+        return this.task(id, 'start');
     }
 
     /**
@@ -55,7 +55,7 @@ export class EngineSystemsService extends EngineResourceService<EngineSystem> {
      * @param id System ID
      */
     public stop(id: string): Promise<void> {
-        return this.task(id, 'stop')
+        return this.task(id, 'stop');
     }
 
     /**
@@ -71,7 +71,7 @@ export class EngineSystemsService extends EngineResourceService<EngineSystem> {
         index: number = 1,
         args: any[] = []
     ): Promise<HashMap> {
-        return this.task(id, 'exec', { module, index, args })
+        return this.task(id, 'exec', { module, index, args });
     }
 
     /**
@@ -82,7 +82,7 @@ export class EngineSystemsService extends EngineResourceService<EngineSystem> {
      * @param lookup Status variable of interest. If set it will return only the state of this variable
      */
     public state(id: string, module: string, index: number = 1, lookup?: string): Promise<HashMap> {
-        return this.task(id, 'state', { module, index, lookup }, 'get')
+        return this.task(id, 'state', { module, index, lookup }, 'get');
     }
 
     /**
@@ -96,15 +96,24 @@ export class EngineSystemsService extends EngineResourceService<EngineSystem> {
         module: string,
         index: number = 1
     ): Promise<IEngineModuleFunctionMap> {
-        return this.task(id, 'funcs', { module, index }, 'get')
+        return this.task(id, 'funcs', { module, index }, 'get');
     }
 
     /**
-     * Get list types of modules and counts in the given system
+     * Occurances of a particular type of module in the given system
+     * @param id System ID
+     * @param module Class name of the Module e.g. `Display`, `Lighting` etc.
+     */
+    public count(id: string, module: string): Promise<{ count: number }> {
+        return this.task(id, 'count', { module }, 'get');
+    }
+
+    /**
+     * List types of modules and counts in the given system
      * @param id System ID
      */
     public types(id: string): Promise<HashMap<number>> {
-        return this.task(id, 'count', undefined, 'get')
+        return this.task(id, 'count', undefined, 'get');
     }
 
     /**
@@ -112,6 +121,6 @@ export class EngineSystemsService extends EngineResourceService<EngineSystem> {
      * @param item Raw API data
      */
     protected process(item: HashMap) {
-        return new EngineSystem(this, item)
+        return new EngineSystem(this, item);
     }
 }

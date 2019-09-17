@@ -1,14 +1,14 @@
-import { HashMap } from '../../../utilities/types.utilities'
-import { EngineHttpClient } from '../../http.service'
-import { EngineResourceService } from '../resources/resources.service'
-import { EngineModule } from './module.class'
-import { IEngineModulePing, IEngineModuleQuery } from './module.interfaces'
+import { HashMap } from '../../../utilities/types.utilities';
+import { EngineHttpClient } from '../../http.service';
+import { EngineResourceService } from '../resources/resources.service';
+import { EngineModule } from './module.class';
+import { IEngineModulePing, IEngineModuleQuery } from './module.interfaces';
 
 export class EngineModulesService extends EngineResourceService<EngineModule> {
     constructor(protected http: EngineHttpClient) {
-        super(http)
-        this._name = 'Module'
-        this._api_route = 'modules'
+        super(http);
+        this._name = 'Module';
+        this._api_route = 'modules';
     }
 
     /**
@@ -16,7 +16,7 @@ export class EngineModulesService extends EngineResourceService<EngineModule> {
      * @param query_params Map of query paramaters to add to the request URL
      */
     public query(query_params?: IEngineModuleQuery) {
-        return super.query(query_params)
+        return super.query(query_params);
     }
 
     /**
@@ -24,7 +24,7 @@ export class EngineModulesService extends EngineResourceService<EngineModule> {
      * @param id Module ID
      */
     public start(id: string): Promise<void> {
-        return this.task(id, 'start')
+        return this.task(id, 'start');
     }
 
     /**
@@ -32,15 +32,15 @@ export class EngineModulesService extends EngineResourceService<EngineModule> {
      * @param id Module ID
      */
     public stop(id: string): Promise<void> {
-        return this.task(id, 'stop')
+        return this.task(id, 'stop');
     }
 
     /**
-     * Stops the module with the given ID
+     * Pings the IP address of the module with the given ID
      * @param id Module ID
      */
     public ping(id: string): Promise<IEngineModulePing> {
-        return this.task(id, 'ping')
+        return this.task(id, 'ping');
     }
 
     /**
@@ -49,7 +49,7 @@ export class EngineModulesService extends EngineResourceService<EngineModule> {
      * @param lookup Status variable of interest. If set it will return only the state of this variable
      */
     public state(id: string, lookup?: string): Promise<HashMap> {
-        return this.task(id, 'state', { lookup }, 'get')
+        return this.task(id, 'state', { lookup }, 'get');
     }
 
     /**
@@ -58,7 +58,7 @@ export class EngineModulesService extends EngineResourceService<EngineModule> {
      * @param lookup Status variable of interest. If set it will return only the state of this variable
      */
     public internalState(id: string): Promise<HashMap> {
-        return this.task(id, 'internal_state', undefined, 'get')
+        return this.task(id, 'internal_state', undefined, 'get');
     }
 
     /**
@@ -66,6 +66,6 @@ export class EngineModulesService extends EngineResourceService<EngineModule> {
      * @param item Raw API data
      */
     protected process(item: HashMap) {
-        return new EngineModule(this, item)
+        return new EngineModule(this, item);
     }
 }
