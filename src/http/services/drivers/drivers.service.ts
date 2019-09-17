@@ -1,14 +1,14 @@
-import { EngineResourceService } from '../resources/resources.service'
-import { EngineHttpClient } from '../../http.service'
-import { EngineDriver } from './driver.class'
-import { IEngineDependencyQuery } from './drivers.interfaces'
-import { HashMap } from '../../../utilities/types.utilities'
+import { EngineResourceService } from '../resources/resources.service';
+import { EngineHttpClient } from '../../http.service';
+import { EngineDriver } from './driver.class';
+import { IEngineDependencyQuery } from './drivers.interfaces';
+import { HashMap } from '../../../utilities/types.utilities';
 
 export class EngineDriversService extends EngineResourceService<EngineDriver> {
     constructor(protected http: EngineHttpClient) {
-        super(http)
-        this._name = 'Driver'
-        this._api_route = 'dependencies'
+        super(http);
+        this._name = 'Driver';
+        this._api_route = 'drivers';
     }
 
     /**
@@ -16,7 +16,7 @@ export class EngineDriversService extends EngineResourceService<EngineDriver> {
      * @param query_params Map of query paramaters to add to the request URL
      */
     public query(query_params?: IEngineDependencyQuery) {
-        return super.query(query_params)
+        return super.query(query_params);
     }
 
     /**
@@ -24,7 +24,7 @@ export class EngineDriversService extends EngineResourceService<EngineDriver> {
      * @param id Dependency ID
      */
     public reload(id: string): Promise<void> {
-        return this.task(id, 'reload')
+        return this.task(id, 'reload');
     }
 
     /**
@@ -32,6 +32,6 @@ export class EngineDriversService extends EngineResourceService<EngineDriver> {
      * @param item Raw API data
      */
     protected process(item: HashMap) {
-        return new EngineDriver(this, item)
+        return new EngineDriver(this, item);
     }
 }
