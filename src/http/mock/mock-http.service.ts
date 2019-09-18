@@ -25,6 +25,14 @@ declare global {
     }
 }
 
+if (!window.control) {
+    window.control = {};
+}
+
+if (!window.control.systems) {
+    window.control.handlers = {};
+}
+
 export class MockEngineHttpClient extends EngineHttpClient {
     /** Mapping of handlers for http requests */
     private _handlers: HashMap<MockHttpRequestHandler> = {};

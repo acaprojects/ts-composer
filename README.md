@@ -145,10 +145,88 @@ Composer.users.current();
 ```
 
 You can find more details about endpoint action on the API docs
+
 https://app.swaggerhub.com/apis/ACAprojects/ACAEngine/3.5.0#/
 
 ## Writing mocks
 
+If you don't have access to an ACAEngine server you can also write mocks so that you can still develop interfaces for ACAEngine.
+
+To use the mock services you can pass `mock: true` into the initialisation object.
+
 ### Websockets
 
+To write mocks for the the realtime(websocket) API you'll need to add your systems to `window.control.systems` before initialising composer.
+
+```typescript
+window.control.systems = {
+    "my-system": {
+        "MyModule": [
+            {
+                power: true,
+                $power_on: () => this.power = true;
+                $power_off: () => this.power = false;
+            }
+        ]
+    }
+}
+```
+
+Note that executable methods on mock systems are namespaced with `$` as real systems in engine allow for methods to have the same name as variables.
+
+Once initialised interactions with a system are performed in the same manner as the live system.
+
+```typescript
+const my_mod = Composer.bindings.module('my-system', 'MyModule', 1);
+const my_variable = my_mod.binding('power');
+const unbind = my_variable.bind();
+const sub = my_variable.listen((value) => doSomething(value)); // Emits true
+my_mod.exec('power_off'); // The listen callback will now emit false 
+```
+
+Some methods may need access to other modules within the system, for this a property is appended on runtime called `_system` which allows for access to the parent system
+
+```typescript
+window.control.systems = {
+    "my-system": {
+        "MyModule": [
+            {
+                $lights_off: () => this._system.MyOtherModule[0].lights = false;
+            }
+        ]
+        "MyOtherModule": [
+            {
+                lights: true,
+            }
+        ]
+    }
+}
+```
+
 ### HTTP Requests
+
+HTTP API Requests can be mocked in a similar way to the realtime API by adding handlers to `window.control.handlers`
+
+```typescript
+window.control.handlers = [
+    {
+        path: '/api/engine/v1/systems'
+        metadata: {},
+        method: 'GET',
+        callback: (request) => my_mock_systems
+    }
+]
+```
+
+Paths allow for route parameters and will pass the value in the callback input.
+
+```typescript
+window.control.handlers = [
+    {
+        path: '/api/engine/v1/systems/:system_id'
+        ...
+        callback: (request) => 
+            my_mock_systems.find(sys => sys.id === request.route_params.system_id)
+    }
+]
+```

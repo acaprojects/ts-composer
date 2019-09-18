@@ -21,6 +21,14 @@ declare global {
     }
 }
 
+if (!window.control) {
+    window.control = {};
+}
+
+if (!window.control.systems) {
+    window.control.systems = {};
+}
+
 export class MockEngineWebsocket extends EngineWebsocket {
     protected websocket: any;
     /** Listeners for mock bindings values */
