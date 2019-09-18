@@ -164,8 +164,8 @@ window.control.systems = {
         "MyModule": [
             {
                 power: true,
-                $power_on: () => this.power = true;
-                $power_off: () => this.power = false;
+                $power_on: () => this.power = true,
+                $power_off: () => this.power = false
             }
         ]
     }
@@ -230,3 +230,9 @@ window.control.handlers = [
     }
 ]
 ```
+
+Query parameters are also available on the callback input.
+
+`GET`, `POST`, `PUT`, `PATCH` and `DELETE` requests can be mocked out.
+
+If a request is made and there are no handlers it will attempt to make the live request.
