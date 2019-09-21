@@ -2,13 +2,13 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
 import { Md5 } from 'ts-md5/dist/md5';
 
-import { log, getFragments, generateNonce } from '../utilities/general.utilities';
-import { EngineAuthority, EngineTokenResponse, EngineAuthOptions } from './auth.interfaces';
+import { generateNonce, getFragments, log } from '../utilities/general.utilities';
 import { HashMap } from '../utilities/types.utilities';
+import { EngineAuthOptions, EngineAuthority, EngineTokenResponse } from './auth.interfaces';
 
 import * as _dayjs from 'dayjs';
 // tslint:disable-next-line:no-duplicate-imports
-import { default as _rollupDayjs, Dayjs } from 'dayjs';
+import { Dayjs, default as _rollupDayjs } from 'dayjs';
 /**
  * @hidden
  */
@@ -310,9 +310,8 @@ export class EngineAuthService {
      * Generate token generation URL
      */
     private createRefreshURL(): string {
-        let refresh_uri = this.options.token_uri || '/auth/token';
+        const refresh_uri = this.options.token_uri || '/auth/token';
         let url = refresh_uri + `?client_id=${encodeURIComponent(this._client_id)}`;
-        +`&redirect_uri=${encodeURIComponent(this.options.redirect_uri)}`;
         if (this.refresh_token) {
             url += `&refresh_token=${encodeURIComponent(this.refresh_token)}`;
             url += `&grant_type=refresh_token`;

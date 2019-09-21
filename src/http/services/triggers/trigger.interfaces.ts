@@ -1,10 +1,6 @@
-/** Allowed query paramters for the query/index endpoint */
-export interface IEngineTriggerQueryOptions {}
+import { EngineRequestOptions } from '../../../websocket/websocket.interfaces';
 
-/** Allowed query paramters for the show endpoint */
-export interface IEngineTriggerShowOptions {}
-
-export interface IEngineTrigger {
+export interface Trigger {
     /** Name of the trigger */
     name: string;
     /** Description of the trigger */
@@ -37,7 +33,9 @@ export interface TriggerFunction {
     args?: Args;
 }
 
-export type Args = { [argument: string]: any };
+export interface Args {
+    [argument: string]: any;
+}
 
 export interface TriggerConditions {
     comparisons: TriggerComparison[];
@@ -63,11 +61,11 @@ export enum ConditionOperator {
     XOR = 'exclusive_or'
 }
 
-export type ConditionValue = IEngineStatusVariable | ConditionConstant;
+export type ConditionValue = TriggerStatusVariable | ConditionConstant;
 
 export type ConditionConstant = number | string | boolean;
 
-export interface IEngineStatusVariable {
+export interface TriggerStatusVariable {
     mod: string;
     status: string;
     keys: string[];

@@ -2,7 +2,7 @@ import { HashMap } from '../../../utilities/types.utilities';
 import { EngineHttpClient } from '../../http.service';
 import { EngineResourceService } from '../resources/resources.service';
 import { EngineModule } from './module.class';
-import { IEngineModulePing, IEngineModuleQuery } from './module.interfaces';
+import { EngineModulePingOptions, EngineModuleQueryOptions } from './module.interfaces';
 
 export class EngineModulesService extends EngineResourceService<EngineModule> {
     constructor(protected http: EngineHttpClient) {
@@ -15,7 +15,7 @@ export class EngineModulesService extends EngineResourceService<EngineModule> {
      * Query the index of the API route associated with this service
      * @param query_params Map of query paramaters to add to the request URL
      */
-    public query(query_params?: IEngineModuleQuery) {
+    public query(query_params?: EngineModuleQueryOptions) {
         return super.query(query_params);
     }
 
@@ -39,7 +39,7 @@ export class EngineModulesService extends EngineResourceService<EngineModule> {
      * Pings the IP address of the module with the given ID
      * @param id Module ID
      */
-    public ping(id: string): Promise<IEngineModulePing> {
+    public ping(id: string): Promise<EngineModulePingOptions> {
         return this.task(id, 'ping');
     }
 

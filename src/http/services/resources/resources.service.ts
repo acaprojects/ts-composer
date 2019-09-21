@@ -3,12 +3,12 @@ import { BehaviorSubject, Observable, Subject, Subscriber } from 'rxjs';
 import { toQueryString } from '../../../utilities/api.utilities';
 import { EngineBaseClass } from '../../../utilities/base.class';
 import { HashMap } from '../../../utilities/types.utilities';
-import { EngineHttpClient } from '../../http.service';
-import { IResourceService } from './resources.interface';
 import { HttpError } from '../../http.interfaces';
+import { EngineHttpClient } from '../../http.service';
+import { EngineResourceQueryOptions, ResourceService } from './resources.interface';
 
 export abstract class EngineResourceService<T extends {}> extends EngineBaseClass
-    implements IResourceService<T> {
+    implements ResourceService<T> {
     /** Whether service has been initialised */
     public get initialised() {
         return this._initialised;
@@ -45,7 +45,6 @@ export abstract class EngineResourceService<T extends {}> extends EngineBaseClas
      * @param query_params Map of query paramaters to add to the request URL
      */
     public query(query_params: HashMap = {}): Promise<T[]> {
-        const engine = false;
         let cache = 1000;
         /* istanbul ignore else */
         if (query_params) {
@@ -201,7 +200,7 @@ export abstract class EngineResourceService<T extends {}> extends EngineBaseClas
                 delay
             );
         } else {
-            this.query(query).then(d => sub.next(d), e => sub.error(e));
+            this.query(query).then((d: T[]) => sub.next(d), (e: any) => sub.error(e));
             this.interval(
                 key,
                 () => {

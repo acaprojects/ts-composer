@@ -55,7 +55,9 @@ export class MockEngineWebsocket extends EngineWebsocket {
         }
     }
 
-    public updateToken(_: string) {}
+    public updateToken(_: string): void {
+        log('WS(M)', 'Updated token');
+    }
 
     /**
      * Connect to engine websocket

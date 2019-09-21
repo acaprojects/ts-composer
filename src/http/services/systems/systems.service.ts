@@ -4,9 +4,9 @@ import { HashMap } from '../../../utilities/types.utilities';
 import { EngineHttpClient } from '../../http.service';
 import { EngineSystem } from './system.class';
 import {
-    IEngineModuleFunctionMap,
-    IEngineSystemShow,
-    IEngineSystemsQuery
+    EngineModuleFunctionMap,
+    EngineSystemShowOptions,
+    EngineSystemsQueryOptions
 } from './system.interfaces';
 
 export class EngineSystemsService extends EngineResourceService<EngineSystem> {
@@ -20,7 +20,7 @@ export class EngineSystemsService extends EngineResourceService<EngineSystem> {
      * Query the index of the API route associated with this service
      * @param query_params Map of query paramaters to add to the request URL
      */
-    public query(query_params?: IEngineSystemsQuery) {
+    public query(query_params?: EngineSystemsQueryOptions) {
         return super.query(query_params);
     }
 
@@ -29,7 +29,7 @@ export class EngineSystemsService extends EngineResourceService<EngineSystem> {
      * @param id ID of the item
      * @param query_params Map of query paramaters to add to the request URL
      */
-    public show(id: string, query_params?: IEngineSystemShow) {
+    public show(id: string, query_params?: EngineSystemShowOptions) {
         return super.show(id, query_params);
     }
 
@@ -95,7 +95,7 @@ export class EngineSystemsService extends EngineResourceService<EngineSystem> {
         id: string,
         module: string,
         index: number = 1
-    ): Promise<IEngineModuleFunctionMap> {
+    ): Promise<EngineModuleFunctionMap> {
         return this.task(id, 'funcs', { module, index }, 'get');
     }
 

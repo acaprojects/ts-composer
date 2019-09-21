@@ -1,8 +1,8 @@
-import { EngineResource } from '../resources/resource.class';
 import { HashMap } from '../../../utilities/types.utilities';
-import { EngineTriggersService } from './triggers.service';
-import { TriggerActions, TriggerConditions, Args } from './trigger.interfaces';
+import { EngineResource } from '../resources/resource.class';
 import { EngineSystemTriggersService } from './system-triggers.service';
+import { Args, TriggerActions, TriggerConditions } from './trigger.interfaces';
+import { EngineTriggersService } from './triggers.service';
 
 export class EngineTrigger extends EngineResource<
     EngineTriggersService | EngineSystemTriggersService

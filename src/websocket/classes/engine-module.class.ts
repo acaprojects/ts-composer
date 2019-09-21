@@ -1,11 +1,11 @@
-import { HashMap } from '../../utilities/types.utilities'
-import { EngineBindingService } from '../binding.service'
-import { EngineVariableBinding } from './engine-status-variable.class'
-import { EngineSystemBinding } from './engine-system.class'
+import { HashMap } from '../../utilities/types.utilities';
+import { EngineBindingService } from '../binding.service';
+import { EngineVariableBinding } from './engine-status-variable.class';
+import { EngineSystemBinding } from './engine-system.class';
 
 export class EngineModuleBinding {
     /** Mapping of module bindings */
-    private _bindings: HashMap<EngineVariableBinding> = {}
+    private _bindings: HashMap<EngineVariableBinding> = {};
 
     constructor(
         private _service: EngineBindingService,
@@ -14,26 +14,26 @@ export class EngineModuleBinding {
     ) {}
 
     public get id(): string {
-        return `${this.name}_${this.index}`
+        return `${this.name}_${this.index}`;
     }
 
     /** Parent system of the module */
     public get system(): EngineSystemBinding {
-        return this._system
+        return this._system;
     }
 
     /** Module index */
     public get index(): number {
-        const parts = this._id.split('_')
-        const index = parts.pop()
-        return parseInt(index || '') || 1
+        const parts = this._id.split('_');
+        const index = parts.pop();
+        return parseInt(index || '', 10) || 1;
     }
 
     /** Module name */
     public get name(): string {
-        const parts = this._id.split('_')
-        parts.pop()
-        return parts.join('_')
+        const parts = this._id.split('_');
+        parts.pop();
+        return parts.join('_');
     }
 
     /**
@@ -42,9 +42,9 @@ export class EngineModuleBinding {
      */
     public binding(name: string) {
         if (!this._bindings[name]) {
-            this._bindings[name] = new EngineVariableBinding(this._service, this, name)
+            this._bindings[name] = new EngineVariableBinding(this._service, this, name);
         }
-        return this._bindings[name]
+        return this._bindings[name];
     }
 
     /**
@@ -59,6 +59,6 @@ export class EngineModuleBinding {
             index: this.index,
             name: method,
             args
-        })
+        });
     }
 }

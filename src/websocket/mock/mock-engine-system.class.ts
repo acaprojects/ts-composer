@@ -10,7 +10,9 @@ export class MockEngineWebsocketSystem {
             if (properties.hasOwnProperty(key) && properties[key]) {
                 /* istanbul ignore else */
                 if (properties[key] instanceof Array) {
-                    properties[key].forEach((i: HashMap) => { this.addModule(key, i) });
+                    properties[key].forEach((i: HashMap) => {
+                        this.addModule(key, i);
+                    });
                 }
             }
         }

@@ -40,10 +40,10 @@ export class EngineBaseClass {
     protected timeout(name: string, fn: () => void, delay: number = 300) {
         if (name && fn && fn instanceof Function) {
             this.clearTimeout(name);
-            this._timers[name] = <any>setTimeout(() => {
+            this._timers[name] = setTimeout(() => {
                 fn();
                 delete this._timers[name];
-            }, delay);
+            }, delay) as any;
         } else {
             throw new Error(
                 name
@@ -73,7 +73,7 @@ export class EngineBaseClass {
     protected interval(name: string, fn: () => void, delay: number = 300) {
         if (name && fn && fn instanceof Function) {
             this.clearInterval(name);
-            this._intervals[name] = <any>setInterval(() => fn(), delay);
+            this._intervals[name] = setInterval(() => fn(), delay) as any;
         } else {
             throw new Error(
                 name

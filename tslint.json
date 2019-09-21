@@ -42,6 +42,7 @@
         "interface-name": [true, "never-prefix"],
         "ordered-imports": {"import-sources-order": "any"},
         "arrow-parens": false,
-        "trailing-comma": { "multiline": "never", "singleline": "never" }
+        "trailing-comma": { "multiline": "never", "singleline": "never" },
+        "object-literal-sort-keys": false
     }
 }

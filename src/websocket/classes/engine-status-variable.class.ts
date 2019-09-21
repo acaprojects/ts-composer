@@ -1,41 +1,41 @@
-import { Subscription } from 'rxjs'
-import { EngineBindingService } from '../binding.service'
-import { EngineCommandRequestMetadata, EngineRequestOptions } from '../websocket.interfaces'
-import { EngineModuleBinding } from './engine-module.class'
+import { Subscription } from 'rxjs';
+import { EngineBindingService } from '../binding.service';
+import { EngineCommandRequestMetadata, EngineRequestOptions } from '../websocket.interfaces';
+import { EngineModuleBinding } from './engine-module.class';
 
 export class EngineVariableBinding {
     /** Status variable name */
-    public readonly name: string
+    public readonly name: string;
     /** Number of active bindings to this variable */
-    private _binding_count: number = 0
+    private _binding_count: number = 0;
     /** Number of bindings to restore on reconnection */
-    private _stale_bindings: number = 0
+    private _stale_bindings: number = 0;
 
     constructor(
         private _service: EngineBindingService,
         private _module: EngineModuleBinding,
         _name: string
     ) {
-        this.name = _name
+        this.name = _name;
         // Listen for state changes in the websocket connection
         this._service.engine.status(value => {
             if (value && this._stale_bindings) {
-                this.rebind()
+                this.rebind();
             } else {
-                this._stale_bindings = this._binding_count
-                this._binding_count = 0
+                this._stale_bindings = this._binding_count;
+                this._binding_count = 0;
             }
-        })
+        });
     }
 
     /** Number of bindings to this status variable */
     public get count(): number {
-        return this._binding_count
+        return this._binding_count;
     }
 
     /** Current value of the binding */
     public get value(): any {
-        return this._service.engine.value(this.binding())
+        return this._service.engine.value(this.binding());
     }
 
     /**
@@ -43,7 +43,7 @@ export class EngineVariableBinding {
      * @param next Callback for changes to the bindings value
      */
     public listen(next: (_: any) => void): Subscription {
-        return this._service.engine.listen(this.binding(), next)
+        return this._service.engine.listen(this.binding(), next);
     }
 
     /**
@@ -53,10 +53,10 @@ export class EngineVariableBinding {
         /* istanbul ignore else */
         if (this._binding_count <= 0) {
             this._service.engine.bind(this.binding()).then(() => {
-                this._binding_count++
-            })
+                this._binding_count++;
+            });
         }
-        return () => this.unbind()
+        return () => this.unbind();
     }
 
     /**
@@ -65,12 +65,12 @@ export class EngineVariableBinding {
     public unbind() {
         if (this._binding_count === 1) {
             this._service.engine.unbind(this.binding()).then(() => {
-                this._binding_count--
-            })
+                this._binding_count--;
+            });
         } else {
-            this._binding_count--
+            this._binding_count--;
             if (this._binding_count < 0) {
-                this._binding_count = 0
+                this._binding_count = 0;
             }
         }
     }
@@ -80,9 +80,9 @@ export class EngineVariableBinding {
      */
     private rebind() {
         this._service.engine.bind(this.binding()).then(() => {
-            this._binding_count = this._stale_bindings
-            this._stale_bindings = 0
-        })
+            this._binding_count = this._stale_bindings;
+            this._stale_bindings = 0;
+        });
     }
 
     /**
@@ -94,6 +94,6 @@ export class EngineVariableBinding {
             mod: this._module.name,
             index: this._module.index,
             name: this.name
-        }
+        };
     }
 }

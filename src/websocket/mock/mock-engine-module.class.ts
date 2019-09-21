@@ -1,4 +1,3 @@
-
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 
 import { HashMap } from '../../utilities/types.utilities';
@@ -26,7 +25,9 @@ export class MockEngineWebsocketModule {
      * @param args Array of arguments to pass to the method being called
      */
     public call<T = any>(command: string, args?: any[]): T | null {
-        if (!args) { args = []; }
+        if (!args) {
+            args = [];
+        }
         if (this[`$${command}`] instanceof Function) {
             return this[`$${command}`](...args) as T;
         }
@@ -39,7 +40,11 @@ export class MockEngineWebsocketModule {
      * @param next Callback for changes to the property
      */
     public listen<T = any>(prop_name: string, next: (_: any) => void): Subscription {
-        if (!this[`_${prop_name}`] && !(this[`_${prop_name}_obs`] instanceof Observable) && !this[prop_name]) {
+        if (
+            !this[`_${prop_name}`] &&
+            !(this[`_${prop_name}_obs`] instanceof Observable) &&
+            !this[prop_name]
+        ) {
             this.addProperty<T>(prop_name, null);
         }
         const observer = this[`_${prop_name}_obs`] as Observable<T>;
@@ -51,7 +56,7 @@ export class MockEngineWebsocketModule {
      * @param prop_name Name of the method
      * @param fn Method logic
      */
-    private addMethod(prop_name: string, fn: Function) {
+    private addMethod(prop_name: string, fn: (...args: any[]) => any) {
         if (prop_name[0] !== '$') {
             prop_name = `$${prop_name}`;
         }
@@ -68,11 +73,10 @@ export class MockEngineWebsocketModule {
             prop_name = prop_name.replace('$', '');
         }
         this[`_${prop_name}`] = new BehaviorSubject<T>(value);
-        this[`_${prop_name}_obs`] = this[`_${prop_name}`]
+        this[`_${prop_name}_obs`] = this[`_${prop_name}`];
         Object.defineProperty(this, prop_name, {
             get: () => this[`_${prop_name}`].getValue(),
-            set: (v) => this[`_${prop_name}`].next(v)
+            set: v => this[`_${prop_name}`].next(v)
         });
     }
-
 }

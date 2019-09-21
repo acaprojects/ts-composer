@@ -4,15 +4,16 @@
 
 import 'core-js/es/promise';
 
+import { EngineAuthOptions } from './auth/auth.interfaces';
 import { EngineAuthService } from './auth/auth.service';
 import { EngineHttpClient } from './http/http.service';
-import { EngineBindingService } from './websocket/binding.service';
-import { EngineWebsocket } from './websocket/webocket.class';
-import { EngineAuthOptions } from './auth/auth.interfaces';
-import { EngineSystemsService } from './http/services/systems/systems.service';
-import { MockEngineWebsocket } from './websocket/mock/mock-websocket.class';
 import { MockEngineHttpClient } from './http/mock/mock-http.service';
+import { EngineSystemsService } from './http/services/systems/systems.service';
+import { EngineBindingService } from './websocket/binding.service';
+import { MockEngineWebsocket } from './websocket/mock/mock-websocket.class';
+import { EngineWebsocket } from './websocket/webocket.class';
 
+import { Subscription } from 'rxjs';
 import { EngineApplicationsService } from './http/services/applications/applications.service';
 import { EngineAuthSourcesService } from './http/services/auth-sources/auth-sources.service';
 import { EngineDomainsService } from './http/services/domains/domains.service';
@@ -20,7 +21,6 @@ import { EngineDriversService } from './http/services/drivers/drivers.service';
 import { EngineModulesService } from './http/services/modules/modules.service';
 import { EngineUsersService } from './http/services/users/users.service';
 import { EngineZonesService } from './http/services/zones/zones.service';
-import { Subscription } from 'rxjs';
 
 export interface ComposerOptions extends EngineAuthOptions {
     /** Host name and port of the engine server */
@@ -30,107 +30,6 @@ export interface ComposerOptions extends EngineAuthOptions {
 }
 
 export default class Composer {
-    /** HTTP Client for request with composer credentials */
-    private static _http: EngineHttpClient;
-    /** Authentication service for Composer */
-    private static _auth_service: EngineAuthService;
-    /** Service for binding to engine's realtime API */
-    private static _binding_service: EngineBindingService;
-    /** Websocket for engine realtime API communications */
-    private static _websocket: EngineWebsocket;
-    /** HTTP service for engine applications */
-    private static _applications: EngineApplicationsService;
-    /** HTTP service for engine auth sources */
-    private static _auth_sources: EngineAuthSourcesService;
-    /** HTTP service for engine domains */
-    private static _domains: EngineDomainsService;
-    /** HTTP service for engine drivers */
-    private static _drivers: EngineDriversService;
-    /** Http service for engine modules */
-    private static _modules: EngineModulesService;
-    /** HTTP service for engine systems */
-    private static _systems: EngineSystemsService;
-    /** HTTP service for engine users */
-    private static _users: EngineUsersService;
-    /** HTTP service for engine zones */
-    private static _zones: EngineZonesService;
-    /** Initialisation subscription */
-    private static _sub: Subscription;
-
-    constructor() {
-        throw new Error('No constructor for static class');
-    }
-
-    /**
-     * Initialise composer services
-     * @param options
-     */
-    public static init(options: ComposerOptions) {
-        this.clear();
-        this._auth_service = new EngineAuthService(options);
-        this._sub = this._auth_service.online_state.subscribe(state => {
-            /* istanbul ignore else */
-            if (state) {
-                // Initialise websocket API
-                const websocket_options = {
-                    host: options.host || location.host,
-                    token: this._auth_service.token,
-                    fixed: this._auth_service.fixed_device
-                };
-                this._websocket =
-                    options.mock !== true
-                        ? new EngineWebsocket(websocket_options)
-                        : new MockEngineWebsocket(websocket_options);
-                this._binding_service = new EngineBindingService(this._websocket);
-                // Initialise HTTP API
-                this._http =
-                    options.mock !== true
-                        ? new EngineHttpClient(this._auth_service)
-                        : new MockEngineHttpClient(this._auth_service);
-                // Initialise HTTP services
-                this._applications = new EngineApplicationsService(this._http);
-                this._auth_sources = new EngineAuthSourcesService(this._http);
-                this._domains = new EngineDomainsService(this._http);
-                this._drivers = new EngineDriversService(this._http);
-                this._modules = new EngineModulesService(this._http);
-                this._systems = new EngineSystemsService(this._http);
-                this._users = new EngineUsersService(this._http);
-                this._zones = new EngineZonesService(this._http);
-                if (this._sub) {
-                    this._sub.unsubscribe();
-                }
-            }
-        });
-    }
-
-    /**
-     * Remove any old services
-     */
-    private static clear() {
-        const keys = [
-            '_auth_service',
-            '_http',
-            '_websocket',
-            '_binding_service',
-            '_application',
-            '_auth_sources',
-            '_domains',
-            '_drivers',
-            '_modules',
-            '_systems',
-            '_users',
-            '_zones'
-        ];
-        for (const key of keys) {
-            if (key && (this as any)[key]) {
-                if ((this as any)[key].destroy instanceof Function) {
-                    (this as any)[key].destroy();
-                }
-                delete (this as any)[key];
-            }
-        }
-    }
-
     /** HTTP Client for making request with composer credentials */
     public static get http(): EngineHttpClient {
         return this.checkProperty(this._http);
@@ -191,6 +90,102 @@ export default class Composer {
         return this.checkProperty(this._zones);
     }
 
+    /**
+     * Initialise composer services
+     * @param options
+     */
+    public static init(options: ComposerOptions) {
+        this.clear();
+        this._auth_service = new EngineAuthService(options);
+        this._sub = this._auth_service.online_state.subscribe(state => {
+            /* istanbul ignore else */
+            if (state) {
+                // Initialise websocket API
+                const websocket_options = {
+                    fixed: this._auth_service.fixed_device,
+                    host: options.host || location.host,
+                    token: this._auth_service.token
+                };
+                this._websocket =
+                    options.mock !== true
+                        ? new EngineWebsocket(websocket_options)
+                        : new MockEngineWebsocket(websocket_options);
+                this._binding_service = new EngineBindingService(this._websocket);
+                // Initialise HTTP API
+                this._http =
+                    options.mock !== true
+                        ? new EngineHttpClient(this._auth_service)
+                        : new MockEngineHttpClient(this._auth_service);
+                // Initialise HTTP services
+                this._applications = new EngineApplicationsService(this._http);
+                this._auth_sources = new EngineAuthSourcesService(this._http);
+                this._domains = new EngineDomainsService(this._http);
+                this._drivers = new EngineDriversService(this._http);
+                this._modules = new EngineModulesService(this._http);
+                this._systems = new EngineSystemsService(this._http);
+                this._users = new EngineUsersService(this._http);
+                this._zones = new EngineZonesService(this._http);
+                if (this._sub) {
+                    this._sub.unsubscribe();
+                }
+            }
+        });
+    }
+    /** HTTP Client for request with composer credentials */
+    private static _http: EngineHttpClient;
+    /** Authentication service for Composer */
+    private static _auth_service: EngineAuthService;
+    /** Service for binding to engine's realtime API */
+    private static _binding_service: EngineBindingService;
+    /** Websocket for engine realtime API communications */
+    private static _websocket: EngineWebsocket;
+    /** HTTP service for engine applications */
+    private static _applications: EngineApplicationsService;
+    /** HTTP service for engine auth sources */
+    private static _auth_sources: EngineAuthSourcesService;
+    /** HTTP service for engine domains */
+    private static _domains: EngineDomainsService;
+    /** HTTP service for engine drivers */
+    private static _drivers: EngineDriversService;
+    /** Http service for engine modules */
+    private static _modules: EngineModulesService;
+    /** HTTP service for engine systems */
+    private static _systems: EngineSystemsService;
+    /** HTTP service for engine users */
+    private static _users: EngineUsersService;
+    /** HTTP service for engine zones */
+    private static _zones: EngineZonesService;
+    /** Initialisation subscription */
+    private static _sub: Subscription;
+
+    /**
+     * Remove any old services
+     */
+    private static clear() {
+        const keys = [
+            '_auth_service',
+            '_http',
+            '_websocket',
+            '_binding_service',
+            '_application',
+            '_auth_sources',
+            '_domains',
+            '_drivers',
+            '_modules',
+            '_systems',
+            '_users',
+            '_zones'
+        ];
+        for (const key of keys) {
+            if (key && (this as any)[key]) {
+                if ((this as any)[key].destroy instanceof Function) {
+                    (this as any)[key].destroy();
+                }
+                delete (this as any)[key];
+            }
+        }
+    }
+
     private static checkProperty<T>(prop: T) {
         if (!prop) {
             throw new Error(
@@ -198,5 +193,9 @@ export default class Composer {
             );
         }
         return prop;
+    }
+
+    constructor() {
+        throw new Error('No constructor for static class');
     }
 }

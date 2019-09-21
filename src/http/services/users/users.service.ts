@@ -1,22 +1,22 @@
-import { EngineHttpClient } from '../../http.service'
-import { EngineResourceService } from '../resources/resources.service'
-import { HashMap } from '../../../utilities/types.utilities'
-import { EngineUser } from './user.class'
-import { IEngineUserQuery } from './user.interfaces'
+import { HashMap } from '../../../utilities/types.utilities';
+import { EngineHttpClient } from '../../http.service';
+import { EngineResourceService } from '../resources/resources.service';
+import { EngineUser } from './user.class';
+import { EngineUserQueryOptions } from './user.interfaces';
 
 export class EngineUsersService extends EngineResourceService<EngineUser> {
     constructor(protected http: EngineHttpClient) {
-        super(http)
-        this._name = 'User'
-        this._api_route = 'users'
+        super(http);
+        this._name = 'User';
+        this._api_route = 'users';
     }
 
     /**
      * Query the index of the API route associated with this service
      * @param query_params Map of query paramaters to add to the request URL
      */
-    public query(query_params?: IEngineUserQuery) {
-        return super.query(query_params)
+    public query(query_params?: EngineUserQueryOptions) {
+        return super.query(query_params);
     }
 
     /**
@@ -25,14 +25,14 @@ export class EngineUsersService extends EngineResourceService<EngineUser> {
      * @param query_params Map of query paramaters to add to the request URL
      */
     public add(_: HashMap, __: HashMap) {
-        return Promise.reject('Adding a new user is not allowed')
+        return Promise.reject('Adding a new user is not allowed');
     }
 
     /**
      * Query the API for the currently logged in user
      */
     public current() {
-        return super.show('current')
+        return super.show('current');
     }
 
     /**
@@ -40,6 +40,6 @@ export class EngineUsersService extends EngineResourceService<EngineUser> {
      * @param item Raw API data
      */
     protected process(item: HashMap) {
-        return new EngineUser(this, item)
+        return new EngineUser(this, item);
     }
 }

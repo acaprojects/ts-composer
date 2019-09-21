@@ -1,23 +1,23 @@
-import { of, from, Observable } from 'rxjs';
+import { from, Observable, of } from 'rxjs';
 import { concatMap, delay } from 'rxjs/operators';
 
-import { EngineHttpClient } from '../http.service';
+import { EngineAuthService } from '../../auth/auth.service';
+import { convertPairStringToMap, log } from '../../utilities/general.utilities';
 import { HashMap } from '../../utilities/types.utilities';
-import { log, convertPairStringToMap } from '../../utilities/general.utilities';
 import {
-    MockHttpRequestHandler,
-    MockHttpRequest,
-    MockHttpRequestHandlerOptions
-} from './mock-http.interfaces';
-import {
+    HttpJsonOptions,
     HttpOptions,
     HttpResponse,
-    HttpVerb,
-    HttpJsonOptions,
     HttpTextOptions,
+    HttpVerb,
     HttpVoidOptions
 } from '../http.interfaces';
-import { EngineAuthService } from '../../auth/auth.service';
+import { EngineHttpClient } from '../http.service';
+import {
+    MockHttpRequest,
+    MockHttpRequestHandler,
+    MockHttpRequestHandlerOptions
+} from './mock-http.interfaces';
 
 declare global {
     interface Window {
@@ -150,7 +150,9 @@ export class MockEngineHttpClient extends EngineHttpClient {
         const method_handlers: MockHttpRequestHandler[] = Object.keys(this._handlers).reduce<
             MockHttpRequestHandler[]
         >((l, i) => {
-            i.indexOf(`${method}|`) === 0 ? l.push(this._handlers[i]) : '';
+            if (i.indexOf(`${method}|`) === 0) {
+                l.push(this._handlers[i]);
+            }
             return l;
         }, []);
         for (const handler of method_handlers) {

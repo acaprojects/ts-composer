@@ -1,20 +1,20 @@
 import { Observable, of, throwError } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
-import { ajax, AjaxResponse, AjaxError } from 'rxjs/ajax';
+import { ajax, AjaxError, AjaxResponse } from 'rxjs/ajax';
+import { catchError, map } from 'rxjs/operators';
 
+import { EngineAuthService } from '../auth/auth.service';
 import { log } from '../utilities/general.utilities';
 import { HashMap } from '../utilities/types.utilities';
-import { EngineAuthService } from '../auth/auth.service';
 import {
+    HttpError,
     HttpJsonOptions,
-    HttpTextOptions,
     HttpOptions,
     HttpResponse,
-    HttpVoidOptions,
     HttpResponseType,
-    HttpError,
+    HttpStatusCode,
+    HttpTextOptions,
     HttpVerb,
-    HttpStatusCode
+    HttpVoidOptions
 } from './http.interfaces';
 
 /**
@@ -22,8 +22,8 @@ import {
  * @hidden
  */
 export const engine_http: any = {
-    log,
-    ajax
+    ajax,
+    log
 };
 
 export class EngineHttpClient {
