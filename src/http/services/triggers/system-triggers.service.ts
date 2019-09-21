@@ -1,8 +1,8 @@
 import { HashMap } from '../../../utilities/types.utilities';
 import { EngineHttpClient } from '../../http.service';
+import { EngineResourceQueryOptions } from '../resources/resources.interface';
 import { EngineResourceService } from '../resources/resources.service';
 import { EngineTrigger } from './trigger.class';
-import { EngineResourceQueryOptions } from '../resources/resources.interface';
 
 export class EngineSystemTriggersService extends EngineResourceService<EngineTrigger> {
     constructor(protected http: EngineHttpClient) {

@@ -14,11 +14,9 @@ export * from './http/services/applications/application.interfaces';
 export * from './http/services/applications/application.class';
 
 export * from './http/services/auth-sources/auth-sources.service';
-export * from './http/services/auth-sources/auth-source.interfaces';
 export * from './http/services/auth-sources/auth-source.class';
 
 export * from './http/services/domains/domains.service';
-export * from './http/services/domains/domain.interfaces';
 export * from './http/services/domains/domain.class';
 
 export * from './http/services/drivers/drivers.service';
