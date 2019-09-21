@@ -13,7 +13,7 @@ export interface IEngineTrigger {
     actions?: TriggerActions;
     /** Conditions for activating the trigger */
     conditions?: TriggerConditions;
-    /**  */
+    /** Duration with which to ignore sequential activations of the trigger */
     debounce_period: number;
     /** Whether the trigger should take priority */
     important: boolean;

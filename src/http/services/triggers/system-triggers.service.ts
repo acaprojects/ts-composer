@@ -4,11 +4,11 @@ import { EngineResourceService } from '../resources/resources.service';
 import { HashMap } from '../../../utilities/types.utilities';
 import { IEngineTriggerQueryOptions, IEngineTriggerShowOptions } from './trigger.interfaces';
 
-export class EngineTriggersService extends EngineResourceService<EngineTrigger> {
+export class EngineSystemTriggersService extends EngineResourceService<EngineTrigger> {
     constructor(protected http: EngineHttpClient) {
         super(http);
         this._name = 'Trigger';
-        this._api_route = 'triggers';
+        this._api_route = 'system-triggers';
     }
 
     /**
