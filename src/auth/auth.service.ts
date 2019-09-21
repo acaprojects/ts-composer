@@ -1,3 +1,4 @@
+import { BehaviorSubject, Observable } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
 import { Md5 } from 'ts-md5/dist/md5';
 
@@ -5,10 +6,16 @@ import { log, getFragments, generateNonce } from '../utilities/general.utilities
 import { EngineAuthority, EngineTokenResponse, EngineAuthOptions } from './auth.interfaces';
 import { HashMap } from '../utilities/types.utilities';
 
-import * as dayjs from 'dayjs';
-import { BehaviorSubject, Observable } from 'rxjs';
+import * as _dayjs from 'dayjs';
+// tslint:disable-next-line:no-duplicate-imports
+import { default as _rollupDayjs, Dayjs } from 'dayjs';
 
-/** Method store to allow attaching spies for testing */
+const dayjs = _rollupDayjs || _dayjs;
+
+/**
+ * Method store to allow attaching spies for testing
+ * @private
+ */
 export const engine = { ajax, log };
 
 export class EngineAuthService {

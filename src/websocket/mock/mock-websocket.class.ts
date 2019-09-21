@@ -13,6 +13,10 @@ import { HashMap } from '../../utilities/types.utilities';
 import { MockEngineWebsocketModule } from './mock-engine-module.class';
 import { MockEngineWebsocketSystem } from './mock-engine-system.class';
 
+/**
+ * Method store to allow attaching spies for testing
+ * @private
+ */
 export const engine_mock_socket = { log };
 
 declare global {

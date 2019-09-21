@@ -17,6 +17,10 @@ import {
     HttpStatusCode
 } from './http.interfaces';
 
+/**
+ * Method store to allow attaching spies for testing
+ * @private
+ */
 export const engine_http: any = {
     log,
     ajax
