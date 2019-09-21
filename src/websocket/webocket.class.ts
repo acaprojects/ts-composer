@@ -18,6 +18,10 @@ const KEEP_ALIVE = 20;
 /** Global counter for websocket request IDs */
 let REQUEST_COUNT = 0;
 
+/**
+ * Method store to allow attaching spies for testing
+ * @hidden
+ */
 export let engine_socket = { websocket: webSocket, log };
 
 export class EngineWebsocket {

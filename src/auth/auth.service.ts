@@ -9,12 +9,14 @@ import { HashMap } from '../utilities/types.utilities';
 import * as _dayjs from 'dayjs';
 // tslint:disable-next-line:no-duplicate-imports
 import { default as _rollupDayjs, Dayjs } from 'dayjs';
-
+/**
+ * @hidden
+ */
 const dayjs = _rollupDayjs || _dayjs;
 
 /**
  * Method store to allow attaching spies for testing
- * @private
+ * @hidden
  */
 export const engine = { ajax, log };
 

@@ -15,7 +15,7 @@ import { MockEngineWebsocketSystem } from './mock-engine-system.class';
 
 /**
  * Method store to allow attaching spies for testing
- * @private
+ * @hidden
  */
 export const engine_mock_socket = { log };
 

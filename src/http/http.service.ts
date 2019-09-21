@@ -19,7 +19,7 @@ import {
 
 /**
  * Method store to allow attaching spies for testing
- * @private
+ * @hidden
  */
 export const engine_http: any = {
     log,

@@ -5,11 +5,14 @@ declare global {
         debug: boolean;
     }
 }
-
+/**
+ * @hidden
+ */
 export type ConsoleIOStream = 'log' | 'warn' | 'debug' | 'error';
 /* istanbul ignore next */
 /**
  * Log message to the console
+ * @hidden
  * @param type Where the message is from
  * @param msg Body of the message
  * @param args Javascript data to post after the message
@@ -44,6 +47,7 @@ export function log(
 /* istanbul ignore next */
 /**
  * Whether the console has colours
+ * @hidden
  */
 export function consoleHasColours() {
     const doc = document as any;

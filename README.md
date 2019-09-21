@@ -4,7 +4,7 @@ Composer is a typescript API for ACAEngine
 
 ## Compilation
 
-You can build the library from source after installing the dependancies with the command
+You can build the library from source after installing the dependencies with the command
 
 `npm run build`
 
@@ -59,7 +59,7 @@ const sub = my_variable.listen((value) => doSomething(value));
 This binds to the `power` status variable on the 3rd `TestModule` in the system `sys-death-star`.
 Any changes to the value of `power` on ACAEngine will then be emitted to the function passed to `listen`.
 
-Other than listening to changes in values you can also remotely execute methods on modules.
+Other than listening to changes of values you can also remotely execute methods on modules.
 
 ```typescript
 const my_mod = Composer.bindings.module('sys-death-star', 'DemoModule', 2);
