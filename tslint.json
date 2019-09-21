@@ -40,7 +40,7 @@
         ],
         "max-line-length": [true, 128],
         "interface-name": [true, "never-prefix"],
-        "import-sources-order": "any",
+        "ordered-imports": {"import-sources-order": "any"},
         "arrow-parens": false,
         "trailing-comma": { "multiline": "never", "singleline": "never" }
     }
