@@ -23,7 +23,13 @@
                 "variable-declaration": "nospace"
             }
         ],
-        "variable-name": [true, "ban-keywords", "check-format", "allow-snake-case"],
+        "variable-name": [
+            true,
+            "ban-keywords",
+            "check-format",
+            "allow-snake-case",
+            "allow-leading-underscore"
+        ],
         "whitespace": [
             true,
             "check-branch",
@@ -33,6 +39,9 @@
             "check-type"
         ],
         "max-line-length": [true, 128],
-        "interface-name": [true, "never-prefix"]
+        "interface-name": [true, "never-prefix"],
+        "import-sources-order": "any",
+        "arrow-parens": false,
+        "trailing-comma": { "multiline": "never", "singleline": "never" }
     }
 }
