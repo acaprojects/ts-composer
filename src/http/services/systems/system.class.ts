@@ -10,7 +10,7 @@ export class EngineSystem extends EngineResource<EngineSystemsService> {
 
     public set edge_id(value: string) {
         if (this.id) {
-            throw new Error("Edge ID cannot be changed from it's initial value");
+            throw new Error('Edge ID cannot be changed from it\'s initial value');
         }
         this.change('edge_id', value);
     }

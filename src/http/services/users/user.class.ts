@@ -13,7 +13,7 @@ export class EngineUser extends EngineResource<EngineUsersService> {
 
     public set authority_id(value: string) {
         if (this.id) {
-            throw new Error("Authority ID cannot be changed from it's initial value");
+            throw new Error('Authority ID cannot be changed from it\'s initial value');
         }
         this.change('authority_id', value);
     }

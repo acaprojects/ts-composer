@@ -29,7 +29,7 @@ export class EngineDriver extends EngineResource<EngineDriversService> {
 
     public set role(value: EngineDriverRole) {
         if (this.id) {
-            throw new Error("Role cannot be changed from it's initial value");
+            throw new Error('Role cannot be changed from it\'s initial value');
         }
         this.change('role', value);
     }

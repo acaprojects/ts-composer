@@ -189,7 +189,7 @@ export default class Composer {
     private static checkProperty<T>(prop: T) {
         if (!prop) {
             throw new Error(
-                "Composer hasn't been initialised yet. Call `Composer.init` to initialise composer"
+                'Composer hasn\'t been initialised yet. Call `Composer.init` to initialise composer'
             );
         }
         return prop;

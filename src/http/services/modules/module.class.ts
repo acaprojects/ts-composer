@@ -12,7 +12,7 @@ export class EngineModule extends EngineResource<EngineModulesService> {
 
     public set dependency_id(value: string) {
         if (this.id) {
-            throw new Error("Dependency ID cannot be changed from it's initial value");
+            throw new Error('Dependency ID cannot be changed from it\'s initial value');
         }
         this.change('dependency_id', value);
     }
@@ -24,7 +24,7 @@ export class EngineModule extends EngineResource<EngineModulesService> {
 
     public set system_id(value: string) {
         if (this.id) {
-            throw new Error("System ID cannot be changed from it's initial value");
+            throw new Error('System ID cannot be changed from it\'s initial value');
         }
         this.change('control_system_id', value);
     }
@@ -36,7 +36,7 @@ export class EngineModule extends EngineResource<EngineModulesService> {
 
     public set edge_id(value: string) {
         if (this.id) {
-            throw new Error("Edge ID cannot be changed from it's initial value");
+            throw new Error('Edge ID cannot be changed from it\'s initial value');
         }
         this.change('edge_id', value);
     }
@@ -48,7 +48,7 @@ export class EngineModule extends EngineResource<EngineModulesService> {
 
     public set ip(value: string) {
         if (this.id) {
-            throw new Error("IP Address cannot be changed from it's initial value");
+            throw new Error('IP Address cannot be changed from it\'s initial value');
         }
         this.change('ip', value);
     }
@@ -60,7 +60,7 @@ export class EngineModule extends EngineResource<EngineModulesService> {
 
     public set tls(value: boolean) {
         if (this.id) {
-            throw new Error("TLS cannot be changed from it's initial value");
+            throw new Error('TLS cannot be changed from it\'s initial value');
         }
         this.change('tls', value);
     }
@@ -72,7 +72,7 @@ export class EngineModule extends EngineResource<EngineModulesService> {
 
     public set udp(value: boolean) {
         if (this.id) {
-            throw new Error("UDP cannot be changed from it's initial value");
+            throw new Error('UDP cannot be changed from it\'s initial value');
         }
         this.change('udp', value);
     }
@@ -84,7 +84,7 @@ export class EngineModule extends EngineResource<EngineModulesService> {
 
     public set port(value: number) {
         if (this.id) {
-            throw new Error("Port number cannot be changed from it's initial value");
+            throw new Error('Port number cannot be changed from it\'s initial value');
         }
         this.change('port', value);
     }
@@ -96,7 +96,7 @@ export class EngineModule extends EngineResource<EngineModulesService> {
 
     public set makebreak(value: boolean) {
         if (this.id) {
-            throw new Error("Makebreak cannot be changed from it's initial value");
+            throw new Error('Makebreak cannot be changed from it\'s initial value');
         }
         this.change('makebreak', value);
     }
@@ -108,7 +108,7 @@ export class EngineModule extends EngineResource<EngineModulesService> {
 
     public set uri(value: string) {
         if (this.id) {
-            throw new Error("URI cannot be changed from it's initial value");
+            throw new Error('URI cannot be changed from it\'s initial value');
         }
         this.change('uri', value);
     }
@@ -138,7 +138,7 @@ export class EngineModule extends EngineResource<EngineModulesService> {
 
     public set role(value: EngineDriverRole) {
         if (this.id) {
-            throw new Error("Role cannot be changed from it's initial value");
+            throw new Error('Role cannot be changed from it\'s initial value');
         }
         this.change('role', value);
     }
@@ -159,7 +159,7 @@ export class EngineModule extends EngineResource<EngineModulesService> {
 
     public set ignore_connected(value: boolean) {
         if (this.id) {
-            throw new Error("Ignore connected cannot be changed from it's initial value");
+            throw new Error('Ignore connected cannot be changed from it\'s initial value');
         }
         this.change('ignore_connected', value);
     }
@@ -259,7 +259,7 @@ export class EngineModule extends EngineResource<EngineModulesService> {
      */
     public state(lookup?: string): Promise<HashMap> {
         if (!this.id) {
-            throw new Error("You must save the module before it's state can be grabbed");
+            throw new Error('You must save the module before it\'s state can be grabbed');
         }
         return this.service.state(this.id, lookup);
     }
@@ -269,7 +269,7 @@ export class EngineModule extends EngineResource<EngineModulesService> {
      */
     public internalState(): Promise<HashMap> {
         if (!this.id) {
-            throw new Error("You must save the module before it's internal state can be grabbed");
+            throw new Error('You must save the module before it\'s internal state can be grabbed');
         }
         return this.service.internalState(this.id);
     }
