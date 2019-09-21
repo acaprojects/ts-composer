@@ -118,7 +118,6 @@ Composer.zones.delete(zone_id).then(() => doSomething());
 
 The services also provide methods for the various item action endpoints
 
-
 ```typescript
 // Driver Actions
 Composer.drivers.reload(driver_id);
@@ -142,6 +141,22 @@ Composer.system.count(system_id);
 
 // User Actions
 Composer.users.current();
+```
+
+Objects returned by `show` and `query` methods are immutable, 
+though when reassigning value it will be saved under the `changes` property of that object.
+These changes can be saved using the `save` method which will return a promise for the new object.
+
+```typescript
+Composer.zones.show(zone_id).then((zone) => {
+    console.log(zone.description); // Prints the current description
+    zone.description = 'New description';
+    console.log(zone.description); // Same a previous print
+    cosnole.log(zone.changes.description) // New description
+    zone.save().then((updated_zone) => {
+        cosnole.log(updated_zone.description) // New description
+    });
+});
 ```
 
 You can find more details about endpoint action on the API docs
