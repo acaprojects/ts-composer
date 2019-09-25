@@ -1,6 +1,6 @@
-import { EngineDriversService } from '../../../../src/http/services/drivers/drivers.service';
-import { EngineDriver } from '../../../../src/http/services/drivers/driver.class';
 import { of } from 'rxjs';
+import { EngineDriver } from '../../../../src/http/services/drivers/driver.class';
+import { EngineDriversService } from '../../../../src/http/services/drivers/drivers.service';
 
 describe('EngineDriversService', () => {
     let service: EngineDriversService;
@@ -11,7 +11,8 @@ describe('EngineDriversService', () => {
             get: jest.fn(),
             post: jest.fn(),
             put: jest.fn(),
-            delete: jest.fn()
+            delete: jest.fn(),
+            api_endpoint: '/api/engine/v1'
         };
         service = new EngineDriversService(http);
     });

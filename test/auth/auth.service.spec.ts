@@ -1,7 +1,7 @@
 import { of, throwError } from 'rxjs';
 
-import { engine, EngineAuthService } from '../../src/auth/auth.service';
 import { EngineAuthority } from '../../src/auth/auth.interfaces';
+import { engine, EngineAuthService } from '../../src/auth/auth.service';
 
 import * as dayjs from 'dayjs';
 
@@ -33,7 +33,8 @@ describe('EngineAuthService', () => {
             logout_url: `/logout`,
             session: false,
             production: false,
-            config: {}
+            config: {},
+            version: `2.0.0`
         };
         spy = jest.spyOn(engine.ajax, 'get');
         storage = jest.spyOn(Object.getPrototypeOf(localStorage), 'getItem');
@@ -48,6 +49,11 @@ describe('EngineAuthService', () => {
         storage.mockReset();
         spy.mockRestore();
         storage.mockRestore();
+    });
+
+    it('should expose the API endpoint', () => {
+        service = newService();
+        expect(service.api_endpoint).toBe('/api/engine/v1');
     });
 
     it('should get the authority', done => {
@@ -65,7 +71,7 @@ describe('EngineAuthService', () => {
         jest.useRealTimers();
     });
 
-    it("should redirect to login page user isn't authorised", done => {
+    it('should redirect to login page user isn\'t authorised', done => {
         service = newService();
         setTimeout(() => {
             expect(global.location.assign).toBeCalledWith(
@@ -99,7 +105,7 @@ describe('EngineAuthService', () => {
         window.history.pushState(
             {},
             'Test Title',
-            '/not-login.html?access_token=test&expires_in=3600&refresh_token=refresh&trust=true&fixed_device=true&state=nonce;other'
+    '/not-login.html?access_token=test&expires_in=3600&refresh_token=refresh&trust=true&fixed_device=true&state=nonce;other'
         );
         storage.mockImplementationOnce(() => '').mockImplementationOnce(() => 'nonce');
         service = newService();
@@ -134,7 +140,7 @@ describe('EngineAuthService', () => {
     });
 
     it('should generate tokens from code', done => {
-        let post_spy = jest.spyOn(engine.ajax, 'post');
+        const post_spy = jest.spyOn(engine.ajax, 'post');
         post_spy.mockImplementation(
             () =>
                 of({
@@ -161,7 +167,7 @@ describe('EngineAuthService', () => {
     });
 
     it('should generate tokens from refresh token', done => {
-        let post_spy = jest.spyOn(engine.ajax, 'post');
+        const post_spy = jest.spyOn(engine.ajax, 'post');
         post_spy.mockImplementation(
             () =>
                 of({

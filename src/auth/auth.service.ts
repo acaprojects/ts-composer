@@ -45,6 +45,16 @@ export class EngineAuthService {
         this.loadAuthority();
     }
 
+    /** API Endpoint for the retrieved version of engine */
+    public get api_endpoint() {
+        if (this.authority) {
+            if (/1\.[0-9]+\.[0-9]+/g.test(this.authority.version || '')) {
+                return `/control/api`;
+            }
+        }
+        return `/api/engine/v1`;
+    }
+
     /** OAuth 2 client ID for the application */
     public get client_id(): string {
         return this._client_id;

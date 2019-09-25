@@ -12,7 +12,8 @@ describe('EngineSystemTriggersService', () => {
             get: jest.fn(),
             post: jest.fn(),
             put: jest.fn(),
-            delete: jest.fn()
+            delete: jest.fn(),
+            api_endpoint: '/api/engine/v1'
         };
         service = new EngineSystemTriggersService(http);
     });

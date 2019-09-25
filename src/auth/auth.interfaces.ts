@@ -19,6 +19,8 @@ export interface EngineAuthority {
     session: boolean;
     /** Configuration metadata for the authority */
     config: HashMap;
+    /** Version of the ACAEngine API */
+    version?: string;
 }
 
 export interface EngineAuthOptions {

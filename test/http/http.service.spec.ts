@@ -1,5 +1,5 @@
-import { EngineHttpClient, engine_http } from '../../src/http/http.service';
 import { of, throwError } from 'rxjs';
+import { engine_http, EngineHttpClient } from '../../src/http/http.service';
 
 describe('EngineHttpClient', () => {
     let spy: any;
@@ -7,7 +7,7 @@ describe('EngineHttpClient', () => {
     let service: EngineHttpClient;
 
     beforeEach(() => {
-        auth = { has_token: false, token: 'test_token' };
+        auth = { has_token: false, token: 'test_token', api_endpoint: '/api/engine/v1' };
         auth.refreshAuthority = jest.fn();
         service = new EngineHttpClient(auth);
     });
@@ -29,6 +29,10 @@ describe('EngineHttpClient', () => {
         expect(auth.refreshAuthority).toBeCalled();
         spy.mockReset();
         spy.mockRestore();
+    });
+
+    it('should expose the API endpoint', () => {
+        expect(service.api_endpoint).toBe('/api/engine/v1');
     });
 
     describe('GET', () => {
@@ -92,7 +96,7 @@ describe('EngineHttpClient', () => {
                 .get('test_url', { headers: { 'CUSTOM-HEADER-X': 'Trump Cards :)' } })
                 .subscribe(_ => null);
             expect(engine_http.ajax.get).toBeCalledWith('test_url', {
-                Authorization: 'test_token',
+                'Authorization': 'test_token',
                 'CUSTOM-HEADER-X': 'Trump Cards :)'
             });
         });
@@ -173,7 +177,7 @@ describe('EngineHttpClient', () => {
                 .post('test_url', 'test_body', { headers: { 'CUSTOM-HEADER-X': 'Trump Cards :)' } })
                 .subscribe(_ => null);
             expect(engine_http.ajax.post).toBeCalledWith('test_url', 'test_body', {
-                Authorization: 'test_token',
+                'Authorization': 'test_token',
                 'CUSTOM-HEADER-X': 'Trump Cards :)'
             });
         });

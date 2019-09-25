@@ -1,7 +1,7 @@
 import { of } from 'rxjs';
 
-import { EngineTriggersService } from '../../../../src/http/services/triggers/triggers.service';
 import { EngineTrigger } from '../../../../src/http/services/triggers/trigger.class';
+import { EngineTriggersService } from '../../../../src/http/services/triggers/triggers.service';
 
 describe('EngineTriggersService', () => {
     let service: EngineTriggersService;
@@ -12,7 +12,8 @@ describe('EngineTriggersService', () => {
             get: jest.fn(),
             post: jest.fn(),
             put: jest.fn(),
-            delete: jest.fn()
+            delete: jest.fn(),
+            api_endpoint: '/api/engine/v1'
         };
         service = new EngineTriggersService(http);
     });

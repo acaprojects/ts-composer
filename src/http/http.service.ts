@@ -29,6 +29,11 @@ export const engine_http: any = {
 export class EngineHttpClient {
     constructor(protected _auth: EngineAuthService) {}
 
+    /** API Endpoint for the retrieved version of engine */
+    public get api_endpoint() {
+        return this._auth.api_endpoint;
+    }
+
     /**
      * Perform AJAX HTTP GET request
      * @param url URL of the GET endpoint

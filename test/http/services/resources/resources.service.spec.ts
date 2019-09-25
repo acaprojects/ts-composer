@@ -1,13 +1,13 @@
-import { Observable, of, throwError } from 'rxjs'
+import { Observable, of, throwError } from 'rxjs';
 
-import { EngineResource } from '../../../../src/http/services/resources/resource.class'
-import { EngineResourceService } from '../../../../src/http/services/resources/resources.service'
+import { EngineResource } from '../../../../src/http/services/resources/resource.class';
+import { EngineResourceService } from '../../../../src/http/services/resources/resources.service';
 
 class ERSInstance extends EngineResourceService<EngineResource> {}
 
 describe('EngineResourceService', () => {
-    let service: ERSInstance
-    let http: any
+    let service: ERSInstance;
+    let http: any;
 
     async function testRequest(
         method: 'get' | 'post' | 'put' | 'delete',
@@ -16,179 +16,180 @@ describe('EngineResourceService', () => {
         test1: any[],
         test2: any[]
     ) {
-        const item = result.hasOwnProperty('results') ? result.results : result
+        const item = result.hasOwnProperty('results') ? result.results : result;
         http[method]
             .mockReturnValueOnce(of(result))
             .mockReturnValueOnce(of(result))
-            .mockReturnValueOnce(throwError('An Error Value'))
-        const value = await (service as any)[fn](...test1)
-        jest.runOnlyPendingTimers()
+            .mockReturnValueOnce(throwError('An Error Value'));
+        const value = await (service as any)[fn](...test1);
+        jest.runOnlyPendingTimers();
         if (method === 'delete') {
-            expect(value).toBeFalsy()
+            expect(value).toBeFalsy();
         } else {
-            expect(value).toEqual(item || [])
+            expect(value).toEqual(item || []);
         }
         // Test request with parameters
-        await (service as any)[fn](...test2)
-        jest.runOnlyPendingTimers()
+        await (service as any)[fn](...test2);
+        jest.runOnlyPendingTimers();
         // Test error handling
         try {
-            await (service as any)[fn](...test1)
-            throw new Error('Failed to error')
+            await (service as any)[fn](...test1);
+            throw new Error('Failed to error');
         } catch (e) {
-            expect(e).toBe('An Error Value')
+            expect(e).toBe('An Error Value');
         }
-        jest.runOnlyPendingTimers()
+        jest.runOnlyPendingTimers();
     }
 
     beforeEach(() => {
-        jest.useFakeTimers()
+        jest.useFakeTimers();
         http = {
             get: jest.fn(),
             post: jest.fn(),
             put: jest.fn(),
-            delete: jest.fn()
-        }
-        service = new ERSInstance(http)
-    })
+            delete: jest.fn(),
+            api_endpoint: '/api/engine/v1'
+        };
+        service = new ERSInstance(http);
+    });
 
     afterEach(() => {
-        jest.useRealTimers()
-    })
+        jest.useRealTimers();
+    });
 
     it('should create an instance', () => {
-        expect(service).toBeTruthy()
-        expect(service).toBeInstanceOf(ERSInstance)
-    })
+        expect(service).toBeTruthy();
+        expect(service).toBeInstanceOf(ERSInstance);
+    });
 
     it('should expose initialised state', () => {
-        expect(service.initialised).toBeTruthy()
-    })
+        expect(service.initialised).toBeTruthy();
+    });
 
     it('should allow querying the index endpoint', async () => {
-        expect.assertions(8)
-        const item = { id: 'test', name: 'Test' }
-        await testRequest('get', 'query', [item], [], [{ cache: 100, test: true }])
-        await testRequest('get', 'query', { total: 10, results: [item] }, [], [{ test: true }])
-        await testRequest('get', 'query', { total: 10, results: undefined }, [], [{ test: true }])
-        expect(http.get).toBeCalledWith('/api/engine/v1/base')
-        expect(http.get).toBeCalledWith('/api/engine/v1/base?test=true')
-    })
+        expect.assertions(8);
+        const item = { id: 'test', name: 'Test' };
+        await testRequest('get', 'query', [item], [], [{ cache: 100, test: true }]);
+        await testRequest('get', 'query', { total: 10, results: [item] }, [], [{ test: true }]);
+        await testRequest('get', 'query', { total: 10, results: undefined }, [], [{ test: true }]);
+        expect(http.get).toBeCalledWith('/api/engine/v1/base');
+        expect(http.get).toBeCalledWith('/api/engine/v1/base?test=true');
+    });
 
     it('should allow for grabbing the show endpoint for an item', async () => {
-        expect.assertions(4)
-        const item = { id: 'test', name: 'Test' }
-        await testRequest('get', 'show', item, ['test'], ['test', { test: true }])
-        expect(http.get).toBeCalledWith('/api/engine/v1/base/test')
-        expect(http.get).toBeCalledWith('/api/engine/v1/base/test?test=true')
-    })
+        expect.assertions(4);
+        const item = { id: 'test', name: 'Test' };
+        await testRequest('get', 'show', item, ['test'], ['test', { test: true }]);
+        expect(http.get).toBeCalledWith('/api/engine/v1/base/test');
+        expect(http.get).toBeCalledWith('/api/engine/v1/base/test?test=true');
+    });
 
     it('should allow adding new items', async () => {
-        expect.assertions(4)
-        const item = { id: 'test', name: 'Test' }
-        await testRequest('post', 'add', item, [item], [item, { test: true }])
-        expect(http.post).toBeCalledWith('/api/engine/v1/base', item)
-        expect(http.post).toBeCalledWith('/api/engine/v1/base?test=true', item)
-    })
+        expect.assertions(4);
+        const item = { id: 'test', name: 'Test' };
+        await testRequest('post', 'add', item, [item], [item, { test: true }]);
+        expect(http.post).toBeCalledWith('/api/engine/v1/base', item);
+        expect(http.post).toBeCalledWith('/api/engine/v1/base?test=true', item);
+    });
 
     it('should allow running POST tasks on items', async () => {
-        expect.assertions(4)
-        const item = { id: 'test', name: 'Test' }
+        expect.assertions(4);
+        const item = { id: 'test', name: 'Test' };
         await testRequest(
             'post',
             'task',
             'success',
             ['test', 'a_task'],
             ['test', 'a_task', { test: true }]
-        )
+        );
         expect(http.post).toBeCalledWith('/api/engine/v1/base/test/a_task', {
             id: 'test',
             _task: 'a_task'
-        })
+        });
         expect(http.post).toBeCalledWith('/api/engine/v1/base/test/a_task', {
             test: true,
             id: 'test',
             _task: 'a_task'
-        })
-    })
+        });
+    });
 
     it('should allow running GET tasks on items', async () => {
-        expect.assertions(4)
-        const item = { id: 'test', name: 'Test' }
+        expect.assertions(4);
+        const item = { id: 'test', name: 'Test' };
         await testRequest(
             'get',
             'task',
             'success',
             ['test', 'a_task', null, 'get'],
             ['test', 'a_task', { test: true }, 'get']
-        )
-        expect(http.get).toBeCalledWith('/api/engine/v1/base/test/a_task')
-        expect(http.get).toBeCalledWith('/api/engine/v1/base/test/a_task?test=true')
-    })
+        );
+        expect(http.get).toBeCalledWith('/api/engine/v1/base/test/a_task');
+        expect(http.get).toBeCalledWith('/api/engine/v1/base/test/a_task?test=true');
+    });
 
     it('should allow polling index endpoints', done => {
-        const item = { id: 'test', name: 'Test' }
-        const spy = spyOn(service, 'query')
-        spy.and.returnValue(Promise.resolve(item))
-        const obs = service.poll()
-        expect(obs).toBeInstanceOf(Observable)
+        const item = { id: 'test', name: 'Test' };
+        const spy = spyOn(service, 'query');
+        spy.and.returnValue(Promise.resolve(item));
+        const obs = service.poll();
+        expect(obs).toBeInstanceOf(Observable);
         obs.subscribe(
             value => {
-                expect(value).toBe(item)
-                jest.runOnlyPendingTimers()
-                spy.and.returnValue(Promise.reject('An error :)'))
+                expect(value).toBe(item);
+                jest.runOnlyPendingTimers();
+                spy.and.returnValue(Promise.reject('An error :)'));
             },
             e => {
-                expect(service.query).toBeCalledTimes(3)
-                expect(e).toBe('An error :)')
-                done()
+                expect(service.query).toBeCalledTimes(3);
+                expect(e).toBe('An error :)');
+                done();
             }
-        )
-    })
+        );
+    });
 
     it('should allow polling show endpoints', done => {
-        const item = { id: 'test', name: 'Test' }
-        const spy = spyOn(service, 'show')
-        spy.and.returnValue(Promise.resolve(item))
-        const obs = service.poll('test')
-        expect(obs).toBeInstanceOf(Observable)
+        const item = { id: 'test', name: 'Test' };
+        const spy = spyOn(service, 'show');
+        spy.and.returnValue(Promise.resolve(item));
+        const obs = service.poll('test');
+        expect(obs).toBeInstanceOf(Observable);
         obs.subscribe(
             value => {
-                expect(value).toBe(item)
-                jest.runOnlyPendingTimers()
-                spy.and.returnValue(Promise.reject('An error :)'))
+                expect(value).toBe(item);
+                jest.runOnlyPendingTimers();
+                spy.and.returnValue(Promise.reject('An error :)'));
             },
             e => {
-                expect(service.show).toBeCalledTimes(3)
-                expect(e).toBe('An error :)')
-                done()
+                expect(service.show).toBeCalledTimes(3);
+                expect(e).toBe('An error :)');
+                done();
             }
-        )
-    })
+        );
+    });
 
     it('should allow cancelling polling', done => {
-        const item = { id: 'test', name: 'Test' }
-        const spy = spyOn(service, 'show')
-        spy.and.returnValue(Promise.resolve(item))
-        const obs = service.poll('test', {}, 3000)
-        expect(obs).toBeInstanceOf(Observable)
-        obs.subscribe(_ => null, _ => null, () => done())
-        service.stopPoll('test')
-    })
+        const item = { id: 'test', name: 'Test' };
+        const spy = spyOn(service, 'show');
+        spy.and.returnValue(Promise.resolve(item));
+        const obs = service.poll('test', {}, 3000);
+        expect(obs).toBeInstanceOf(Observable);
+        obs.subscribe(_ => null, _ => null, () => done());
+        service.stopPoll('test');
+    });
 
     it('should allow updating items', async () => {
-        expect.assertions(4)
-        const item = { id: 'test', name: 'Test' }
-        await testRequest('put', 'update', item, ['test', item], ['test', item, { test: true }])
-        expect(http.put).toBeCalledWith('/api/engine/v1/base/test', item)
-        expect(http.put).toBeCalledWith('/api/engine/v1/base/test?test=true', item)
-    })
+        expect.assertions(4);
+        const item = { id: 'test', name: 'Test' };
+        await testRequest('put', 'update', item, ['test', item], ['test', item, { test: true }]);
+        expect(http.put).toBeCalledWith('/api/engine/v1/base/test', item);
+        expect(http.put).toBeCalledWith('/api/engine/v1/base/test?test=true', item);
+    });
 
     it('should allow deleting items', async () => {
-        expect.assertions(4)
-        const item = { id: 'test', name: 'Test' }
-        await testRequest('delete', 'delete', item, ['test'], ['test', { test: true }])
-        expect(http.delete).toBeCalledWith('/api/engine/v1/base/test')
-        expect(http.delete).toBeCalledWith('/api/engine/v1/base/test?test=true')
-    })
-})
+        expect.assertions(4);
+        const item = { id: 'test', name: 'Test' };
+        await testRequest('delete', 'delete', item, ['test'], ['test', { test: true }]);
+        expect(http.delete).toBeCalledWith('/api/engine/v1/base/test');
+        expect(http.delete).toBeCalledWith('/api/engine/v1/base/test?test=true');
+    });
+});
