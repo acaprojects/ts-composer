@@ -28,7 +28,7 @@ export function log(
 ) {
     if (window.debug) {
         const clr = color ? color : '#009688';
-        const COLOURS = ['color: #0288D1', `color:${clr}`, 'color:rgba(0,0,0,0.87)'];
+        const COLOURS = ['color: #0288D1', `color:${clr}`, 'color: default'];
         if (args) {
             if (consoleHasColours()) {
                 console[out](`%c[COMPOSER]%c[${type}] %c${msg}`, ...COLOURS, args);
@@ -108,4 +108,20 @@ export function generateNonce(length: number = 40): string {
         nonce += allowed_characters.charAt(Math.floor(Math.random() * allowed_characters.length));
     }
     return nonce;
+}
+
+/**
+ * Replace the URL fragment with the given name
+ * @param name Name of the fragment to remove
+ */
+export function removeFragment(name: string) {
+    const new_hash = (location.hash || '')
+        .replace(new RegExp(`${name}[a-zA-Z0-9\%\=]*&?`, 'g'), '')
+        .replace(/&&/g, '&')
+        .replace(/#&/g, '#');
+    const new_search = (location.search || '')
+        .replace(new RegExp(`${name}[a-zA-Z0-9\%\=]*&?`, 'g'), '')
+        .replace(/&&/g, '&')
+        .replace(/\?&/g, '#');
+    window.history.pushState(null, '', `${location.pathname}${new_hash}${new_search}`);
 }

@@ -2,7 +2,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
 import { Md5 } from 'ts-md5/dist/md5';
 
-import { generateNonce, getFragments, log } from '../utilities/general.utilities';
+import { generateNonce, getFragments, log, removeFragment } from '../utilities/general.utilities';
 import { HashMap } from '../utilities/types.utilities';
 import { EngineAuthOptions, EngineAuthority, EngineTokenResponse } from './auth.interfaces';
 
@@ -22,13 +22,13 @@ export const engine = { ajax, log };
 
 export class EngineAuthService {
     /** Browser key store to use for authentication credentials. Defaults to localStorage */
-    private _storage: Storage;
+    private _storage: Storage = localStorage;
     /** Authentication authority of for the current domain */
     private _authority: EngineAuthority | undefined;
     /** Map of promises */
     private _promises: HashMap<Promise<any> | undefined> = {};
     /** OAuth 2 client ID for the application */
-    private _client_id: string;
+    private _client_id: string = '';
     /** OAuth 2 state property */
     private _state: string = '';
     /** OAuth 2 token generation code */
@@ -39,6 +39,13 @@ export class EngineAuthService {
     private _online_observer = this._online.asObservable();
 
     constructor(private options: EngineAuthOptions) {
+        if (options) {
+            this.setup(options);
+        }
+    }
+
+    public setup(options: EngineAuthOptions) {
+        this.options = options;
         // Intialise storage
         this._storage = this.options.storage === 'session' ? sessionStorage : localStorage;
         this._client_id = Md5.hashStr(this.options.redirect_uri, false) as string;
@@ -48,11 +55,11 @@ export class EngineAuthService {
     /** API Endpoint for the retrieved version of engine */
     public get api_endpoint() {
         if (this.authority) {
-            if (/1\.[0-9]+\.[0-9]+/g.test(this.authority.version || '')) {
-                return `/control/api`;
+            if (/2\.[0-9]+\.[0-9]+/g.test(this.authority.version || '')) {
+                return `/api/engine/v1`;
             }
         }
-        return `/api/engine/v1`;
+        return `/control/api`;
     }
 
     /** OAuth 2 client ID for the application */
@@ -62,6 +69,11 @@ export class EngineAuthService {
 
     /** Bearer token for authenticating requests to engine */
     public get token(): string {
+        const expires_at = `${this._storage.getItem(`${this._client_id}_expires_at`)}`;
+        if (dayjs(+expires_at).isBefore(dayjs(), 's')) {
+            engine.log('Auth', 'Token expired. Requesting new token...');
+            this.invalidateToken();
+        }
         return this._storage.getItem(`${this._client_id}_access_token`) || '';
     }
 
@@ -126,6 +138,13 @@ export class EngineAuthService {
     }
 
     /**
+     * Invalidate the current access token
+     */
+    public invalidateToken() {
+        this._storage.removeItem(`${this._client_id}_access_token`);
+    }
+
+    /**
      * Check the users authentication credentials and perform actions required for the user to authenticate
      * @param state Additional state information for auth requests
      */
@@ -184,12 +203,11 @@ export class EngineAuthService {
      * Load authority details from engine
      */
     private loadAuthority(tries: number = 0) {
-        engine.log('Auth', `Fixed device: ${this.fixed_device}`);
-        engine.log('Auth', `Trusted: ${this.trusted}`);
-        engine.log('Auth', 'Loading authority...');
+        engine.log('Auth', `Fixed: ${this.fixed_device} | Trusted: ${this.trusted}`);
+        engine.log('Auth', `Loading authority...`);
         let authority: EngineAuthority;
         engine.ajax.get('/auth/authority').subscribe(
-            resp => (authority = JSON.parse(resp.responseText)),
+            resp => (authority = resp.response && typeof resp.response === 'object' ? resp.response : null),
             err => {
                 engine.log('Auth', `Failed to load authority(${err})`);
                 this._online.next(false);
@@ -201,6 +219,9 @@ export class EngineAuthService {
                     this._authority = authority;
                     this._online.next(true);
                     this.authorise('').then(_ => null, _ => null);
+                } else {
+                    // Retry if authority fails to load
+                    setTimeout(() => this.loadAuthority(tries), 300 * Math.min(20, ++tries));
                 }
             }
         );
@@ -214,7 +235,7 @@ export class EngineAuthService {
             this._promises.check_token = new Promise((resolve, reject) => {
                 if (this.authority) {
                     if (this.token) {
-                        resolve();
+                        resolve(this.token);
                     } else {
                         this.checkForAuthParameters().then(_ => resolve(_), _ => reject(_));
                     }
@@ -247,6 +268,7 @@ export class EngineAuthService {
                     // Store authorisation code
                     if (fragments.code) {
                         this._code = fragments.code;
+                        removeFragment('code');
                     }
                     // Store refresh token
                     if (fragments.refresh_token) {
@@ -254,9 +276,12 @@ export class EngineAuthService {
                             `${this._client_id}_refresh_token`,
                             fragments.refresh_token
                         );
+                        removeFragment('refresh_token');
                     }
                     const saved_nonce = this._storage.getItem(`${this._client_id}_nonce`) || '';
                     const state_parts = (fragments.state || '').split(';');
+                    removeFragment('state');
+                    removeFragment('token_type');
                     const nonce = state_parts[0];
                     if (saved_nonce === nonce) {
                         // Store access token
@@ -265,6 +290,7 @@ export class EngineAuthService {
                                 `${this._client_id}_access_token`,
                                 fragments.access_token
                             );
+                            removeFragment('access_token');
                         }
                         // Store token expiry time
                         if (fragments.expires_in) {
@@ -275,6 +301,7 @@ export class EngineAuthService {
                                 `${this._client_id}_expires_at`,
                                 `${expires_at.valueOf()}`
                             );
+                            removeFragment('expires_in');
                         }
                         // Store state
                         if (state_parts[1]) {
