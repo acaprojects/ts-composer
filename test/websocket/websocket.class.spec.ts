@@ -1,13 +1,14 @@
 import { Subject } from 'rxjs';
 
-import { engine_socket, EngineWebsocket } from '../../src/websocket/webocket.class';
-import { EngineResponse, EngineCommandRequest } from '../../src/websocket/websocket.interfaces';
 import { HashMap } from '../../src/utilities/types.utilities';
+import { engine_socket, EngineWebsocket } from '../../src/websocket/webocket.class';
+import { EngineCommandRequest, EngineResponse } from '../../src/websocket/websocket.interfaces';
 
 describe('EngineWebsocket', () => {
     let websocket: EngineWebsocket;
     let fake_socket: Subject<any>;
     let another_fake_socket: Subject<any>;
+    let auth: any;
     let spy: jasmine.Spy;
 
     beforeEach(() => {
@@ -16,8 +17,8 @@ describe('EngineWebsocket', () => {
         another_fake_socket = new Subject<any>();
         spy = spyOn(engine_socket, 'websocket').and.returnValues(fake_socket, another_fake_socket);
         spyOn(engine_socket, 'log');
-        websocket = new EngineWebsocket({
-            token: 'test',
+        auth = { token: 'test', refreshAuthority: () => null };
+        websocket = new EngineWebsocket(auth, {
             host: 'aca.test',
             fixed: true
         });
@@ -32,9 +33,7 @@ describe('EngineWebsocket', () => {
     });
 
     it('should connect to the websocket', () => {
-        expect(engine_socket.websocket).toBeCalledWith(
-            `ws://aca.test/control/websocket?bearer=test&fixed_device=true`
-        );
+        expect(engine_socket.websocket).toBeCalled();
     });
 
     it('should handle bind request', done => {
@@ -189,7 +188,7 @@ describe('EngineWebsocket', () => {
             actions++;
             if (actions === 1) {
                 expect(connected).toBe(true);
-                websocket.updateToken('new-token');
+                auth.token = ('new-token');
                 jest.runOnlyPendingTimers();
             } else if (actions === 2) {
                 expect(connected).toBe(false);
@@ -284,9 +283,9 @@ describe('EngineWebsocket', () => {
     });
 
     it('should throw an error on connect if there is no token', () => {
-        expect(() => new EngineWebsocket({} as any)).toThrowError();
+        expect(() => new EngineWebsocket({} as any, {} as any)).toThrowError();
         expect(() => {
-            websocket.updateToken(undefined as any);
+            auth.token = undefined;
             jest.runOnlyPendingTimers();
         }).toThrowError();
     });
@@ -309,11 +308,13 @@ describe('EngineWebsocket', () => {
                 const expected: HashMap = { id: 1, cmd: 'bind', ...metadata };
                 const message: HashMap = JSON.parse(msg_str);
                 for (const key in message) {
-                    expect(message[key]).toBe(expected[key]);
+                    if (message[key]) {
+                        expect(message[key]).toBe(expected[key]);
+                    }
                 }
             }
         });
-        websocket.updateToken('test');
+        auth.token = 'test';
         websocket.bind(metadata);
         jest.runOnlyPendingTimers();
         another_fake_socket.next({ id: 1, type: 'success' } as EngineResponse);
@@ -331,14 +332,12 @@ describe('EngineWebsocket', () => {
             writable: true,
             value: location
         });
-        websocket = new EngineWebsocket({
-            token: 'test'
-        });
+        websocket = new EngineWebsocket(auth, {});
         // Exaust retries
         for (let i = 0; i < 6; i++) {
             jest.runOnlyPendingTimers();
         }
-        expect(engine_socket.log).toBeCalledTimes(5);
+        expect(engine_socket.log).toBeCalledTimes(7);
         expect(engine_socket.log).toBeCalledWith(
             'WS',
             `Failed to create websocket(0). Retrying...`

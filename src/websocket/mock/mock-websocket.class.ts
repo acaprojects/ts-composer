@@ -8,8 +8,8 @@ import {
     EngineWebsocketOptions
 } from '../websocket.interfaces';
 
+import { EngineAuthService } from '../../auth/auth.service';
 import { log } from '../../utilities/general.utilities';
-import { HashMap } from '../../utilities/types.utilities';
 import { MockEngineWebsocketModule } from './mock-engine-module.class';
 import { MockEngineWebsocketSystem } from './mock-engine-system.class';
 
@@ -38,8 +38,8 @@ export class MockEngineWebsocket extends EngineWebsocket {
     /** Listeners for mock bindings values */
     protected listeners: { [id: string]: Subscription } = {};
 
-    constructor(protected options: EngineWebsocketOptions) {
-        super(options);
+    constructor(protected auth: EngineAuthService, protected options: EngineWebsocketOptions) {
+        super(auth, options);
         // Convert static objects on the window into
         /* istanbul ignore else */
         if (window.control && window.control.systems) {
@@ -53,10 +53,6 @@ export class MockEngineWebsocket extends EngineWebsocket {
                 }
             }
         }
-    }
-
-    public updateToken(_: string): void {
-        log('WS(M)', 'Updated token');
     }
 
     /**

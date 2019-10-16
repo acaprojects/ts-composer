@@ -8,7 +8,7 @@ import {
 describe('MockEngineWebsocket', () => {
     let websocket: MockEngineWebsocket;
     let fake_socket: Subject<any>;
-    let spy: jasmine.Spy;
+    let auth: any;
 
     beforeEach(() => {
         jest.useFakeTimers();
@@ -20,7 +20,7 @@ describe('MockEngineWebsocket', () => {
                     Test: [
                         {
                             test: 10,
-                            $testCall: function() {
+                            $testCall() {
                                 return (this as any)._system.Test[0].test++;
                             }
                         }
@@ -28,10 +28,9 @@ describe('MockEngineWebsocket', () => {
                 }
             }
         } as any;
-
+        auth = { token: 'test', refreshAuthority: () => null };
         spyOn(engine_mock_socket, 'log');
-        websocket = new MockEngineWebsocket({
-            token: 'test',
+        websocket = new MockEngineWebsocket(auth, {
             host: 'aca.test',
             fixed: true
         });
@@ -103,7 +102,7 @@ describe('MockEngineWebsocket', () => {
 
     it('should error if binding module not found', done => {
         const binding = { sys: 'sys-A0', mod: 'Testing', index: 1, name: 'test' };
-        let promise = websocket.bind(binding);
+        const promise = websocket.bind(binding);
         promise.then(null, () => {
             done();
         });
@@ -112,7 +111,7 @@ describe('MockEngineWebsocket', () => {
 
     it('should error if binding system not found', done => {
         const binding = { sys: 'sys-B0', mod: 'Test', index: 1, name: 'test' };
-        let promise = websocket.bind(binding);
+        const promise = websocket.bind(binding);
         promise.then(null, () => {
             done();
         });
@@ -121,7 +120,7 @@ describe('MockEngineWebsocket', () => {
 
     it('should error if binding system not found', done => {
         const binding = { sys: 'sys-B0', mod: 'Test', index: 1, name: 'test' };
-        let promise = websocket.bind(binding);
+        const promise = websocket.bind(binding);
         promise.then(null, () => {
             done();
         });
@@ -129,7 +128,7 @@ describe('MockEngineWebsocket', () => {
     });
 
     it('update token should do nothing', () => {
-        websocket.updateToken('');
+        auth.token = '';
         expect(websocket.is_connected).toBe(true);
         jest.runOnlyPendingTimers();
         expect(websocket.is_connected).toBe(true);

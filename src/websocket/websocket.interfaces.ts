@@ -1,3 +1,4 @@
+
 export type EngineCommand = 'bind' | 'unbind' | 'debug' | 'ignore' | 'exec';
 
 export interface EngineCommandRequest {
@@ -44,12 +45,12 @@ export interface EngineExecRequestOptions extends EngineRequestOptions {
 }
 
 export interface EngineWebsocketOptions {
-    /** Auth token for the engine websocket endpoint */
-    token: string;
     /** Domain and port of the engine server */
     host?: string;
     /** Whether this endpoint is a fixed device */
     fixed?: boolean;
+    /** Whether to use the secure communcations protocol */
+    secure?: boolean;
 }
 
 export interface EngineResponse {

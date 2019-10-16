@@ -1,11 +1,11 @@
 import { of } from 'rxjs';
 
-import Composer from '../src/composer';
 import { engine } from '../src/auth/auth.service';
+import { Composer } from '../src/composer';
 
 import { EngineAuthority } from '../src/auth/auth.interfaces';
-import { EngineBindingService } from '../src/websocket/binding.service';
-import { EngineWebsocket } from '../src/websocket/webocket.class';
+import { EngineHttpClient } from '../src/http/http.service';
+import { MockEngineHttpClient } from '../src/http/mock/mock-http.service';
 import { EngineApplicationsService } from '../src/http/services/applications/applications.service';
 import { EngineAuthSourcesService } from '../src/http/services/auth-sources/auth-sources.service';
 import { EngineDomainsService } from '../src/http/services/domains/domains.service';
@@ -14,9 +14,9 @@ import { EngineModulesService } from '../src/http/services/modules/modules.servi
 import { EngineSystemsService } from '../src/http/services/systems/systems.service';
 import { EngineUsersService } from '../src/http/services/users/users.service';
 import { EngineZonesService } from '../src/http/services/zones/zones.service';
-import { EngineHttpClient } from '../src/http/http.service';
-import { MockEngineHttpClient } from '../src/http/mock/mock-http.service';
+import { EngineBindingService } from '../src/websocket/binding.service';
 import { MockEngineWebsocket } from '../src/websocket/mock/mock-websocket.class';
+import { EngineWebsocket } from '../src/websocket/webocket.class';
 
 describe('Composer', () => {
     it('constuctor throws error', () => {

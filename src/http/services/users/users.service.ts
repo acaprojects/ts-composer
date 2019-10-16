@@ -24,7 +24,7 @@ export class EngineUsersService extends EngineResourceService<EngineUser> {
      * @param form_data Data to post to the server
      * @param query_params Map of query paramaters to add to the request URL
      */
-    public add(_: HashMap, __: HashMap) {
+    public add(_: HashMap): Promise<any> {
         return Promise.reject('Adding a new user is not allowed');
     }
 

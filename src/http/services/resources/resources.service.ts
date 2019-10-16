@@ -5,9 +5,10 @@ import { EngineBaseClass } from '../../../utilities/base.class';
 import { HashMap } from '../../../utilities/types.utilities';
 import { HttpError } from '../../http.interfaces';
 import { EngineHttpClient } from '../../http.service';
-import { EngineResourceQueryOptions, ResourceService } from './resources.interface';
+import { EngineResource } from './resource.class';
+import { ResourceService } from './resources.interface';
 
-export abstract class EngineResourceService<T extends {}> extends EngineBaseClass
+export abstract class EngineResourceService<T extends EngineResource> extends EngineBaseClass
     implements ResourceService<T> {
     /** Whether service has been initialised */
     public get initialised() {
@@ -17,6 +18,16 @@ export abstract class EngineResourceService<T extends {}> extends EngineBaseClas
     /** API Route of the service */
     public get api_route() {
         return `${this.http.api_endpoint}/${this._api_route}`;
+    }
+
+    /** Total number of items returned by the last basic index query */
+    public get total(): number {
+        return this._total;
+    }
+
+    /** Total number of items returned by the last basic index query */
+    public get last_total(): number {
+        return this._last_total;
     }
     /** Display name of the service */
     protected _name: string;
@@ -32,6 +43,10 @@ export abstract class EngineResourceService<T extends {}> extends EngineBaseClas
     protected _promises: { [key: string]: Promise<any> } = {};
     /** Whether the service has initialised or not */
     protected _initialised: boolean = false;
+    /** Total number of items returned by the last basic index query */
+    protected _total: number = 0;
+    /** Total number of items returned by the last index query */
+    protected _last_total: number = 0;
 
     constructor(protected http: EngineHttpClient) {
         super();
@@ -64,8 +79,13 @@ export abstract class EngineResourceService<T extends {}> extends EngineBaseClas
                             d && d instanceof Array
                                 ? d.map(i => this.process(i))
                                 : d && !(d instanceof Array) && d.results
-                                ? (d.results as HashMap[]).map(i => this.process(i))
-                                : [];
+                                    ? (d.results as HashMap[]).map(i => this.process(i))
+                                    : [];
+                        if (d.total) {
+                            query.length < 2 || query.length < 12 && query.indexOf('offset=') >= 0
+                                ? this._total = d.total
+                                : this._last_total = d.total;
+                        }
                     },
                     (e: any) => {
                         reject(e);

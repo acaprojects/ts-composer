@@ -76,6 +76,15 @@ describe('EngineResourceService', () => {
         expect(http.get).toBeCalledWith('/api/engine/v1/base?test=true');
     });
 
+    it('should save index request totals', async () => {
+        expect.assertions(6);
+        const item = { id: 'test', name: 'Test' };
+        await testRequest('get', 'query', { total: 10, results: [item] }, [{ offset: 10 }], [{ offset: 10 }]);
+        await testRequest('get', 'query', { total: 25, results: undefined }, [{ test: true }], [{ test: true }]);
+        expect(service.total).toBe(10);
+        expect(service.last_total).toBe(25);
+    });
+
     it('should allow for grabbing the show endpoint for an item', async () => {
         expect.assertions(4);
         const item = { id: 'test', name: 'Test' };

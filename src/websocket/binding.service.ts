@@ -8,7 +8,7 @@ export class EngineBindingService {
     /** Mapping of system IDs to binding interfaces */
     private _system_list: HashMap<EngineSystemBinding> = {};
 
-    constructor(private _websocket: EngineWebsocket) {}
+    constructor(private _websocket: EngineWebsocket) { }
 
     /** Engine websocket */
     public get engine(): EngineWebsocket {
@@ -43,5 +43,9 @@ export class EngineBindingService {
      */
     public exec(options: EngineExecRequestOptions): Promise<any> {
         return this._websocket.exec(options);
+    }
+
+    protected set websocket(websocket: EngineWebsocket) {
+        this._websocket = websocket;
     }
 }

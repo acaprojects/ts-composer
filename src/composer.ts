@@ -2,7 +2,7 @@
 // import "core-js/fn/array.find"
 // ...
 
-import 'core-js/es/promise';
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 
 import { EngineAuthOptions } from './auth/auth.interfaces';
 import { EngineAuthService } from './auth/auth.service';
@@ -13,7 +13,6 @@ import { EngineBindingService } from './websocket/binding.service';
 import { MockEngineWebsocket } from './websocket/mock/mock-websocket.class';
 import { EngineWebsocket } from './websocket/webocket.class';
 
-import { Subscription } from 'rxjs';
 import { EngineApplicationsService } from './http/services/applications/applications.service';
 import { EngineAuthSourcesService } from './http/services/auth-sources/auth-sources.service';
 import { EngineDomainsService } from './http/services/domains/domains.service';
@@ -21,15 +20,19 @@ import { EngineDriversService } from './http/services/drivers/drivers.service';
 import { EngineModulesService } from './http/services/modules/modules.service';
 import { EngineUsersService } from './http/services/users/users.service';
 import { EngineZonesService } from './http/services/zones/zones.service';
+import { EngineWebsocketOptions } from './websocket/websocket.interfaces';
 
 export interface ComposerOptions extends EngineAuthOptions {
     /** Host name and port of the engine server */
     host?: string;
     /** Whether to run the application with mock services */
     mock?: boolean;
+    /** Whether to use https/wss protocols */
+    secure?: boolean;
 }
 
-export default class Composer {
+export class Composer {
+
     /** HTTP Client for making request with composer credentials */
     public static get http(): EngineHttpClient {
         return this.checkProperty(this._http);
@@ -90,6 +93,11 @@ export default class Composer {
         return this.checkProperty(this._zones);
     }
 
+    /** Observable for the intialised state of composer */
+    public static get is_initialised(): Observable<boolean> {
+        return this._initialised.asObservable();
+    }
+
     /**
      * Initialise composer services
      * @param options
@@ -101,15 +109,14 @@ export default class Composer {
             /* istanbul ignore else */
             if (state) {
                 // Initialise websocket API
-                const websocket_options = {
+                const websocket_options: EngineWebsocketOptions = {
                     fixed: this._auth_service.fixed_device,
-                    host: options.host || location.host,
-                    token: this._auth_service.token
+                    host: options.host || location.host
                 };
                 this._websocket =
                     options.mock !== true
-                        ? new EngineWebsocket(websocket_options)
-                        : new MockEngineWebsocket(websocket_options);
+                        ? new EngineWebsocket(this._auth_service, websocket_options)
+                        : new MockEngineWebsocket(this._auth_service, websocket_options);
                 this._binding_service = new EngineBindingService(this._websocket);
                 // Initialise HTTP API
                 this._http =
@@ -125,12 +132,15 @@ export default class Composer {
                 this._systems = new EngineSystemsService(this._http);
                 this._users = new EngineUsersService(this._http);
                 this._zones = new EngineZonesService(this._http);
+                this._initialised.next(true);
                 if (this._sub) {
                     this._sub.unsubscribe();
                 }
             }
         });
     }
+    /** Subject for the initialised state of composer */
+    private static _initialised = new BehaviorSubject(false);
     /** HTTP Client for request with composer credentials */
     private static _http: EngineHttpClient;
     /** Authentication service for Composer */
@@ -184,6 +194,7 @@ export default class Composer {
                 delete (this as any)[key];
             }
         }
+        this._initialised.next(false);
     }
 
     private static checkProperty<T>(prop: T) {

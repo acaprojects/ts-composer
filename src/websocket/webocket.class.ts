@@ -11,6 +11,7 @@ import {
     EngineWebsocketOptions
 } from './websocket.interfaces';
 
+import { EngineAuthService } from '../auth/auth.service';
 import { log } from '../utilities/general.utilities';
 
 /** Time in seconds to ping the server to keep the websocket connection alive */
@@ -44,18 +45,9 @@ export class EngineWebsocket {
     /** Observable fo the connection status subject value */
     protected _status_obs = this._status.asObservable();
 
-    constructor(protected options: EngineWebsocketOptions) {
+    constructor(protected auth: EngineAuthService, protected options: EngineWebsocketOptions) {
         REQUEST_COUNT = 0;
         this.connect();
-    }
-
-    /**
-     * Update the websocket token and reconnect the websocket
-     * @param token New access token
-     */
-    public updateToken(token: string) {
-        this.options.token = token;
-        this.reconnect();
     }
 
     /** Whether the websocket is connected */
@@ -156,7 +148,7 @@ export class EngineWebsocket {
                     req.reject = e => reject(e);
                     const bind = `${request.sys}, ${request.mod}_${request.index}, ${request.name}`;
                     engine_socket.log('WS', `[${request.cmd.toUpperCase()}] ${bind}`, request.args);
-                    this.websocket.next(JSON.stringify(request));
+                    this.websocket.next(request);
                 } else {
                     setTimeout(() => {
                         delete this.requests[key];
@@ -234,7 +226,7 @@ export class EngineWebsocket {
                 type = 'UNKNOWN COMMAND';
                 break;
         }
-        engine_socket.log('WS', `[Error] ${type}(${message.id}): ${message.msg}`, null, 'error');
+        engine_socket.log('WS', `[Error] ${type}(${message.id}): ${message.msg}`, undefined, 'error');
         const request = Object.keys(this.requests)
             .map(i => this.requests[i])
             .find(i => i.id === message.id);
@@ -256,7 +248,7 @@ export class EngineWebsocket {
             this.observers[key] = this.binding[key].asObservable();
         }
         const bind = `${options.sys}, ${options.mod}_${options.index}, ${options.name}`;
-        engine_socket.log('WS', `[Notify] ${bind} |`, [this.binding[key].getValue(), '→', value]);
+        engine_socket.log('WS', `[Notify] ${bind} changed`, [this.binding[key].getValue(), '→', value]);
         this.binding[key].next(value);
     }
 
@@ -267,22 +259,37 @@ export class EngineWebsocket {
         if (tries > 4) {
             return;
         }
-        if (!this.options || !this.options.token) {
+        if (!this.options) {
             throw new Error('No token is set for engine websocket');
         }
-        const secure = location.protocol.indexOf('https') >= 0;
+        const secure = this.options.secure || location.protocol.indexOf('https') >= 0;
         const host = this.options.host || location.host;
-        const url = `ws${secure ? 's' : ''}://${host}/control/websocket?bearer=${
-            this.options.token
+        const url = `ws${secure ? 's' : ''}://${host}/control/websocket?bearer_token=${
+            this.auth.token
         }${this.options.fixed ? '&fixed_device=true' : ''}`;
-        this.websocket = engine_socket.websocket(url);
-        if (this.websocket) {
+        this.websocket = engine_socket.websocket({
+            url,
+            serializer: (data) => typeof data === 'object' ? JSON.stringify(data) : data,
+            deserializer: (data) => {
+                let return_value = data.data;
+                try {
+                    const obj = JSON.parse(data.data);
+                    return_value = obj;
+                } catch (e) {
+                    return_value = return_value;
+                }
+                return return_value;
+            },
+        });
+        if (this.websocket && this.auth.token) {
             this._status.next(true);
             this.websocket.subscribe(
                 (resp: EngineResponse) => this.onMessage(resp),
                 err => {
                     this._status.next(false);
-                    engine_socket.log('WS', 'Websocket error:', err);
+                    engine_socket.log('WS', 'Websocket error:', err, undefined, 'error');
+                    this.auth.invalidateToken();
+                    this.auth.refreshAuthority();
                     // Try reconnecting after 1 second
                     this.reconnect();
                 },
@@ -293,7 +300,9 @@ export class EngineWebsocket {
             }
             this.keep_alive = setInterval(() => this.ping(), KEEP_ALIVE * 1000) as any;
         } else {
-            engine_socket.log('WS', `Failed to create websocket(${tries}). Retrying...`);
+            if (!this.websocket) {
+                engine_socket.log('WS', `Failed to create websocket(${tries}). Retrying...`, undefined, 'error');
+            }
             setTimeout(() => this.connect(tries), 300 * ++tries);
         }
     }
