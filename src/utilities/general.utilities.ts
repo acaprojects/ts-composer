@@ -123,5 +123,5 @@ export function removeFragment(name: string) {
         .replace(new RegExp(`${name}[a-zA-Z0-9\%\=]*&?`, 'g'), '')
         .replace(/&&/g, '&')
         .replace(/\?&/g, '#');
-    window.history.pushState(null, '', `${location.pathname}${new_hash}${new_search}`);
+    window.history.replaceState(null, '', `${location.pathname}${new_hash}${new_search}`);
 }
