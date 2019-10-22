@@ -45,18 +45,10 @@ export class EngineHttpClient {
         if (!options) {
             options = { response_type: 'json' };
         }
-        if (this._auth.has_token) {
-            return this.request('GET', url, { response_type: 'json', ...options });
+        if (!this._auth.has_token) {
+            this._auth.refreshAuthority();
         }
-        return new Observable(obs => {
-            setTimeout(() => {
-                this.get(url, options as any).subscribe(
-                    (resp: HttpResponse) => obs.next(resp),
-                    (err: HttpError) => obs.error(err),
-                    () => obs.complete()
-                );
-            }, 500);
-        });
+        return this.request('GET', url, { response_type: 'json', ...options });
     }
 
     /**
@@ -72,17 +64,9 @@ export class EngineHttpClient {
             options = { response_type: 'json' };
         }
         if (this._auth.has_token) {
-            return this.request('POST', url, { body, response_type: 'json', ...options });
+            this._auth.refreshAuthority();
         }
-        return new Observable(obs => {
-            setTimeout(() => {
-                this.post(url, body, options as any).subscribe(
-                    (resp: HttpResponse) => obs.next(resp),
-                    (err: HttpError) => obs.error(err),
-                    () => obs.complete()
-                );
-            }, 500);
-        });
+        return this.request('POST', url, { body, response_type: 'json', ...options });
     }
 
     /**
@@ -98,17 +82,9 @@ export class EngineHttpClient {
             options = { response_type: 'json' };
         }
         if (this._auth.has_token) {
-            return this.request('PUT', url, { body, response_type: 'json', ...options });
+            this._auth.refreshAuthority();
         }
-        return new Observable(obs => {
-            setTimeout(() => {
-                this.put(url, body, options as any).subscribe(
-                    (resp: HttpResponse) => obs.next(resp),
-                    (err: HttpError) => obs.error(err),
-                    () => obs.complete()
-                );
-            }, 500);
-        });
+        return this.request('PUT', url, { body, response_type: 'json', ...options });
     }
 
     /**
@@ -118,18 +94,13 @@ export class EngineHttpClient {
      * @param options Options to add to the request
      */
     public patch(url: string, body: any, options?: HttpOptions): Observable<HttpResponse> {
-        if (this._auth.has_token) {
-            return this.request('PATCH', url, { body, response_type: 'json', ...options });
+        if (!options) {
+            options = { response_type: 'json' };
         }
-        return new Observable(obs => {
-            setTimeout(() => {
-                this.patch(url, body, options as any).subscribe(
-                    (resp: HttpResponse) => obs.next(resp),
-                    (err: HttpError) => obs.error(err),
-                    () => obs.complete()
-                );
-            }, 500);
-        });
+        if (this._auth.has_token) {
+            this._auth.refreshAuthority();
+        }
+        return this.request('PATCH', url, { body, response_type: 'json', ...options });
     }
 
     /**
@@ -145,17 +116,9 @@ export class EngineHttpClient {
             options = { response_type: 'void' };
         }
         if (this._auth.has_token) {
-            return this.request('DELETE', url, { response_type: 'void', ...options });
+            this._auth.refreshAuthority();
         }
-        return new Observable(obs => {
-            setTimeout(() => {
-                this.delete(url, options as any).subscribe(
-                    (resp: HttpResponse) => obs.next(resp),
-                    (err: HttpError) => obs.error(err),
-                    () => obs.complete()
-                );
-            }, 500);
-        });
+        return this.request('DELETE', url, { response_type: 'void', ...options });
     }
 
     /**
@@ -163,14 +126,14 @@ export class EngineHttpClient {
      * @param response Request response contents
      * @param type Type of data to return
      */
-    private transform(response: AjaxResponse, type: 'json'): HashMap;
-    private transform(response: AjaxResponse, type: 'text'): string;
-    private transform(response: AjaxResponse, type: 'void'): void;
-    private transform(response: AjaxResponse, type: HttpResponseType): HttpResponse {
-        const text = response.responseText;
+    private transform(resp: AjaxResponse, type: 'json'): HashMap;
+    private transform(resp: AjaxResponse, type: 'text'): string;
+    private transform(resp: AjaxResponse, type: 'void'): void;
+    private transform(resp: AjaxResponse, type: HttpResponseType): HttpResponse {
+        const text = resp.response;
         switch (type) {
             case 'json':
-                return text ? JSON.parse(text) : {};
+                return typeof text === 'string' ? JSON.parse(text || '{}') : text;
             case 'text':
                 return text;
             case 'void':
@@ -205,7 +168,7 @@ export class EngineHttpClient {
             if (!options.headers) {
                 options.headers = {};
             }
-            options.headers.Authorization = this._auth.token;
+            options.headers.Authorization = `Bearer ${this._auth.token}`;
             const verb = method.toLowerCase();
             switch (method) {
                 case 'GET':
@@ -218,6 +181,12 @@ export class EngineHttpClient {
                 case 'PATCH':
                 case 'PUT':
                 case 'POST':
+                    if (!options.headers.Accept) {
+                        options.headers.Accept = 'application/json';
+                    }
+                    if (!options.headers['Content-Type']) {
+                        options.headers['Content-Type'] = 'application/json';
+                    }
                     ajax_obs = engine_http.ajax[verb](url, options.body, options.headers).pipe(
                         map((r: AjaxResponse) => this.transform(r, options.response_type as any)),
                         catchError(e => throwError(this.error(e)))

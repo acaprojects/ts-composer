@@ -25,8 +25,6 @@ export class EngineZone extends EngineResource<EngineZonesService> {
     public get triggers(): string[] {
         return [...this._triggers];
     }
-    /** Timestamp the zone was created at, in ms since UTC epoch */
-    public readonly created_at: number;
     /** Description of the zone's purpose */
     private _description: string;
     /** Local settings for the zone */
@@ -34,9 +32,8 @@ export class EngineZone extends EngineResource<EngineZonesService> {
     /** List of triggers associated with the zone */
     private _triggers: string[];
 
-    constructor(protected service: EngineZonesService, raw_data: HashMap) {
-        super(service, raw_data);
-        this.created_at = raw_data.created_at;
+    constructor(protected _service: EngineZonesService, raw_data: HashMap) {
+        super(_service, raw_data);
         this._description = raw_data.description;
         this._settings = raw_data.settings;
         this._triggers = raw_data.triggers;

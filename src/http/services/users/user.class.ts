@@ -98,8 +98,6 @@ export class EngineUser extends EngineResource<EngineUsersService> {
     public set last_name(value: string) {
         this.change('last_name', value);
     }
-    /** Timestamp the zone was created at, in ms since UTC epoch */
-    public readonly created_at: number;
     /** Hash of the email address of the user */
     public readonly email_digest: string;
     /** ID of the authority associated with the user */
@@ -123,9 +121,8 @@ export class EngineUser extends EngineResource<EngineUsersService> {
     /** Last name of the user */
     private _last_name: string;
 
-    constructor(protected service: EngineUsersService, raw_data: HashMap) {
-        super(service, raw_data);
-        this.created_at = raw_data.created_at;
+    constructor(protected _service: EngineUsersService, raw_data: HashMap) {
+        super(_service, raw_data);
         this._authority_id = raw_data.authority_id;
         this._email = raw_data.email;
         this.email_digest = raw_data.email_digest;

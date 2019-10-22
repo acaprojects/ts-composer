@@ -85,10 +85,10 @@ export class EngineTrigger extends EngineResource<
     private _system_id: string;
 
     constructor(
-        protected service: EngineTriggersService | EngineSystemTriggersService,
+        protected _service: EngineTriggersService | EngineSystemTriggersService,
         raw_data: HashMap
     ) {
-        super(service, raw_data);
+        super(_service, raw_data);
         this._description = raw_data.description;
         this._actions = raw_data.actions;
         this._conditions = raw_data.conditions;

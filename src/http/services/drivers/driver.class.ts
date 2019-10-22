@@ -62,8 +62,6 @@ export class EngineDriver extends EngineResource<EngineDriversService> {
     }
     /** Engine class name of the driver */
     public readonly class_name: string;
-    /** Timestamp driver was created in ms since UTC epoch */
-    public readonly created_at: number;
     /** Description of the driver functionality */
     private _description: string;
     /** Name to use for modules that inherit this driver */
@@ -77,8 +75,8 @@ export class EngineDriver extends EngineResource<EngineDriversService> {
     /** Local settings for the driver */
     private _settings: HashMap;
 
-    constructor(protected service: EngineDriversService, raw_data: HashMap) {
-        super(service, raw_data);
+    constructor(protected _service: EngineDriversService, raw_data: HashMap) {
+        super(_service, raw_data);
         this._description = raw_data.description;
         this._module_name = raw_data.module_name;
         this._role = raw_data.role;
@@ -86,7 +84,6 @@ export class EngineDriver extends EngineResource<EngineDriversService> {
         this._ignore_connected = raw_data.ignore_connected;
         this._settings = raw_data.settings;
         this.class_name = raw_data.class_name;
-        this.created_at = raw_data.created_at;
     }
 
     /**
@@ -96,6 +93,6 @@ export class EngineDriver extends EngineResource<EngineDriversService> {
         if (!this.id) {
             throw new Error('You must save the module before it can be started');
         }
-        return this.service.reload(this.id);
+        return this._service.reload(this.id);
     }
 }

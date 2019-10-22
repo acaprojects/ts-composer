@@ -54,8 +54,6 @@ export class EngineDomain extends EngineResource<EngineDomainsService> {
         this.change('internals', value);
     }
 
-    /** Timestamp the zone was created at, in ms since UTC epoch */
-    public readonly created_at: number;
     /** Domain name */
     private _dom: string;
     /** Login URL for the domain */
@@ -69,9 +67,8 @@ export class EngineDomain extends EngineResource<EngineDomainsService> {
     /** Internal settings for the domain */
     private _internals: HashMap;
 
-    constructor(protected service: EngineDomainsService, raw_data: HashMap) {
-        super(service, raw_data);
-        this.created_at = raw_data.created_at;
+    constructor(protected _service: EngineDomainsService, raw_data: HashMap) {
+        super(_service, raw_data);
         this._description = raw_data.description;
         this._dom = raw_data.domain || raw_data.dom;
         this._login_url = raw_data.login_url;

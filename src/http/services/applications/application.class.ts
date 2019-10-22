@@ -35,9 +35,6 @@ export class EngineApplication extends EngineResource<EngineApplicationsService>
     public set skip_authorization(value: boolean) {
         this.change('skip_authorization', value);
     }
-
-    /** Timestamp the zone was created at, in ms since UTC epoch */
-    public readonly created_at: number;
     /** Unique identifier of the application */
     public readonly uid: string;
     /** Secret associated with the application */
@@ -51,9 +48,8 @@ export class EngineApplication extends EngineResource<EngineApplicationsService>
     /** Skip authorization checks for the application */
     private _skip_authorization: boolean;
 
-    constructor(protected service: EngineApplicationsService, raw_data: HashMap) {
-        super(service, raw_data);
-        this.created_at = raw_data.created_at;
+    constructor(protected _service: EngineApplicationsService, raw_data: HashMap) {
+        super(_service, raw_data);
         this.uid = raw_data.uid;
         this.secret = raw_data.secret;
         this._owner_id = raw_data.owner_id;

@@ -169,8 +169,6 @@ export class EngineModule extends EngineResource<EngineModulesService> {
     public readonly running: boolean;
     /** Timestamp of last update in ms since UTC epoch */
     public readonly updated_at: number;
-    /** Timestamp of module creation in ms since UTC epoch */
-    public readonly created_at: number;
 
     /** ID of the driver associated with the module */
     private _dependency_id: string;
@@ -201,8 +199,8 @@ export class EngineModule extends EngineResource<EngineModulesService> {
     /** Ignore connection issues */
     private _ignore_connected: boolean;
 
-    constructor(protected service: EngineModulesService, raw_data: HashMap) {
-        super(service, raw_data);
+    constructor(protected _service: EngineModulesService, raw_data: HashMap) {
+        super(_service, raw_data);
         this._dependency_id = raw_data.dependency_id;
         this._control_system_id = raw_data.control_system_id;
         this._edge_id = raw_data.edge_id;
@@ -220,7 +218,6 @@ export class EngineModule extends EngineResource<EngineModulesService> {
         this.connected = raw_data.connected;
         this.running = raw_data.running;
         this.updated_at = raw_data.updated_at;
-        this.created_at = raw_data.created_at;
     }
 
     /**
@@ -230,7 +227,7 @@ export class EngineModule extends EngineResource<EngineModulesService> {
         if (!this.id) {
             throw new Error('You must save the module before it can be started');
         }
-        return this.service.start(this.id);
+        return this._service.start(this.id);
     }
 
     /**
@@ -240,7 +237,7 @@ export class EngineModule extends EngineResource<EngineModulesService> {
         if (!this.id) {
             throw new Error('You must save the module before it can be stopped');
         }
-        return this.service.stop(this.id);
+        return this._service.stop(this.id);
     }
 
     /**
@@ -250,7 +247,7 @@ export class EngineModule extends EngineResource<EngineModulesService> {
         if (!this.id) {
             throw new Error('You must save the module before it can be pinged');
         }
-        return this.service.ping(this.id);
+        return this._service.ping(this.id);
     }
 
     /**
@@ -261,7 +258,7 @@ export class EngineModule extends EngineResource<EngineModulesService> {
         if (!this.id) {
             throw new Error('You must save the module before it\'s state can be grabbed');
         }
-        return this.service.state(this.id, lookup);
+        return this._service.state(this.id, lookup);
     }
 
     /**
@@ -271,6 +268,6 @@ export class EngineModule extends EngineResource<EngineModulesService> {
         if (!this.id) {
             throw new Error('You must save the module before it\'s internal state can be grabbed');
         }
-        return this.service.internalState(this.id);
+        return this._service.internalState(this.id);
     }
 }

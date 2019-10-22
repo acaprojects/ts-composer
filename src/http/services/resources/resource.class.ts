@@ -3,17 +3,6 @@ import { HashMap } from '../../../utilities/types.utilities';
 import { ResourceService } from './resources.interface';
 
 export abstract class EngineResource<T = ResourceService<any>> {
-    /** Unique Identifier of the object */
-    public readonly id: string;
-    /** Human readable name of the object */
-    protected _name: string;
-    /** Map of unsaved property changes */
-    protected _changes: HashMap = {};
-
-    constructor(protected service: T, raw_data: HashMap) {
-        this.id = raw_data.id;
-        this._name = raw_data.name;
-    }
 
     /** Human readable name of the object */
     public get name(): string {
@@ -25,15 +14,41 @@ export abstract class EngineResource<T = ResourceService<any>> {
     }
 
     /**
+     * Get map of changes to the resources
+     */
+    public get changes(): HashMap {
+        return { ...this._changes };
+    }
+    /** Unique Identifier of the object */
+    public readonly id: string;
+    /** Unique Identifier of the object */
+    public readonly created_at: string;
+    /** Human readable name of the object */
+    protected _name: string;
+    /** Map of unsaved property changes */
+    protected _changes: HashMap = {};
+    /** Map of local property names to server ones */
+    protected _server_names: HashMap = {};
+    /** Version of the data */
+    protected _version: number;
+
+    constructor(protected _service: T, raw_data: HashMap) {
+        this.id = raw_data.id;
+        this._name = raw_data.name;
+        this.created_at = raw_data.created_at;
+        this._version = raw_data.version || 0;
+    }
+
+    /**
      * Save any changes made to the server
      */
     public async save(): Promise<EngineResource> {
         const changes: HashMap = this.changes;
-        const me: EngineResource = this as any;
+        const me: HashMap = this.toJSON();
         if (Object.keys(this._changes).length > 0) {
             return this.id
-                ? (this.service as any).update(this.id, { ...me, ...changes })
-                : (this.service as any).add({ ...me, ...changes });
+                ? (this._service as any).update(this.id, { ...me, ...changes })
+                : (this._service as any).add({ ...me, ...changes});
         } else {
             return Promise.reject('No changes have been made');
         }
@@ -43,14 +58,26 @@ export abstract class EngineResource<T = ResourceService<any>> {
      * Make request to delete the resource on the server
      */
     public delete(): Promise<void> {
-        return (this.service as any).delete(this.id);
+        return (this._service as any).delete(this.id);
     }
 
     /**
-     * Get map of changes to the resources
+     * Convert object into plain object
      */
-    public get changes(): HashMap {
-        return { ...this._changes };
+    public toJSON(): HashMap {
+        const obj: any = { ...(this as any) };
+        delete obj._service;
+        delete obj._changes;
+        delete obj._server_names;
+        const keys = Object.keys(obj);
+        for (const key of keys) {
+            if (key[0] === '_') {
+                const new_key = this._server_names[key.substr(1)] || key.substr(1);
+                obj[new_key] = obj[key];
+                delete obj[key];
+            }
+        }
+        return obj;
     }
 
     /**

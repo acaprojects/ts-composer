@@ -93,8 +93,6 @@ export class EngineSystem extends EngineResource<EngineSystemsService> {
         this.change('settings', value);
     }
 
-    /** Time at which the system was created in ms since UTC epoch */
-    public readonly created_at: number;
     /** ID of the engine node this system belongs */
     private _edge_id: string;
     /** Description of the system */
@@ -118,8 +116,8 @@ export class EngineSystem extends EngineResource<EngineSystemsService> {
     /** Map of user settings for the system */
     private _settings: HashMap;
 
-    constructor(protected service: EngineSystemsService, raw_data: HashMap) {
-        super(service, raw_data);
+    constructor(protected _service: EngineSystemsService, raw_data: HashMap) {
+        super(_service, raw_data);
         this._edge_id = raw_data.edge_id;
         this._description = raw_data.description;
         this._email = raw_data.email;
@@ -131,7 +129,6 @@ export class EngineSystem extends EngineResource<EngineSystemsService> {
         this._modules = raw_data.modules;
         this._zones = raw_data.zones;
         this._settings = raw_data.settings;
-        this.created_at = raw_data.created_at;
     }
 
     /**
@@ -141,7 +138,7 @@ export class EngineSystem extends EngineResource<EngineSystemsService> {
         if (!this.id) {
             throw new Error('You must save the system before it can be started');
         }
-        return this.service.start(this.id);
+        return this._service.start(this.id);
     }
 
     /**
@@ -151,7 +148,7 @@ export class EngineSystem extends EngineResource<EngineSystemsService> {
         if (!this.id) {
             throw new Error('You must save the system before it can be stopped');
         }
-        return this.service.stop(this.id);
+        return this._service.stop(this.id);
     }
 
     /**
@@ -161,7 +158,7 @@ export class EngineSystem extends EngineResource<EngineSystemsService> {
         if (!this.id) {
             throw new Error('You must save the system before you can grab module details');
         }
-        return this.service.types(this.id);
+        return this._service.types(this.id);
     }
 
     /**
@@ -183,7 +180,7 @@ export class EngineSystem extends EngineResource<EngineSystemsService> {
      * @param mod_id ID of the module to remove
      */
     public removeModule(mod_id: string) {
-        return this.service.remove(this.id, mod_id);
+        return this._service.remove(this.id, mod_id);
     }
 
     /**
