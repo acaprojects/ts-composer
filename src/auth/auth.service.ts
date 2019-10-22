@@ -156,15 +156,23 @@ export class EngineAuthService {
                 }
                 const check_token = () => {
                     if (this.token) {
+                        delete this._promises.authorise;
                         resolve(this.token);
                     } else {
                         if (this._code || this.refresh_token) {
-                            this.generateToken().then(_ => resolve(this.token), _ => reject(_));
+                            this.generateToken().then(_ => {
+                                delete this._promises.authorise;
+                                resolve(this.token);
+                            }, _ => {
+                                delete this._promises.authorise;
+                                reject(_);
+                            });
                         } else {
                             if (this.authority!.session) {
                                 // Generate tokens
                                 const login_url = this.createLoginURL(state);
                                 window.location.assign(login_url);
+                                delete this._promises.authorise;
                             } else {
                                 if (this.options.handle_login !== false) {
                                     // Redirect to login form
@@ -173,6 +181,7 @@ export class EngineAuthService {
                                         encodeURIComponent(location.href)
                                     );
                                     window.location.assign(url);
+                                    delete this._promises.authorise;
                                 }
                             }
                         }
@@ -331,7 +340,7 @@ export class EngineAuthService {
         state = state ? `${nonce};${state}` : nonce;
         const has_query = this.options ? this.options.auth_uri.indexOf('?') >= 0 : false;
         const login_url = (this.options ? this.options.auth_uri : null) || '/auth/oauth/authorize';
-        const response_type = 'token';
+        const response_type = this.trusted ? 'code' : 'token';
         const url =
             `${login_url}${has_query ? '&' : '?'}` +
             `response_type=${encodeURIComponent(response_type)}` +
@@ -349,6 +358,7 @@ export class EngineAuthService {
     private createRefreshURL(): string {
         const refresh_uri = this.options.token_uri || '/auth/token';
         let url = refresh_uri + `?client_id=${encodeURIComponent(this._client_id)}`;
+        url += `&redirect_uri=${encodeURIComponent(this.options.redirect_uri)}`;
         if (this.refresh_token) {
             url += `&refresh_token=${encodeURIComponent(this.refresh_token)}`;
             url += `&grant_type=refresh_token`;
@@ -369,7 +379,7 @@ export class EngineAuthService {
                 let tokens: EngineTokenResponse;
                 engine.ajax.post(token_url, '').subscribe(
                     resp => {
-                        tokens = JSON.parse(resp.responseText || '{}') as EngineTokenResponse;
+                        tokens = resp.response;
                     },
                     err => {
                         engine.log('Auth', 'Error generating new tokens.', err);
