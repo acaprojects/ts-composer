@@ -147,7 +147,7 @@ export class EngineWebsocket {
                     req.resolve = d => resolve(d);
                     req.reject = e => reject(e);
                     const bind = `${request.sys}, ${request.mod}_${request.index}, ${request.name}`;
-                    engine_socket.log('WS', `[${request.cmd.toUpperCase()}] ${bind}`, request.args);
+                    engine_socket.log('WS', `[${request.cmd.toUpperCase()}(${request.id})] ${bind}`, request.args);
                     this.websocket.next(request);
                 } else {
                     setTimeout(() => {
@@ -172,7 +172,7 @@ export class EngineWebsocket {
             } else if (message.type === 'success') {
                 this.handleSuccess(message);
             } else if (message.type === 'debug') {
-                engine_socket.log('WS', `[Debug] ${message.mod}${message.klass} →`, message.msg);
+                engine_socket.log('WS', `[DEBUG] ${message.mod}${message.klass} →`, message.msg);
             } else if (message.type === 'error') {
                 this.handleError(message);
             } else {
@@ -189,7 +189,7 @@ export class EngineWebsocket {
         const request = Object.keys(this.requests)
             .map(i => this.requests[i])
             .find(i => i.id === message.id);
-        engine_socket.log('WS', `[SUCCESS] ${message.id}`);
+        engine_socket.log('WS', `[SUCCESS(${message.id})] `);
         /* istanbul ignore else */
         if (request && request.resolve) {
             request.resolve(message.value);
@@ -226,7 +226,7 @@ export class EngineWebsocket {
                 type = 'UNKNOWN COMMAND';
                 break;
         }
-        engine_socket.log('WS', `[Error] ${type}(${message.id}): ${message.msg}`, undefined, 'error');
+        engine_socket.log('WS', `[ERROR] ${type}(${message.id}): ${message.msg}`, undefined, 'error');
         const request = Object.keys(this.requests)
             .map(i => this.requests[i])
             .find(i => i.id === message.id);
@@ -248,7 +248,7 @@ export class EngineWebsocket {
             this.observers[key] = this.binding[key].asObservable();
         }
         const bind = `${options.sys}, ${options.mod}_${options.index}, ${options.name}`;
-        engine_socket.log('WS', `[Notify] ${bind} changed`, [this.binding[key].getValue(), '→', value]);
+        engine_socket.log('WS', `[NOTIFY] ${bind} changed`, [this.binding[key].getValue(), '→', value]);
         this.binding[key].next(value);
     }
 
