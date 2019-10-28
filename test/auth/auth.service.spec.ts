@@ -16,12 +16,13 @@ describe('EngineAuthService', () => {
     let storage: jest.SpyInstance;
     let storage_set: jest.SpyInstance;
 
-    function newService() {
+    function newService(local: boolean = true) {
         return new EngineAuthService({
             auth_uri: '/auth/oauth/authorize',
             token_uri: '/auth/token',
             redirect_uri: 'http://localhost:8080/oauth-resp.html',
-            scope: 'any'
+            scope: 'any',
+            storage: local ? 'local' : 'session'
         });
     }
 
@@ -87,14 +88,14 @@ describe('EngineAuthService', () => {
 
     it('should redirect to authorise if user is logged in but without a token', done => {
         spy.mockImplementation(() => of({ response: { ...authority, session: true } }));
-        service = newService();
+        service = newService(false);
         setTimeout(() => {
             expect(location.assign).toBeCalledWith(
                 `/auth/oauth/authorize?` +
                     `response_type=${encodeURIComponent('token')}` +
                     `&client_id=${encodeURIComponent(service.client_id)}` +
                     `&state=${encodeURIComponent(
-                        localStorage.getItem(`${service.client_id}_nonce`) || ''
+                        sessionStorage.getItem(`${service.client_id}_nonce`) || ''
                     )}` +
                     `&redirect_uri=${encodeURIComponent(`http://localhost:8080/oauth-resp.html`)}` +
                     `&scope=${encodeURIComponent('any')}`

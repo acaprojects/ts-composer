@@ -39,6 +39,7 @@ export class EngineAuthService {
     private _online_observer = this._online.asObservable();
 
     constructor(private options: EngineAuthOptions) {
+        /* istanbul ignore else */
         if (options) {
             this.setup(options);
         }
@@ -54,7 +55,9 @@ export class EngineAuthService {
 
     /** API Endpoint for the retrieved version of engine */
     public get api_endpoint() {
+        /* istanbul ignore else */
         if (this.authority) {
+            /* istanbul ignore else */
             if (/2\.[0-9]+\.[0-9]+/g.test(this.authority.version || '')) {
                 return `/api/engine/v1`;
             }
@@ -154,6 +157,7 @@ export class EngineAuthService {
      * @param state Additional state information for auth requests
      */
     public authorise(state?: string): Promise<string> {
+        /* istanbul ignore else */
         if (!this._promises.authorise) {
             this._promises.authorise = new Promise<string>((resolve, reject) => {
                 if (!this.authority) {
@@ -250,6 +254,7 @@ export class EngineAuthService {
      * Check authentication token
      */
     private checkToken(): Promise<boolean> {
+        /* istanbul ignore else */
         if (!this._promises.check_token) {
             this._promises.check_token = new Promise((resolve, reject) => {
                 if (this.authority) {
@@ -274,6 +279,7 @@ export class EngineAuthService {
      * Check URL for auth parameters
      */
     private checkForAuthParameters(): Promise<boolean> {
+        /* istanbul ignore else */
         if (!this._promises.check_params) {
             this._promises.check_params = new Promise((resolve, reject) => {
                 let fragments = getFragments();
@@ -302,6 +308,7 @@ export class EngineAuthService {
                     removeFragment('state');
                     removeFragment('token_type');
                     const nonce = state_parts[0];
+                    /* istanbul ignore else */
                     if (saved_nonce === nonce) {
                         // Store access token
                         if (fragments.access_token) {
@@ -383,6 +390,7 @@ export class EngineAuthService {
      * Revoke the current access token
      */
     private revokeToken(): Promise<void> {
+        /* istanbul ignore else */
         if (!this._promises.revoke_token) {
             this._promises.revoke_token = new Promise<void>((resolve, reject) => {
                 const token_uri = this.options.token_uri || '/auth/token';
@@ -407,6 +415,7 @@ export class EngineAuthService {
      * Generate new tokens from a auth code or refresh token
      */
     private generateToken(): Promise<void> {
+        /* istanbul ignore else */
         if (!this._promises.generate_tokens) {
             this._promises.generate_tokens = new Promise<void>((resolve, reject) => {
                 const token_url = this.createRefreshURL();

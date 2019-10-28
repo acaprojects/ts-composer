@@ -25,10 +25,12 @@ declare global {
     }
 }
 
+/* istanbul ignore else */
 if (!window.control) {
     window.control = {};
 }
 
+/* istanbul ignore else */
 if (!window.control.systems) {
     window.control.systems = {};
 }

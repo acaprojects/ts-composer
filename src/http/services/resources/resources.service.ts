@@ -62,8 +62,8 @@ export abstract class EngineResourceService<T extends EngineResource<any>> exten
     public query(query_params: HashMap = {}): Promise<T[]> {
         let cache = 1000;
         /* istanbul ignore else */
-        if (query_params) {
-            cache = query_params.cache || 1000;
+        if (query_params && query_params.cache) {
+            cache = query_params.cache;
             delete query_params.cache;
         }
         const query = toQueryString(query_params);
