@@ -47,6 +47,6 @@ describe('EngineUsersService', () => {
 
     it('should not allow creating new users', async () => {
         expect.assertions(1);
-        service.add({}, {}).catch(e => expect(e).toBeTruthy());
+        service.add({}).catch(e => expect(e).toBeTruthy());
     });
 });

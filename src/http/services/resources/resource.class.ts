@@ -2,7 +2,7 @@ import { HashMap } from '../../../utilities/types.utilities';
 
 import { ResourceService } from './resources.interface';
 
-export abstract class EngineResource<T = ResourceService<any>> {
+export abstract class EngineResource<T extends ResourceService<any>> {
 
     /** Human readable name of the object */
     public get name(): string {
@@ -42,13 +42,12 @@ export abstract class EngineResource<T = ResourceService<any>> {
     /**
      * Save any changes made to the server
      */
-    public async save(): Promise<EngineResource> {
-        const changes: HashMap = this.changes;
+    public async save(): Promise<T> {
         const me: HashMap = this.toJSON();
         if (Object.keys(this._changes).length > 0) {
             return this.id
-                ? (this._service as any).update(this.id, { ...me, ...changes })
-                : (this._service as any).add({ ...me, ...changes});
+                ? (this._service as any).update(this.id, me)
+                : (this._service as any).add(me);
         } else {
             return Promise.reject('No changes have been made');
         }
@@ -64,8 +63,8 @@ export abstract class EngineResource<T = ResourceService<any>> {
     /**
      * Convert object into plain object
      */
-    public toJSON(): HashMap {
-        const obj: any = { ...(this as any) };
+    public toJSON(with_changes: boolean = true): HashMap {
+        const obj: any = { ...this };
         delete obj._service;
         delete obj._changes;
         delete obj._server_names;
@@ -75,9 +74,11 @@ export abstract class EngineResource<T = ResourceService<any>> {
                 const new_key = this._server_names[key.substr(1)] || key.substr(1);
                 obj[new_key] = obj[key];
                 delete obj[key];
+            } else if (obj[key] === undefined) {
+                delete obj[key];
             }
         }
-        return obj;
+        return with_changes ? { ...obj, ...this._changes } : obj;
     }
 
     /**

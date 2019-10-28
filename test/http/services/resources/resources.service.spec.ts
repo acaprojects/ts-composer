@@ -3,7 +3,7 @@ import { Observable, of, throwError } from 'rxjs';
 import { EngineResource } from '../../../../src/http/services/resources/resource.class';
 import { EngineResourceService } from '../../../../src/http/services/resources/resources.service';
 
-class ERSInstance extends EngineResourceService<EngineResource> {}
+class ERSInstance extends EngineResourceService<EngineResource<any>> {}
 
 describe('EngineResourceService', () => {
     let service: ERSInstance;

@@ -8,7 +8,7 @@ import { EngineHttpClient } from '../../http.service';
 import { EngineResource } from './resource.class';
 import { ResourceService } from './resources.interface';
 
-export abstract class EngineResourceService<T extends EngineResource> extends EngineBaseClass
+export abstract class EngineResourceService<T extends EngineResource<any>> extends EngineBaseClass
     implements ResourceService<T> {
     /** Whether service has been initialised */
     public get initialised() {

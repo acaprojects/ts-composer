@@ -12,7 +12,9 @@ describe('EngineAuthService', () => {
     let authority: EngineAuthority;
     let href: string;
     let spy: jest.SpyInstance;
+    let post_spy: jest.SpyInstance;
     let storage: jest.SpyInstance;
+    let storage_set: jest.SpyInstance;
 
     function newService() {
         return new EngineAuthService({
@@ -37,18 +39,20 @@ describe('EngineAuthService', () => {
             version: `2.0.0`
         };
         spy = jest.spyOn(engine.ajax, 'get');
+        post_spy = jest.spyOn(engine.ajax, 'post');
         storage = jest.spyOn(Object.getPrototypeOf(localStorage), 'getItem');
-        spy.mockImplementation(() => of({ responseText: JSON.stringify(authority) }));
+        storage_set = jest.spyOn(Object.getPrototypeOf(localStorage), 'setItem');
+        spy.mockImplementation(() => of({ response: authority }));
         href = location.href;
         localStorage.clear();
         global.location.assign = jest.fn();
     });
 
     afterEach(() => {
-        spy.mockReset();
-        storage.mockReset();
         spy.mockRestore();
         storage.mockRestore();
+        storage_set.mockRestore();
+        post_spy.mockRestore();
     });
 
     it('should expose the API endpoint', () => {
@@ -57,12 +61,12 @@ describe('EngineAuthService', () => {
     });
 
     it('should get the authority', done => {
-        spy.mockImplementation(() => throwError({ responseText: JSON.stringify(authority) }));
+        spy.mockImplementation(() => throwError({ response: authority }));
         jest.useFakeTimers();
         service = newService();
         expect(spy).toBeCalledWith('/auth/authority');
         expect(service.authority).toBeFalsy();
-        spy.mockImplementation(() => of({ responseText: JSON.stringify(authority) }));
+        spy.mockImplementation(() => of({ response: authority }));
         setTimeout(() => {
             expect(service.authority).toBeTruthy();
             done();
@@ -82,9 +86,7 @@ describe('EngineAuthService', () => {
     });
 
     it('should redirect to authorise if user is logged in but without a token', done => {
-        spy.mockImplementation(() =>
-            of({ responseText: JSON.stringify({ ...authority, session: true }) })
-        );
+        spy.mockImplementation(() => of({ response: { ...authority, session: true } }));
         service = newService();
         setTimeout(() => {
             expect(location.assign).toBeCalledWith(
@@ -102,26 +104,27 @@ describe('EngineAuthService', () => {
     });
 
     it('should handle auth URL parameters', done => {
+        spy.mockImplementation(() => of({ response: { ...authority, session: true } }));
         window.history.pushState(
             {},
             'Test Title',
-    '/not-login.html?access_token=test&expires_in=3600&refresh_token=refresh&trust=true&fixed_device=true&state=nonce;other'
+            '/not-login.html?access_token=test&expires_in=3600&refresh_token=refresh&trust=true&fixed_device=true&state=;other'
         );
-        storage.mockImplementationOnce(() => '').mockImplementationOnce(() => 'nonce');
+        storage.mockImplementation(() => '');
         service = newService();
         const date = dayjs()
             .add(3600, 's')
             .startOf('s');
-        setTimeout(() => {
-            expect(service.token).toBe('test');
-            expect(service.refresh_token).toBe('refresh');
-            expect(+(localStorage.getItem(`${service.client_id}_expires_at`) || 0)).toBe(
-                date.valueOf()
-            );
-            expect(service.trusted).toBeTruthy();
-            expect(service.fixed_device).toBeTruthy();
-            done();
-        }, 1);
+        service.online_state.subscribe(online => {
+            if (online) {
+                expect(localStorage.setItem).toBeCalledWith(`${service.client_id}_access_token`, 'test');
+                expect(localStorage.setItem).toBeCalledWith(`${service.client_id}_refresh_token`, 'refresh');
+                expect(localStorage.setItem).toBeCalledWith(`${service.client_id}_expires_at`, `${date.valueOf()}`);
+                expect(service.trusted).toBeTruthy();
+                expect(service.fixed_device).toBeTruthy();
+                done();
+            }
+        });
     });
 
     it('should expose the access token', done => {
@@ -140,24 +143,23 @@ describe('EngineAuthService', () => {
     });
 
     it('should generate tokens from code', done => {
-        const post_spy = jest.spyOn(engine.ajax, 'post');
         post_spy.mockImplementation(
             () =>
                 of({
-                    responseText: JSON.stringify({
+                    response: {
                         access_token: ':)',
                         refresh_token: 'Refresh :|',
                         expires_in: 3600
-                    })
+                    }
                 }) as any
         );
         window.history.pushState({}, 'Test Title', '/not-login.html?code=test');
         service = newService();
         setTimeout(() => {
             expect(post_spy).toBeCalledWith(
-                `/auth/token?client_id=${
-                    service.client_id
-                }&code=test&grant_type=authorization_code`,
+                `/auth/token?client_id=${service.client_id}&redirect_uri=${encodeURIComponent(
+                    service.redirect_uri
+                )}&code=test&grant_type=authorization_code`,
                 ''
             );
             expect(service.token).toBe(':)');
@@ -167,24 +169,23 @@ describe('EngineAuthService', () => {
     });
 
     it('should generate tokens from refresh token', done => {
-        const post_spy = jest.spyOn(engine.ajax, 'post');
         post_spy.mockImplementation(
             () =>
                 of({
-                    responseText: JSON.stringify({
+                    response: {
                         access_token: ':)',
                         refresh_token: 'Refresh :|',
                         expires_in: 3600
-                    })
+                    }
                 }) as any
         );
         window.history.pushState({}, 'Test Title', '/not-login.html?refresh_token=test');
         service = newService();
         setTimeout(() => {
             expect(post_spy).toBeCalledWith(
-                `/auth/token?client_id=${
-                    service.client_id
-                }&refresh_token=test&grant_type=refresh_token`,
+                `/auth/token?client_id=${service.client_id}&redirect_uri=${encodeURIComponent(
+                    service.redirect_uri
+                )}&refresh_token=test&grant_type=refresh_token`,
                 ''
             );
             expect(service.token).toBe(':)');
@@ -207,16 +208,26 @@ describe('EngineAuthService', () => {
         });
     });
 
-    it('should allow logging out', () => {
+    it('should allow logging out', done => {
+        post_spy.mockImplementation(() => of({}));
         window.history.pushState(
             {},
             'Test Title',
             '/not-login.html?access_token=:S&expires_in=3600'
         );
         service = newService();
-        expect(service.token).toBe(':S');
-        service.logout();
-        expect(service.token).toBeFalsy();
-        expect(location.assign).toBeCalledWith('/logout');
+        let count = 0;
+        service.online_state.subscribe(online => {
+            if (online) {
+                expect(service.token).toBe(':S');
+                service.logout();
+                count++;
+            } else if (count > 0) {
+                expect(service.token).toBeFalsy();
+                expect(engine.ajax.post).toBeCalledWith(`/auth/token?token=:S`, '');
+                expect(location.assign).toBeCalledWith('/logout');
+                done();
+            }
+        });
     });
 });

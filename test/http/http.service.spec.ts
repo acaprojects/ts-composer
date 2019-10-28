@@ -42,7 +42,7 @@ describe('EngineHttpClient', () => {
             spy.mockImplementation(() =>
                 of({
                     status: 200,
-                    responseText: JSON.stringify({ message: 'GET RECEIVED!!!' })
+                    response: ({ message: 'GET RECEIVED!!!' })
                 } as any)
             );
             jest.useFakeTimers();
@@ -62,18 +62,7 @@ describe('EngineHttpClient', () => {
                 done();
             });
             expect(engine_http.ajax.get).toBeCalledWith('test_url', {
-                Authorization: 'test_token'
-            });
-        });
-
-        it('should prevent requests until auth is loaded', () => {
-            expect.assertions(2);
-            service.get('test_url').subscribe(_ => null);
-            expect(engine_http.ajax.get).not.toBeCalled();
-            auth.has_token = true;
-            jest.runOnlyPendingTimers();
-            expect(engine_http.ajax.get).toBeCalledWith('test_url', {
-                Authorization: 'test_token'
+                Authorization: 'Bearer test_token'
             });
         });
 
@@ -85,8 +74,9 @@ describe('EngineHttpClient', () => {
                 done();
             });
             expect(engine_http.ajax.get).toBeCalledWith('test_url', {
-                Authorization: 'test_token'
+                Authorization: 'Bearer test_token'
             });
+            jest.runOnlyPendingTimers();
         });
 
         it('should allow custom headers', () => {
@@ -96,7 +86,7 @@ describe('EngineHttpClient', () => {
                 .get('test_url', { headers: { 'CUSTOM-HEADER-X': 'Trump Cards :)' } })
                 .subscribe(_ => null);
             expect(engine_http.ajax.get).toBeCalledWith('test_url', {
-                'Authorization': 'test_token',
+                'Authorization': 'Bearer test_token',
                 'CUSTOM-HEADER-X': 'Trump Cards :)'
             });
         });
@@ -123,7 +113,7 @@ describe('EngineHttpClient', () => {
             spy.mockImplementation(() =>
                 of({
                     status: 200,
-                    responseText: JSON.stringify({ message: 'POST RECEIVED!!!' })
+                    response: ({ message: 'POST RECEIVED!!!' })
                 } as any)
             );
             jest.useFakeTimers();
@@ -143,18 +133,8 @@ describe('EngineHttpClient', () => {
                 done();
             });
             expect(engine_http.ajax.post).toBeCalledWith('test_url', 'test_body', {
-                Authorization: 'test_token'
-            });
-        });
-
-        it('should prevent requests until auth is loaded', () => {
-            expect.assertions(2);
-            service.post('test_url', 'test_body').subscribe(_ => null);
-            expect(engine_http.ajax.post).not.toBeCalled();
-            auth.has_token = true;
-            jest.runOnlyPendingTimers();
-            expect(engine_http.ajax.post).toBeCalledWith('test_url', 'test_body', {
-                Authorization: 'test_token'
+                'Authorization': 'Bearer test_token',
+                'Content-Type': 'application/json'
             });
         });
 
@@ -166,7 +146,8 @@ describe('EngineHttpClient', () => {
                 done();
             });
             expect(engine_http.ajax.post).toBeCalledWith('test_url', 'test_body', {
-                Authorization: 'test_token'
+                'Authorization': 'Bearer test_token',
+                'Content-Type': 'application/json'
             });
         });
 
@@ -177,8 +158,9 @@ describe('EngineHttpClient', () => {
                 .post('test_url', 'test_body', { headers: { 'CUSTOM-HEADER-X': 'Trump Cards :)' } })
                 .subscribe(_ => null);
             expect(engine_http.ajax.post).toBeCalledWith('test_url', 'test_body', {
-                'Authorization': 'test_token',
-                'CUSTOM-HEADER-X': 'Trump Cards :)'
+                'Authorization': 'Bearer test_token',
+                'CUSTOM-HEADER-X': 'Trump Cards :)',
+                'Content-Type': 'application/json'
             });
         });
 
@@ -204,7 +186,7 @@ describe('EngineHttpClient', () => {
             spy.mockImplementation(() =>
                 of({
                     status: 200,
-                    responseText: JSON.stringify({ message: 'PUT RECEIVED!!!' })
+                    response: ({ message: 'PUT RECEIVED!!!' })
                 } as any)
             );
             jest.useFakeTimers();
@@ -224,21 +206,10 @@ describe('EngineHttpClient', () => {
                 done();
             });
             expect(engine_http.ajax.put).toBeCalledWith('test_url', 'test_body', {
-                Authorization: 'test_token'
+                'Authorization': 'Bearer test_token',
+                'Content-Type': 'application/json'
             });
-        });
-
-        it('should prevent requests until auth is loaded', () => {
-            expect.assertions(2);
-            service.put('test_url', { test: 'body' }).subscribe(_ => null);
-            expect(engine_http.ajax.put).not.toBeCalled();
-            auth.has_token = true;
             jest.runOnlyPendingTimers();
-            expect(engine_http.ajax.put).toBeCalledWith(
-                'test_url',
-                { test: 'body' },
-                { Authorization: 'test_token' }
-            );
         });
 
         it('should handle errors', done => {
@@ -263,7 +234,7 @@ describe('EngineHttpClient', () => {
             spy.mockImplementation(() =>
                 of({
                     status: 200,
-                    responseText: JSON.stringify({ message: 'PATCH RECEIVED!!!' })
+                    response: ({ message: 'PATCH RECEIVED!!!' })
                 } as any)
             );
             jest.useFakeTimers();
@@ -283,21 +254,10 @@ describe('EngineHttpClient', () => {
                 done();
             });
             expect(engine_http.ajax.patch).toBeCalledWith('test_url', 'test_body', {
-                Authorization: 'test_token'
+                'Authorization': 'Bearer test_token',
+                'Content-Type': 'application/json'
             });
-        });
-
-        it('should prevent requests until auth is loaded', () => {
-            expect.assertions(2);
-            service.patch('test_url', { test: 'body' }).subscribe(_ => null);
-            expect(engine_http.ajax.patch).not.toBeCalled();
-            auth.has_token = true;
             jest.runOnlyPendingTimers();
-            expect(engine_http.ajax.patch).toBeCalledWith(
-                'test_url',
-                { test: 'body' },
-                { Authorization: 'test_token' }
-            );
         });
 
         it('should handle errors', done => {
@@ -322,7 +282,7 @@ describe('EngineHttpClient', () => {
             spy.mockImplementation(() =>
                 of({
                     status: 200,
-                    responseText: JSON.stringify({ message: 'DELETE RECEIVED!!!' })
+                    response: { message: 'DELETE RECEIVED!!!' }
                 } as any)
             );
             jest.useFakeTimers();
@@ -342,18 +302,7 @@ describe('EngineHttpClient', () => {
                 done();
             });
             expect(engine_http.ajax.delete).toBeCalledWith('test_url', {
-                Authorization: 'test_token'
-            });
-        });
-
-        it('should prevent requests until auth is loaded', () => {
-            expect.assertions(2);
-            service.delete('test_url').subscribe(_ => null);
-            expect(engine_http.ajax.delete).not.toBeCalled();
-            auth.has_token = true;
-            jest.runOnlyPendingTimers();
-            expect(engine_http.ajax.delete).toBeCalledWith('test_url', {
-                Authorization: 'test_token'
+                Authorization: 'Bearer test_token'
             });
         });
 
@@ -365,8 +314,9 @@ describe('EngineHttpClient', () => {
                 done();
             });
             expect(engine_http.ajax.delete).toBeCalledWith('test_url', {
-                Authorization: 'test_token'
+                Authorization: 'Bearer test_token'
             });
+            jest.runOnlyPendingTimers();
         });
 
         it('should allow returning text data', done => {
@@ -377,8 +327,9 @@ describe('EngineHttpClient', () => {
                 done();
             });
             expect(engine_http.ajax.delete).toBeCalledWith('test_url', {
-                Authorization: 'test_token'
+                Authorization: 'Bearer test_token'
             });
+            jest.runOnlyPendingTimers();
         });
 
         it('should handle errors', done => {

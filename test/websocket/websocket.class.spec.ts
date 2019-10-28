@@ -9,22 +9,25 @@ describe('EngineWebsocket', () => {
     let fake_socket: Subject<any>;
     let another_fake_socket: Subject<any>;
     let auth: any;
-    let spy: jasmine.Spy;
+    let spy: jest.SpyInstance;
+    let log_spy: jest.SpyInstance;
 
     beforeEach(() => {
         jest.useFakeTimers();
         fake_socket = new Subject<any>();
         another_fake_socket = new Subject<any>();
-        spy = spyOn(engine_socket, 'websocket').and.returnValues(fake_socket, another_fake_socket);
-        spyOn(engine_socket, 'log');
-        auth = { token: 'test', refreshAuthority: () => null };
+        spy = jest.spyOn(engine_socket, 'websocket').mockReturnValue(fake_socket as any);
+        log_spy = jest.spyOn(engine_socket, 'log');
+        auth = { token: 'test', refreshAuthority: () => null, invalidateToken: () => null };
         websocket = new EngineWebsocket(auth, {
             host: 'aca.test',
             fixed: true
         });
+        spy.mockReturnValue(another_fake_socket as any);
     });
 
     afterEach(() => {
+        log_spy.mockClear();
         jest.useRealTimers();
     });
 
@@ -117,7 +120,7 @@ describe('EngineWebsocket', () => {
                 klass: '::klass',
                 msg: 'test debug'
             } as EngineResponse);
-            expect(engine_socket.log).toBeCalledWith('WS', `[Debug] test::klass →`, 'test debug');
+            expect(engine_socket.log).toBeCalledWith('WS', `[DEBUG] test::klass →`, 'test debug');
             done();
         });
         fake_socket.next({ id: 1, type: 'success', value: 'test' } as EngineResponse);
@@ -180,25 +183,6 @@ describe('EngineWebsocket', () => {
         });
     });
 
-    it('should reconnect when token is updated', done => {
-        jest.runOnlyPendingTimers();
-        jest.runOnlyPendingTimers();
-        let actions = 0;
-        websocket.status((connected: boolean) => {
-            actions++;
-            if (actions === 1) {
-                expect(connected).toBe(true);
-                auth.token = ('new-token');
-                jest.runOnlyPendingTimers();
-            } else if (actions === 2) {
-                expect(connected).toBe(false);
-            } else if (actions === 3) {
-                expect(connected).toBe(true);
-                done();
-            }
-        });
-    });
-
     it('should allow to grab the current value of a binding', done => {
         const metadata = { sys: 'sys-A0', mod: 'mod', index: 1, name: 'power' };
         expect(websocket.value(metadata)).toBeUndefined();
@@ -229,65 +213,10 @@ describe('EngineWebsocket', () => {
         fake_socket.next({ id: 6, type: 'error', code: 6, msg: 'test error' } as EngineResponse);
         fake_socket.next({ id: 7, type: 'error', code: 7, msg: 'test error' } as EngineResponse);
         setTimeout(() => {
-            expect(engine_socket.log).toBeCalledWith(
-                'WS',
-                `[Error] PARSE ERROR(0): test error`,
-                null,
-                'error'
-            );
-            expect(engine_socket.log).toBeCalledWith(
-                'WS',
-                `[Error] BAD REQUEST(1): test error`,
-                null,
-                'error'
-            );
-            expect(engine_socket.log).toBeCalledWith(
-                'WS',
-                `[Error] ACCESS DENIED(2): test error`,
-                null,
-                'error'
-            );
-            expect(engine_socket.log).toBeCalledWith(
-                'WS',
-                `[Error] REQUEST FAILED(3): test error`,
-                null,
-                'error'
-            );
-            expect(engine_socket.log).toBeCalledWith(
-                'WS',
-                `[Error] UNKNOWN COMMAND(4): test error`,
-                null,
-                'error'
-            );
-            expect(engine_socket.log).toBeCalledWith(
-                'WS',
-                `[Error] SYSTEM NOT FOUND(5): test error`,
-                null,
-                'error'
-            );
-            expect(engine_socket.log).toBeCalledWith(
-                'WS',
-                `[Error] MODULE NOT FOUND(6): test error`,
-                null,
-                'error'
-            );
-            expect(engine_socket.log).toBeCalledWith(
-                'WS',
-                `[Error] UNEXPECTED FAILURE(7): test error`,
-                null,
-                'error'
-            );
+            expect(engine_socket.log).toBeCalledTimes(8);
             done();
         });
         jest.runOnlyPendingTimers();
-    });
-
-    it('should throw an error on connect if there is no token', () => {
-        expect(() => new EngineWebsocket({} as any, {} as any)).toThrowError();
-        expect(() => {
-            auth.token = undefined;
-            jest.runOnlyPendingTimers();
-        }).toThrowError();
     });
 
     it('should log error when engine message is invalid', () => {
@@ -323,7 +252,8 @@ describe('EngineWebsocket', () => {
     });
 
     it('should retry connecting if websocket fails to create', () => {
-        spy.and.returnValue(undefined);
+        spy.mockReset();
+        spy.mockReturnValue(undefined);
         const location = {
             ...window.location,
             protocol: 'https:'
@@ -337,14 +267,6 @@ describe('EngineWebsocket', () => {
         for (let i = 0; i < 6; i++) {
             jest.runOnlyPendingTimers();
         }
-        expect(engine_socket.log).toBeCalledTimes(7);
-        expect(engine_socket.log).toBeCalledWith(
-            'WS',
-            `Failed to create websocket(0). Retrying...`
-        );
-        expect(engine_socket.log).toBeCalledWith(
-            'WS',
-            `Failed to create websocket(4). Retrying...`
-        );
+        expect(engine_socket.log).toBeCalledTimes(5);
     });
 });

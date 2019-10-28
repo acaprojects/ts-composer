@@ -1,14 +1,14 @@
-import { MockEngineHttpClient } from '../../../src/http/mock/mock-http.service';
-import { MockHttpRequestHandlerOptions } from '../../../src/http/mock/mock-http.interfaces';
-import { engine_http } from '../../../src/http/http.service';
 import { of } from 'rxjs';
+import { engine_http } from '../../../src/http/http.service';
+import { MockHttpRequestHandlerOptions } from '../../../src/http/mock/mock-http.interfaces';
+import { MockEngineHttpClient } from '../../../src/http/mock/mock-http.service';
 
 describe('MockEngineHttpClient', () => {
     let auth: any;
     let service: MockEngineHttpClient;
 
     beforeEach(() => {
-        auth = { has_token: true };
+        auth = { has_token: true, refreshAuthority: () => null };
         const global_handler: MockHttpRequestHandlerOptions = {
             path: 'test/path',
             method: 'GET',
@@ -103,7 +103,7 @@ describe('MockEngineHttpClient', () => {
             });
             const handler = service.findRequestHandler('POST', 'join/him');
             expect(handler).toBeTruthy();
-            service.post('lob/him?query=true', {}).subscribe(_ => null, err => console.error(err));
+            service.post('lob/him?query=true', {}).subscribe(_ => null, err => null);
             jest.runOnlyPendingTimers();
         });
 
@@ -129,7 +129,7 @@ describe('MockEngineHttpClient', () => {
             });
             const handler = service.findRequestHandler('PUT', 'join/him');
             expect(handler).toBeTruthy();
-            service.put('lob/him?query=true', {}).subscribe(_ => null, err => console.error(err));
+            service.put('lob/him?query=true', {}).subscribe(_ => null, err => null);
             jest.runOnlyPendingTimers();
         });
 
@@ -155,7 +155,7 @@ describe('MockEngineHttpClient', () => {
             });
             const handler = service.findRequestHandler('PATCH', 'join/him');
             expect(handler).toBeTruthy();
-            service.patch('lob/him?query=true', {}).subscribe(_ => null, err => console.error(err));
+            service.patch('lob/him?query=true', {}).subscribe(_ => null, _ => null);
             jest.runOnlyPendingTimers();
         });
 

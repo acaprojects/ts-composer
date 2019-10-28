@@ -56,7 +56,7 @@ describe('Composer', () => {
             };
             window.history.pushState({}, 'Test Composer', '?access_token=hello&expires_in=3600');
             spy = jest.spyOn(engine.ajax, 'get');
-            spy.mockImplementation(() => of({ responseText: JSON.stringify(authority) }));
+            spy.mockImplementation(() => of({ response: authority }));
             jest.useFakeTimers();
             Composer.init({
                 auth_uri: '/auth/oauth/authorize',
@@ -107,7 +107,7 @@ describe('Composer', () => {
             };
             window.history.pushState({}, 'Test Composer', '?access_token=hello&expires_in=3600');
             spy = jest.spyOn(engine.ajax, 'get');
-            spy.mockImplementation(() => of({ responseText: JSON.stringify(authority) }));
+            spy.mockImplementation(() => of({ response: authority }));
             jest.useFakeTimers();
             Composer.init({
                 auth_uri: '/auth/oauth/authorize',

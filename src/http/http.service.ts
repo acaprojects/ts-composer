@@ -135,7 +135,7 @@ export class EngineHttpClient {
             case 'json':
                 return typeof text === 'string' ? JSON.parse(text || '{}') : text;
             case 'text':
-                return text;
+                return typeof text === 'string' ? text : (typeof text === 'object' ? JSON.stringify(text) : `${text}`);
             case 'void':
                 return;
         }
@@ -181,9 +181,6 @@ export class EngineHttpClient {
                 case 'PATCH':
                 case 'PUT':
                 case 'POST':
-                    if (!options.headers.Accept) {
-                        options.headers.Accept = 'application/json';
-                    }
                     if (!options.headers['Content-Type']) {
                         options.headers['Content-Type'] = 'application/json';
                     }
