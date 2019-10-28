@@ -63,7 +63,7 @@ export abstract class EngineResource<T extends ResourceService<any>> {
     /**
      * Convert object into plain object
      */
-    public toJSON(with_changes: boolean = true): HashMap {
+    public toJSON(this: EngineResource<T>, with_changes: boolean = true): HashMap {
         const obj: any = { ...this };
         delete obj._service;
         delete obj._changes;
