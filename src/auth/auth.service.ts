@@ -67,6 +67,11 @@ export class EngineAuthService {
         return this._client_id;
     }
 
+    /** Redirect URI for the OAuth flow */
+    public get redirect_uri(): string {
+        return (this.options || {}).redirect_uri;
+    }
+
     /** Bearer token for authenticating requests to engine */
     public get token(): string {
         const expires_at = `${this._storage.getItem(`${this._client_id}_expires_at`)}`;
@@ -154,6 +159,7 @@ export class EngineAuthService {
                 if (!this.authority) {
                     return reject('Authority is not loaded');
                 }
+                const authority = this._authority || { session: false, login_url: '/login?continue={{url}}' };
                 const check_token = () => {
                     if (this.token) {
                         delete this._promises.authorise;
@@ -168,7 +174,7 @@ export class EngineAuthService {
                                 reject(_);
                             });
                         } else {
-                            if (this.authority!.session) {
+                            if (authority.session) {
                                 // Generate tokens
                                 const login_url = this.createLoginURL(state);
                                 window.location.assign(login_url);
@@ -176,7 +182,7 @@ export class EngineAuthService {
                             } else {
                                 if (this.options.handle_login !== false) {
                                     // Redirect to login form
-                                    const url = (this.authority!.login_url || '').replace(
+                                    const url = (authority.login_url || '').replace(
                                         '{{url}}',
                                         encodeURIComponent(location.href)
                                     );
@@ -197,15 +203,19 @@ export class EngineAuthService {
      * Logout and clear user credentials for the application
      */
     public logout() {
-        // Remove user credentials
-        for (let i = 0; i < this._storage.length; i++) {
-            const key = this._storage.key(i);
-            if (key && key.indexOf(this.client_id) >= 0) {
-                this._storage.removeItem(key);
+        const done = () => {
+            // Remove user credentials
+            for (let i = 0; i < this._storage.length; i++) {
+                const key = this._storage.key(i);
+                if (key && key.indexOf(this.client_id) >= 0) {
+                    this._storage.removeItem(key);
+                }
             }
-        }
-        // Redirect user to logout URL
-        window.location.assign(this.authority ? this.authority.logout_url : '/logout');
+            // Redirect user to logout URL
+            location.assign(this.authority ? this.authority.logout_url : '/logout');
+            this._online.next(false);
+        };
+        this.revokeToken().then(done, done);
     }
 
     /**
@@ -226,8 +236,8 @@ export class EngineAuthService {
             () => {
                 if (authority) {
                     this._authority = authority;
-                    this._online.next(true);
                     this.authorise('').then(_ => null, _ => null);
+                    this._online.next(true);
                 } else {
                     // Retry if authority fails to load
                     setTimeout(() => this.loadAuthority(tries), 300 * Math.min(20, ++tries));
@@ -367,6 +377,30 @@ export class EngineAuthService {
             url += `&grant_type=authorization_code`;
         }
         return url;
+    }
+
+    /**
+     * Revoke the current access token
+     */
+    private revokeToken(): Promise<void> {
+        if (!this._promises.revoke_token) {
+            this._promises.revoke_token = new Promise<void>((resolve, reject) => {
+                const token_uri = this.options.token_uri || '/auth/token';
+                if (!this.has_token) {
+                    resolve();
+                    delete this._promises.revoke_token;
+                } else {
+                    engine.ajax.post(`${token_uri}?token=${this.token}`, '').subscribe(null, err => {
+                        reject(err);
+                        delete this._promises.revoke_token;
+                    }, () => {
+                        resolve();
+                        delete this._promises.revoke_token;
+                    });
+                }
+            });
+        }
+        return this._promises.revoke_token;
     }
 
     /**
