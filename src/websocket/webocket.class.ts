@@ -147,7 +147,7 @@ export class EngineWebsocket {
                     req.resolve = d => resolve(d);
                     req.reject = e => reject(e);
                     const bind = `${request.sys}, ${request.mod}_${request.index}, ${request.name}`;
-                    engine_socket.log('WS', `[${request.cmd.toUpperCase()}(${request.id})] ${bind}`, request.args);
+                    engine_socket.log('WS', `[${request.cmd.toUpperCase()}](${request.id}) ${bind}`, request.args);
                     this.websocket.next(request);
                 } else {
                     setTimeout(() => {
@@ -175,7 +175,7 @@ export class EngineWebsocket {
                 engine_socket.log('WS', `[DEBUG] ${message.mod}${message.klass} →`, message.msg);
             } else if (message.type === 'error') {
                 this.handleError(message);
-            } else {
+            } else if (!(message as any).cmd) { // Not mock message
                 engine_socket.log('WS', 'Invalid websocket message', message, 'error');
             }
         }
@@ -189,7 +189,7 @@ export class EngineWebsocket {
         const request = Object.keys(this.requests)
             .map(i => this.requests[i])
             .find(i => i.id === message.id);
-        engine_socket.log('WS', `[SUCCESS(${message.id})] `);
+        engine_socket.log('WS', `[SUCCESS](${message.id})`);
         /* istanbul ignore else */
         if (request && request.resolve) {
             request.resolve(message.value);

@@ -25,8 +25,6 @@ import { EngineWebsocketOptions } from './websocket/websocket.interfaces';
 export interface ComposerOptions extends EngineAuthOptions {
     /** Host name and port of the engine server */
     host?: string;
-    /** Whether to run the application with mock services */
-    mock?: boolean;
     /** Whether to use https/wss protocols */
     secure?: boolean;
 }

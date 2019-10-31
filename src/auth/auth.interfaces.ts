@@ -38,6 +38,8 @@ export interface EngineAuthOptions {
     use_iframe?: boolean;
     /** Whether service should handling user login. Defaults to `true` */
     handle_login?: boolean;
+    /** Whether system is in mock mode */
+    mock?: boolean;
 }
 
 export interface EngineTokenResponse {

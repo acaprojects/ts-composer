@@ -77,6 +77,9 @@ export class EngineAuthService {
 
     /** Bearer token for authenticating requests to engine */
     public get token(): string {
+        if (this.options.mock) {
+            return 'mock-token';
+        }
         const expires_at = `${this._storage.getItem(`${this._client_id}_expires_at`)}`;
         if (dayjs(+expires_at).isBefore(dayjs(), 's')) {
             engine.log('Auth', 'Token expired. Requesting new token...');
@@ -226,6 +229,24 @@ export class EngineAuthService {
      * Load authority details from engine
      */
     private loadAuthority(tries: number = 0) {
+        if (this.options.mock) {
+            // Setup mock authority
+            this._authority = {
+                id: 'mock-authority',
+                name: 'localhost:4200',
+                description: '',
+                dom: 'localhost:4200',
+                login_url: `/login?continue={{url}}`,
+                logout_url: `/logout`,
+                session: true,
+                production: false,
+                config: {},
+                version: `2.0.0`
+            };
+            engine.log('Auth', `System in mock mode`);
+            this._online.next(true);
+            return;
+        }
         engine.log('Auth', `Fixed: ${this.fixed_device} | Trusted: ${this.trusted}`);
         engine.log('Auth', `Loading authority...`);
         let authority: EngineAuthority;
