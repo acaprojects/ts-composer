@@ -31,6 +31,7 @@ export * from './http/services/modules/module.class';
 export * from './http/services/systems/systems.service';
 export * from './http/services/systems/system.interfaces';
 export * from './http/services/systems/system.class';
+export * from './http/services/systems/system.utilities';
 
 export * from './http/services/users/users.service';
 export * from './http/services/users/user.interfaces';
