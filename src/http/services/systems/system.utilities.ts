@@ -8,7 +8,7 @@ import { Dayjs, default as _rollupDayjs } from 'dayjs';
 const dayjs = _rollupDayjs || _dayjs;
 
 export function generateMockSystem(overrides: any = {}) {
-    if (typeof overrides !== 'object') {
+    if (typeof overrides !== 'object' || !overrides) {
         overrides = {};
     }
     const id = `sys-${Math.floor(Math.random() * 999_999)}`;
