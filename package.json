@@ -9,6 +9,7 @@
   "files": [
     "dist"
   ],
+  "private": false,
   "author": "Alex Sorafumo <alex@yuion.net>",
   "repository": {
     "type": "git",
