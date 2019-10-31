@@ -1,6 +1,6 @@
 {
   "name": "@acaprojects/ts-composer",
-  "version": "0.0.0-development",
+  "version": "1.0.0",
   "description": "",
   "keywords": [],
   "main": "dist/ts-composer.umd.js",
@@ -13,7 +13,7 @@
   "author": "Alex Sorafumo <alex@yuion.net>",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/acaprojects/ts-composer.git"
   },
   "license": "MIT",
   "engines": {
