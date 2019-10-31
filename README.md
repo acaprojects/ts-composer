@@ -143,7 +143,7 @@ Composer.system.count(system_id);
 Composer.users.current();
 ```
 
-Objects returned by `show` and `query` methods are immutable, 
+Objects returned by `show` and `query` methods are immutable,
 though when reassigning value it will be saved under the `changes` property of that object.
 These changes can be saved using the `save` method which will return a promise for the new object.
 
@@ -179,8 +179,8 @@ window.control.systems = {
         "MyModule": [
             {
                 power: true,
-                $power_on: () => this.power = true,
-                $power_off: () => this.power = false
+                $power_on: function () { this.power = true },
+                $power_off: function () { this.power = false }
             }
         ]
     }
@@ -196,7 +196,7 @@ const my_mod = Composer.bindings.module('my-system', 'MyModule', 1);
 const my_variable = my_mod.binding('power');
 const unbind = my_variable.bind();
 const sub = my_variable.listen((value) => doSomething(value)); // Emits true
-my_mod.exec('power_off'); // The listen callback will now emit false 
+my_mod.exec('power_off'); // The listen callback will now emit false
 ```
 
 Some methods may need access to other modules within the system, for this a property is appended on runtime called `_system` which allows for access to the parent system
@@ -206,7 +206,7 @@ window.control.systems = {
     "my-system": {
         "MyModule": [
             {
-                $lights_off: () => this._system.MyOtherModule[0].lights = false;
+                $lights_off: function () { this._system.MyOtherModule[0].lights = false; }
             }
         ]
         "MyOtherModule": [
@@ -225,7 +225,7 @@ HTTP API Requests can be mocked in a similar way to the realtime API by adding h
 ```typescript
 window.control.handlers = [
     {
-        path: '/api/engine/v1/systems'
+        path: '/api/engine/v1/systems',
         metadata: {},
         method: 'GET',
         callback: (request) => my_mock_systems
@@ -238,9 +238,9 @@ Paths allow for route parameters and will pass the value in the callback input.
 ```typescript
 window.control.handlers = [
     {
-        path: '/api/engine/v1/systems/:system_id'
+        path: '/api/engine/v1/systems/:system_id',
         ...
-        callback: (request) => 
+        callback: (request) =>
             my_mock_systems.find(sys => sys.id === request.route_params.system_id)
     }
 ]

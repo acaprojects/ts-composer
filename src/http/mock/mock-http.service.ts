@@ -31,7 +31,7 @@ if (!window.control) {
 }
 
 /* istanbul ignore else */
-if (!window.control.systems) {
+if (!window.control.handlers) {
     window.control.handlers = {};
 }
 
@@ -67,7 +67,7 @@ export class MockEngineHttpClient extends EngineHttpClient {
         const key = `${method}|${path}`;
         if (this._handlers[key]) {
             delete this._handlers[key];
-            log('HTTP(M)', `Removed old handler for ${method} ${path}`);
+            log('HTTP(M)', `- ${method} ${path}`);
         }
         const path_parts = path
             .replace(/(http|https):\/\/[a-zA-Z0-9.]*:?([0-9]*)?/g, '') // Remove URL origin
@@ -82,7 +82,7 @@ export class MockEngineHttpClient extends EngineHttpClient {
             path_structure: path_parts.map(i => (i[0] === ':' ? i.replace(':', '') : ''))
         };
         this._handlers[key] = handler;
-        log('HTTP(M)', `Added handler for ${method} ${path}`);
+        log('HTTP(M)', `+ ${method} ${path}`);
     }
 
     public get(url: string, options?: HttpJsonOptions): Observable<HashMap>;
@@ -147,7 +147,7 @@ export class MockEngineHttpClient extends EngineHttpClient {
      * @param url URL of the request
      */
     public findRequestHandler(method: HttpVerb, url: string): MockHttpRequestHandler | null {
-        const path = url.replace(/(http|https):\/\/[a-zA-Z0-9.]*:?([0-9]*)?/g, '').split('?')[0];
+        const path = url.replace(/(http|https)?:\/\/[a-zA-Z0-9.]*:?([0-9]*)?/g, '').replace(/^\//, '').split('?')[0];
         const route_parts = path.split('/');
         const method_handlers: MockHttpRequestHandler[] = Object.keys(this._handlers).reduce<
             MockHttpRequestHandler[]

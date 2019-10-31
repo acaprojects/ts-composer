@@ -45,7 +45,7 @@ export class MockEngineWebsocket extends EngineWebsocket {
         // Convert static objects on the window into
         /* istanbul ignore else */
         if (window.control && window.control.systems) {
-            const systems: MockEngineWebsocketSystem[] = window.control.systems;
+            const systems: { [id: string]: MockEngineWebsocketSystem } = window.control.systems;
             for (const key in systems) {
                 /* istanbul ignore else */
                 if (!(window.control.systems[key] instanceof MockEngineWebsocketSystem)) {
