@@ -16,7 +16,11 @@ export default {
     { file: pkg.module, format: 'es', sourcemap: true },
   ],
   // Indicate here external modules you don't wanna include in your bundle (i.e.: 'lodash')
-  external: [],
+  external: [
+    'dayjs',
+    'rxjs',
+    'ts-md5'
+  ],
   watch: {
     include: 'src/**',
   },

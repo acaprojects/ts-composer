@@ -1,6 +1,6 @@
 {
-  "name": "ts-composer",
-  "version": "0.0.0",
+  "name": "@acaprojects/ts-composer",
+  "version": "0.0.0-development",
   "description": "",
   "keywords": [],
   "main": "dist/ts-composer.umd.js",
@@ -21,7 +21,7 @@
   "scripts": {
     "lint": "tslint  --project tsconfig.json -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
     "prebuild": "rimraf dist",
-    "build": "tsc --module commonjs && rollup -c rollup.config.ts && typedoc --out docs --target es6 --theme minimal --mode file src",
+    "build": "tsc --module commonjs && rollup -c rollup.config.ts && typedoc --excludePrivate --out docs --target es6 --theme minimal --mode file src",
     "start": "rollup -c rollup.config.ts -w",
     "test": "jest --coverage",
     "test:watch": "jest --coverage --watch",
@@ -36,7 +36,7 @@
   },
   "lint-staged": {
     "{src,test}/**/*.ts": [
-      "prettier --write",
+      "tslint --fix",
       "git add"
     ]
   },
@@ -49,7 +49,7 @@
     "transform": {
       ".(ts|tsx)": "ts-jest"
     },
-    "testEnvironment": "node",
+    "testEnvironment": "jsdom",
     "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
     "moduleFileExtensions": [
       "ts",
@@ -69,17 +69,23 @@
       }
     },
     "collectCoverageFrom": [
-      "src/*.{js,ts}"
+      "src/**/*.{js,ts}"
     ]
   },
   "prettier": {
-    "semi": false,
+    "semi": true,
     "singleQuote": true
   },
   "commitlint": {
     "extends": [
       "@commitlint/config-conventional"
     ]
+  },
+  "peerDependencies": {
+    "core-js": "^3.1.1",
+    "dayjs": "^1.8.14",
+    "rxjs": "^6.5.2",
+    "ts-md5": "^1.2.4"
   },
   "devDependencies": {
     "@commitlint/cli": "^7.1.2",
@@ -92,6 +98,7 @@
     "coveralls": "^3.0.2",
     "cross-env": "^5.2.0",
     "cz-conventional-changelog": "^2.1.0",
+    "dayjs": "^1.8.14",
     "husky": "^1.0.1",
     "jest": "^23.6.0",
     "jest-config": "^23.6.0",
@@ -108,13 +115,14 @@
     "rollup-plugin-sourcemaps": "^0.4.2",
     "rollup-plugin-typescript2": "^0.18.0",
     "rxjs": "^6.5.2",
-    "semantic-release": "^15.9.16",
+    "semantic-release": "^15.13.16",
     "shelljs": "^0.8.3",
     "travis-deploy-once": "^5.0.9",
     "ts-jest": "^23.10.2",
+    "ts-md5": "^1.2.4",
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
-    "tslint-config-prettier": "^1.15.0",
+    "tslint-config-prettier": "^1.18.0",
     "tslint-config-standard": "^8.0.1",
     "typedoc": "^0.12.0",
     "typescript": "^3.0.3"
