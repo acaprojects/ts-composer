@@ -244,8 +244,10 @@ describe('EngineWebsocket', () => {
             }
         });
         auth.token = 'test';
+        (websocket as any)._status.next(false);
         websocket.bind(metadata);
         jest.runOnlyPendingTimers();
+        (websocket as any)._status.next(true);
         another_fake_socket.next({ id: 1, type: 'success' } as EngineResponse);
         jest.runOnlyPendingTimers();
         done();

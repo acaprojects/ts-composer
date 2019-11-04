@@ -1,9 +1,9 @@
 import { EngineTrigger } from '../../../../src/http/services/triggers/trigger.class';
 import {
-    TriggerActions,
-    TriggerConditions,
     ConditionOperator,
     TimeConditionType,
+    TriggerActions,
+    TriggerConditions,
     TriggerWebhookType
 } from '../../../../src/http/services/triggers/trigger.interfaces';
 
@@ -53,7 +53,7 @@ describe('EngineTrigger', () => {
             trigger.system_id = 'life';
             throw Error('Failed to throw error');
         } catch (e) {
-            expect(e).toEqual(new Error("System ID cannot be changed from it's initial value"));
+            expect(e).toEqual(new Error('System ID cannot be changed from it\'s initial value'));
         }
         const trig = new EngineTrigger(service, {});
         trig.system_id = 'life-is-42';
@@ -124,5 +124,14 @@ describe('EngineTrigger', () => {
         trigger.conditions = new_conditions;
         expect(trigger.conditions).not.toEqual(new_conditions);
         expect(trigger.changes.conditions).toEqual(new_conditions);
+    });
+
+    it('should have default values', () => {
+        trigger = new EngineTrigger(service, {});
+        expect(trigger.actions).toBeInstanceOf(Object);
+        expect(trigger.conditions).toBeInstanceOf(Object);
+        trigger = new EngineTrigger(service, { actions: {}, conditions: {} });
+        expect(trigger.actions).toBeInstanceOf(Object);
+        expect(trigger.conditions).toBeInstanceOf(Object);
     });
 });

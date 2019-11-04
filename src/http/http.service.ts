@@ -93,6 +93,8 @@ export class EngineHttpClient {
      * @param body Body contents of the request
      * @param options Options to add to the request
      */
+    public patch(url: string, body: any, options?: HttpJsonOptions): Observable<HashMap>;
+    public patch(url: string, body: any, options?: HttpTextOptions): Observable<string>;
     public patch(url: string, body: any, options?: HttpOptions): Observable<HttpResponse> {
         if (!options) {
             options = { response_type: 'json' };

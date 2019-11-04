@@ -300,6 +300,7 @@ export class EngineWebsocket {
             }
             this.keep_alive = setInterval(() => this.ping(), KEEP_ALIVE * 1000) as any;
         } else {
+            /* istanbul ignore else */
             if (!this.websocket) {
                 engine_socket.log('WS', `Failed to create websocket(${tries}). Retrying...`, undefined, 'error');
             }
@@ -311,6 +312,7 @@ export class EngineWebsocket {
      * Close old websocket connect and open a new one
      */
     protected reconnect() {
+        /* istanbul ignore else */
         if (this.websocket && this.is_connected) {
             this.websocket.complete();
             /* istanbul ignore else */
