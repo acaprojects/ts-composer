@@ -4,6 +4,8 @@ import { EngineResourceQueryOptions } from '../resources/resources.interface';
 export interface EngineZoneQueryOptions extends EngineResourceQueryOptions {
     /** List of space seperated tags to filter the results */
     tag?: string;
+    /** ID of the system to filter the results */
+    sys_id?: string;
 }
 
 /** Mapping of available query parameters for the zones show endpoint */

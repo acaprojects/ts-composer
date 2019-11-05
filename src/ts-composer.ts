@@ -41,6 +41,8 @@ export * from './http/services/zones/zones.service';
 export * from './http/services/zones/zone.interfaces';
 export * from './http/services/zones/zone.class';
 
+export * from './http/services/resources/resource.class';
+
 export * from './websocket/webocket.class';
 export * from './websocket/websocket.interfaces';
 export * from './websocket/mock/mock-websocket.class';
