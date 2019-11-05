@@ -92,8 +92,13 @@ export class Composer {
     }
 
     /** Observable for the intialised state of composer */
-    public static get is_initialised(): Observable<boolean> {
+    public static get initialised(): Observable<boolean> {
         return this._initialised.asObservable();
+    }
+
+    /** Intialised state of composer */
+    public static get is_initialised(): boolean {
+        return this._initialised.getValue();
     }
 
     /**
