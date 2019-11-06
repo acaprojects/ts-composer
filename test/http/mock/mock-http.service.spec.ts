@@ -6,6 +6,17 @@ import { MockEngineHttpClient } from '../../../src/http/mock/mock-http.service';
 describe('MockEngineHttpClient', () => {
     let auth: any;
     let service: MockEngineHttpClient;
+    const global_handlers: MockHttpRequestHandlerOptions[] = [{
+        path: 'test/path',
+        method: 'GET',
+        metadata: {},
+        callback: r => 'test'
+    }, {
+        path: '/test/path2',
+        method: 'GET',
+        metadata: {},
+        callback: r => 'test'
+    }];
 
     beforeEach(() => {
         auth = { has_token: true, refreshAuthority: () => null };
@@ -15,7 +26,7 @@ describe('MockEngineHttpClient', () => {
             metadata: {},
             callback: r => 'test'
         };
-        window.control = { handlers: [global_handler] };
+        window.control = { handlers: global_handlers };
         service = new MockEngineHttpClient(auth);
         jest.useFakeTimers();
     });
@@ -30,7 +41,13 @@ describe('MockEngineHttpClient', () => {
     });
 
     it('should register global handlers', () => {
-        const handler = service.findRequestHandler('GET', 'test/path');
+        let handler = service.findRequestHandler('GET', 'test/path');
+        expect(handler).toBeTruthy();
+        handler = service.findRequestHandler('GET', '/test/path');
+        expect(handler).toBeTruthy();
+        handler = service.findRequestHandler('GET', 'test/path2');
+        expect(handler).toBeTruthy();
+        handler = service.findRequestHandler('GET', '/test/path2');
         expect(handler).toBeTruthy();
     });
 

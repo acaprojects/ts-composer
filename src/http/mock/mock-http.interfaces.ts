@@ -23,6 +23,8 @@ export interface MockHttpRequestHandler<T = any> extends MockHttpRequestHandlerO
 
 export interface MockHttpRequest<T = any> {
     /** URL path requested */
+    url: string;
+    /** Matched handler path */
     path: string;
     /** Request method */
     method: HttpVerb;

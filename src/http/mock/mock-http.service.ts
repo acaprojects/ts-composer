@@ -1,7 +1,7 @@
 import { from, Observable, of } from 'rxjs';
 import { concatMap, delay } from 'rxjs/operators';
 
-import { EngineAuthService } from '../../auth/auth.service';
+import { engine, EngineAuthService } from '../../auth/auth.service';
 import { convertPairStringToMap, log } from '../../utilities/general.utilities';
 import { HashMap } from '../../utilities/types.utilities';
 import {
@@ -89,6 +89,7 @@ export class MockEngineHttpClient extends EngineHttpClient {
     public get(url: string, options?: HttpTextOptions): Observable<string>;
     public get(url: string, options?: HttpOptions): Observable<HttpResponse> {
         const handler = this.findRequestHandler('GET', url);
+        engine.log('HTTP(M)', `GET ${url}`, options);
         if (handler) {
             const request = this.processRequest(url, handler);
             return this.mock_request(handler, request);
@@ -100,6 +101,7 @@ export class MockEngineHttpClient extends EngineHttpClient {
     public post(url: string, body: any, options?: HttpTextOptions): Observable<string>;
     public post(url: string, body: any, options?: HttpOptions): Observable<HttpResponse> {
         const handler = this.findRequestHandler('POST', url);
+        engine.log('HTTP(M)', `POST ${url}`, [body, options]);
         if (handler) {
             const request = this.processRequest(url, handler, body);
             return this.mock_request(handler, request);
@@ -111,6 +113,7 @@ export class MockEngineHttpClient extends EngineHttpClient {
     public put(url: string, body: any, options?: HttpTextOptions): Observable<string>;
     public put(url: string, body: any, options?: HttpOptions): Observable<HttpResponse> {
         const handler = this.findRequestHandler('PUT', url);
+        engine.log('HTTP(M)', `PUT ${url}`, [body, options]);
         if (handler) {
             const request = this.processRequest(url, handler, body);
             return this.mock_request(handler, request);
@@ -122,6 +125,7 @@ export class MockEngineHttpClient extends EngineHttpClient {
     public patch(url: string, body: any, options?: HttpTextOptions): Observable<string>;
     public patch(url: string, body: any, options?: HttpOptions): Observable<HttpResponse> {
         const handler = this.findRequestHandler('PATCH', url);
+        engine.log('HTTP(M)', `PATCH ${url}`, [body, options]);
         if (handler) {
             const request = this.processRequest(url, handler, body);
             return this.mock_request(handler, request);
@@ -134,6 +138,7 @@ export class MockEngineHttpClient extends EngineHttpClient {
     public delete(url: string, options?: HttpVoidOptions): Observable<void>;
     public delete(url: string, options?: HttpOptions): Observable<HttpResponse> {
         const handler = this.findRequestHandler('DELETE', url);
+        engine.log('HTTP(M)', `DELETE ${url}`, options);
         if (handler) {
             const request = this.processRequest(url, handler);
             return this.mock_request(handler, request);
@@ -187,7 +192,7 @@ export class MockEngineHttpClient extends EngineHttpClient {
         body?: any
     ): MockHttpRequest<T> {
         const parts = url.replace(/(http|https):\/\/[a-zA-Z0-9.]*:?([0-9]*)?/g, '').split('?');
-        const path = parts[0];
+        const path = parts[0].replace(/^\//g, '');
         const query = parts[1] || '';
         const query_params = convertPairStringToMap(query);
         // Grab route parameters from URL
@@ -199,6 +204,7 @@ export class MockEngineHttpClient extends EngineHttpClient {
             }
         }
         return {
+            url,
             path: handler.path,
             method: handler.method,
             metadata: handler.metadata,
