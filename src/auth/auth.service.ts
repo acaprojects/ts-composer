@@ -184,6 +184,9 @@ export class EngineAuthService {
                             if (authority.session) {
                                 // Generate tokens
                                 const login_url = this.createLoginURL(state);
+                                if (localStorage) {
+                                    localStorage.setItem('oauth_redirect', location.href);
+                                }
                                 window.location.assign(login_url);
                                 delete this._promises.authorise;
                             } else {
