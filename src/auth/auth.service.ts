@@ -55,14 +55,15 @@ export class EngineAuthService {
 
     /** API Endpoint for the retrieved version of engine */
     public get api_endpoint() {
+        const host = `${location.protocol}//${this.options.host || location.host}`;
         /* istanbul ignore else */
         if (this.authority) {
             /* istanbul ignore else */
             if (/2\.[0-9]+\.[0-9]+/g.test(this.authority.version || '')) {
-                return `/api/engine/v1`;
+                return `${host}/api/engine/v1`;
             }
         }
-        return `/control/api`;
+        return `${host}/control/api`;
     }
 
     /** OAuth 2 client ID for the application */

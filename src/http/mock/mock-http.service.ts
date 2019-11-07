@@ -203,7 +203,7 @@ export class MockEngineHttpClient extends EngineHttpClient {
                 route_params[part] = route_parts[handler.path_structure.indexOf(part)];
             }
         }
-        return {
+        const request = {
             url,
             path: handler.path,
             method: handler.method,
@@ -212,6 +212,8 @@ export class MockEngineHttpClient extends EngineHttpClient {
             query_params,
             body
         };
+        engine.log('HTTP(M)', `MATCHED ${request.method}:`, request);
+        return request;
     }
 
     /**

@@ -23,8 +23,6 @@ import { EngineZonesService } from './http/services/zones/zones.service';
 import { EngineWebsocketOptions } from './websocket/websocket.interfaces';
 
 export interface ComposerOptions extends EngineAuthOptions {
-    /** Host name and port of the engine server */
-    host?: string;
     /** Whether to use https/wss protocols */
     secure?: boolean;
 }

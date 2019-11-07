@@ -24,6 +24,8 @@ export interface EngineAuthority {
 }
 
 export interface EngineAuthOptions {
+    /** Host name and port of the engine server */
+    host?: string;
     /** URI for authorizing the user */
     auth_uri: string;
     /** URI for generating new tokens */

@@ -58,7 +58,7 @@ describe('EngineAuthService', () => {
 
     it('should expose the API endpoint', () => {
         service = newService();
-        expect(service.api_endpoint).toBe('/api/engine/v1');
+        expect(service.api_endpoint).toBe(`${location.origin}/api/engine/v1`);
     });
 
     it('should get the authority', done => {
