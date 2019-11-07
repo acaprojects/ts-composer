@@ -10,6 +10,8 @@ You can build the library from source after installing the dependencies with the
 
 ## Usage
 
+API docs can be found [here](https://acaprojects.github.io/ts-composer)
+
 You can install Typescript composer with the npm command
 
 `npm install --save-dev @acaprojects/ts-composer`
