@@ -188,7 +188,7 @@ export class EngineAuthService {
                                 if (localStorage) {
                                     localStorage.setItem('oauth_redirect', location.href);
                                 }
-                                window.location.assign(login_url);
+                                setTimeout(() => window.location.assign(login_url), 300);
                                 delete this._promises.authorise;
                             } else {
                                 if (this.options.handle_login !== false) {
@@ -197,7 +197,7 @@ export class EngineAuthService {
                                         '{{url}}',
                                         encodeURIComponent(location.href)
                                     );
-                                    window.location.assign(url);
+                                    setTimeout(() => window.location.assign(url), 300);
                                     delete this._promises.authorise;
                                 }
                             }
@@ -223,7 +223,8 @@ export class EngineAuthService {
                 }
             }
             // Redirect user to logout URL
-            location.assign(this.authority ? this.authority.logout_url : '/logout');
+            const url = this.authority ? this.authority.logout_url : '/logout';
+            setTimeout(() => window.location.assign(url), 300);
             this._online.next(false);
         };
         this.revokeToken().then(done, done);
