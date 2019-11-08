@@ -154,6 +154,7 @@ export class EngineAuthService {
      */
     public invalidateToken() {
         this._storage.removeItem(`${this._client_id}_access_token`);
+        this._storage.removeItem(`${this._client_id}_expires_at`);
     }
 
     /**
@@ -167,6 +168,7 @@ export class EngineAuthService {
                 if (!this.authority) {
                     return reject('Authority is not loaded');
                 }
+                engine.log('Auth', 'Authorising user...');
                 const authority = this._authority || { session: false, login_url: '/login?continue={{url}}' };
                 const check_token = () => {
                     if (this.token) {
@@ -285,8 +287,10 @@ export class EngineAuthService {
             this._promises.check_token = new Promise((resolve, reject) => {
                 if (this.authority) {
                     if (this.token) {
+                        engine.log('Auth', 'Valid token found.');
                         resolve(this.token);
                     } else {
+                        engine.log('Auth', 'No token. Checking URL for auth credentials...');
                         this.checkForAuthParameters().then(_ => resolve(_), _ => reject(_));
                     }
                     this._promises.check_token = undefined;
@@ -445,6 +449,7 @@ export class EngineAuthService {
         if (!this._promises.generate_tokens) {
             this._promises.generate_tokens = new Promise<void>((resolve, reject) => {
                 const token_url = this.createRefreshURL();
+                engine.log('Auth', 'Generating new token...');
                 let tokens: EngineTokenResponse;
                 engine.ajax.post(token_url, '').subscribe(
                     resp => {
