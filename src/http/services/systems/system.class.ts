@@ -86,7 +86,7 @@ export class EngineSystem extends EngineResource<EngineSystemsService> {
 
     /** Map of user settings for the system */
     public get settings(): HashMap {
-        return JSON.parse(JSON.stringify(this._settings));
+        return JSON.parse(JSON.stringify(this._settings || {}));
     }
 
     public set settings(value: HashMap) {

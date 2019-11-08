@@ -48,7 +48,7 @@ describe('EngineResourceService', () => {
             post: jest.fn(),
             put: jest.fn(),
             delete: jest.fn(),
-            api_endpoint: '/api/engine/v1'
+            api_endpoint: '/api/engine/v2'
         };
         service = new ERSInstance(http);
     });
@@ -72,8 +72,8 @@ describe('EngineResourceService', () => {
         await testRequest('get', 'query', [item], [], [{ cache: 100, test: true }]);
         await testRequest('get', 'query', { total: 10, results: [item] }, [], [{ test: true }]);
         await testRequest('get', 'query', { total: 10, results: undefined }, [], [{ test: true }]);
-        expect(http.get).toBeCalledWith('/api/engine/v1/base');
-        expect(http.get).toBeCalledWith('/api/engine/v1/base?test=true');
+        expect(http.get).toBeCalledWith('/api/engine/v2/base');
+        expect(http.get).toBeCalledWith('/api/engine/v2/base?test=true');
     });
 
     it('should save index request totals', async () => {
@@ -89,16 +89,16 @@ describe('EngineResourceService', () => {
         expect.assertions(4);
         const item = { id: 'test', name: 'Test' };
         await testRequest('get', 'show', item, ['test'], ['test', { test: true }]);
-        expect(http.get).toBeCalledWith('/api/engine/v1/base/test');
-        expect(http.get).toBeCalledWith('/api/engine/v1/base/test?test=true');
+        expect(http.get).toBeCalledWith('/api/engine/v2/base/test');
+        expect(http.get).toBeCalledWith('/api/engine/v2/base/test?test=true');
     });
 
     it('should allow adding new items', async () => {
         expect.assertions(4);
         const item = { id: 'test', name: 'Test' };
         await testRequest('post', 'add', item, [item], [item, { test: true }]);
-        expect(http.post).toBeCalledWith('/api/engine/v1/base', item);
-        expect(http.post).toBeCalledWith('/api/engine/v1/base?test=true', item);
+        expect(http.post).toBeCalledWith('/api/engine/v2/base', item);
+        expect(http.post).toBeCalledWith('/api/engine/v2/base?test=true', item);
     });
 
     it('should allow running POST tasks on items', async () => {
@@ -111,11 +111,11 @@ describe('EngineResourceService', () => {
             ['test', 'a_task'],
             ['test', 'a_task', { test: true }]
         );
-        expect(http.post).toBeCalledWith('/api/engine/v1/base/test/a_task', {
+        expect(http.post).toBeCalledWith('/api/engine/v2/base/test/a_task', {
             id: 'test',
             _task: 'a_task'
         });
-        expect(http.post).toBeCalledWith('/api/engine/v1/base/test/a_task', {
+        expect(http.post).toBeCalledWith('/api/engine/v2/base/test/a_task', {
             test: true,
             id: 'test',
             _task: 'a_task'
@@ -132,8 +132,8 @@ describe('EngineResourceService', () => {
             ['test', 'a_task', null, 'get'],
             ['test', 'a_task', { test: true }, 'get']
         );
-        expect(http.get).toBeCalledWith('/api/engine/v1/base/test/a_task');
-        expect(http.get).toBeCalledWith('/api/engine/v1/base/test/a_task?test=true');
+        expect(http.get).toBeCalledWith('/api/engine/v2/base/test/a_task');
+        expect(http.get).toBeCalledWith('/api/engine/v2/base/test/a_task?test=true');
     });
 
     it('should allow polling index endpoints', done => {
@@ -190,15 +190,15 @@ describe('EngineResourceService', () => {
         expect.assertions(4);
         const item = { id: 'test', name: 'Test' };
         await testRequest('put', 'update', item, ['test', item], ['test', item, { test: true }]);
-        expect(http.put).toBeCalledWith('/api/engine/v1/base/test', item);
-        expect(http.put).toBeCalledWith('/api/engine/v1/base/test?test=true', item);
+        expect(http.put).toBeCalledWith('/api/engine/v2/base/test', item);
+        expect(http.put).toBeCalledWith('/api/engine/v2/base/test?test=true', item);
     });
 
     it('should allow deleting items', async () => {
         expect.assertions(4);
         const item = { id: 'test', name: 'Test' };
         await testRequest('delete', 'delete', item, ['test'], ['test', { test: true }]);
-        expect(http.delete).toBeCalledWith('/api/engine/v1/base/test');
-        expect(http.delete).toBeCalledWith('/api/engine/v1/base/test?test=true');
+        expect(http.delete).toBeCalledWith('/api/engine/v2/base/test');
+        expect(http.delete).toBeCalledWith('/api/engine/v2/base/test?test=true');
     });
 });

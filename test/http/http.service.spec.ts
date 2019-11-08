@@ -7,7 +7,7 @@ describe('EngineHttpClient', () => {
     let service: EngineHttpClient;
 
     beforeEach(() => {
-        auth = { has_token: false, token: 'test_token', api_endpoint: '/api/engine/v1' };
+        auth = { has_token: false, token: 'test_token', api_endpoint: '/api/engine/v2' };
         auth.refreshAuthority = jest.fn();
         service = new EngineHttpClient(auth);
     });
@@ -32,7 +32,7 @@ describe('EngineHttpClient', () => {
     });
 
     it('should expose the API endpoint', () => {
-        expect(service.api_endpoint).toBe('/api/engine/v1');
+        expect(service.api_endpoint).toBe('/api/engine/v2');
     });
 
     describe('GET', () => {

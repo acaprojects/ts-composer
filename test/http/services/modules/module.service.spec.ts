@@ -12,7 +12,7 @@ describe('EngineModuleService', () => {
             post: jest.fn(),
             put: jest.fn(),
             delete: jest.fn(),
-            api_endpoint: '/api/engine/v1'
+            api_endpoint: '/api/engine/v2'
         };
         service = new EngineModulesService(http);
     });
@@ -25,7 +25,7 @@ describe('EngineModuleService', () => {
     it('allow querying modules index', async () => {
         http.get.mockReturnValueOnce(of({ results: [{ id: 'test' }], total: 10 }));
         const result = await service.query();
-        expect(http.get).toBeCalledWith('/api/engine/v1/modules');
+        expect(http.get).toBeCalledWith('/api/engine/v2/modules');
         expect(result).toBeInstanceOf(Array);
         expect(result[0]).toBeInstanceOf(EngineModule);
     });
@@ -33,7 +33,7 @@ describe('EngineModuleService', () => {
     it('allow starting a module', async () => {
         http.post.mockReturnValueOnce(of(null));
         await service.start('test');
-        expect(http.post).toBeCalledWith('/api/engine/v1/modules/test/start', {
+        expect(http.post).toBeCalledWith('/api/engine/v2/modules/test/start', {
             _task: 'start',
             id: 'test'
         });
@@ -42,7 +42,7 @@ describe('EngineModuleService', () => {
     it('allow stopping a module', async () => {
         http.post.mockReturnValueOnce(of(null));
         await service.stop('test');
-        expect(http.post).toBeCalledWith('/api/engine/v1/modules/test/stop', {
+        expect(http.post).toBeCalledWith('/api/engine/v2/modules/test/stop', {
             _task: 'stop',
             id: 'test'
         });
@@ -52,7 +52,7 @@ describe('EngineModuleService', () => {
         const response = { host: 'test.com', pingable: true };
         http.post.mockReturnValueOnce(of(response));
         const ping = await service.ping('test');
-        expect(http.post).toBeCalledWith('/api/engine/v1/modules/test/ping', {
+        expect(http.post).toBeCalledWith('/api/engine/v2/modules/test/ping', {
             _task: 'ping',
             id: 'test'
         });
@@ -64,10 +64,10 @@ describe('EngineModuleService', () => {
             .mockReturnValueOnce(of({ test: 'yeah' }))
             .mockReturnValueOnce(of({ test: 'yeah2' }));
         let value = await service.state('test', 'look');
-        expect(http.get).toBeCalledWith(`/api/engine/v1/modules/test/state?lookup=look`);
+        expect(http.get).toBeCalledWith(`/api/engine/v2/modules/test/state?lookup=look`);
         expect(value).toEqual({ test: 'yeah' });
         value = await service.state('test');
-        expect(http.get).toBeCalledWith(`/api/engine/v1/modules/test/state`);
+        expect(http.get).toBeCalledWith(`/api/engine/v2/modules/test/state`);
         expect(value).toEqual({ test: 'yeah2' });
     });
 
@@ -75,7 +75,7 @@ describe('EngineModuleService', () => {
         const response = { host: 'test.com', pingable: true };
         http.get.mockReturnValueOnce(of(response));
         const ping = await service.internalState('test');
-        expect(http.get).toBeCalledWith('/api/engine/v1/modules/test/internal_state');
+        expect(http.get).toBeCalledWith('/api/engine/v2/modules/test/internal_state');
         expect(ping).toBe(response);
     });
 });

@@ -59,8 +59,8 @@ export class EngineAuthService {
         /* istanbul ignore else */
         if (this.authority) {
             /* istanbul ignore else */
-            if (/2\.[0-9]+\.[0-9]+/g.test(this.authority.version || '')) {
-                return `${host}/api/engine/v1`;
+            if (/[2-9]\.[0-9]+\.[0-9]+/g.test(this.authority.version || '')) {
+                return `${host}/api/engine/v2`;
             }
         }
         return `${host}/control/api`;

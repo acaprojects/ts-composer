@@ -227,7 +227,7 @@ HTTP API Requests can be mocked in a similar way to the realtime API by adding h
 ```typescript
 window.control.handlers = [
     {
-        path: '/api/engine/v1/systems',
+        path: '/api/engine/v2/systems',
         metadata: {},
         method: 'GET',
         callback: (request) => my_mock_systems
@@ -240,7 +240,7 @@ Paths allow for route parameters and will pass the value in the callback input.
 ```typescript
 window.control.handlers = [
     {
-        path: '/api/engine/v1/systems/:system_id',
+        path: '/api/engine/v2/systems/:system_id',
         ...
         callback: (request) =>
             my_mock_systems.find(sys => sys.id === request.route_params.system_id)

@@ -16,7 +16,7 @@ export interface EngineModuleQueryOptions extends EngineResourceQueryOptions {
     as_of?: number;
 }
 
-/** Engine response from `ping` module task endpoint `/api/engine/v1/<mod_id>/ping` */
+/** Engine response from `ping` module task endpoint `/api/engine/v2/<mod_id>/ping` */
 export interface EngineModulePingOptions {
     /** Host address of the module device */
     host: string;
