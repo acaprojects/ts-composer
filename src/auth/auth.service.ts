@@ -121,7 +121,10 @@ export class EngineAuthService {
         /* istanbul ignore else */
         if (localStorage) {
             const key = `${this.client_id}_trusted`;
-            trusted = trusted || localStorage.getItem(key) === 'true';
+            trusted =
+                trusted ||
+                localStorage.getItem(key) === 'true' ||
+                localStorage.getItem('trusted') === 'true';
             localStorage.setItem(key, `${trusted}`);
         }
         return trusted;
@@ -134,7 +137,10 @@ export class EngineAuthService {
         /* istanbul ignore else */
         if (localStorage) {
             const key = `${this.client_id}_fixed_device`;
-            fixed_device = fixed_device || localStorage.getItem(key) === 'true';
+            fixed_device =
+                fixed_device ||
+                localStorage.getItem(key) === 'true' ||
+                localStorage.getItem('fixed_device') === 'true';
             localStorage.setItem(key, `${fixed_device}`);
         }
         return fixed_device;
@@ -169,20 +175,26 @@ export class EngineAuthService {
                     return reject('Authority is not loaded');
                 }
                 engine.log('Auth', 'Authorising user...');
-                const authority = this._authority || { session: false, login_url: '/login?continue={{url}}' };
+                const authority = this._authority || {
+                    session: false,
+                    login_url: '/login?continue={{url}}'
+                };
                 const check_token = () => {
                     if (this.token) {
                         delete this._promises.authorise;
                         resolve(this.token);
                     } else {
                         if (this._code || this.refresh_token) {
-                            this.generateToken().then(_ => {
-                                delete this._promises.authorise;
-                                resolve(this.token);
-                            }, _ => {
-                                delete this._promises.authorise;
-                                reject(_);
-                            });
+                            this.generateToken().then(
+                                _ => {
+                                    delete this._promises.authorise;
+                                    resolve(this.token);
+                                },
+                                _ => {
+                                    delete this._promises.authorise;
+                                    reject(_);
+                                }
+                            );
                         } else {
                             if (authority.session) {
                                 // Generate tokens
@@ -258,7 +270,9 @@ export class EngineAuthService {
         engine.log('Auth', `Loading authority...`);
         let authority: EngineAuthority;
         engine.ajax.get('/auth/authority').subscribe(
-            resp => (authority = resp.response && typeof resp.response === 'object' ? resp.response : null),
+            resp =>
+                (authority =
+                    resp.response && typeof resp.response === 'object' ? resp.response : null),
             err => {
                 engine.log('Auth', `Failed to load authority(${err})`);
                 this._online.next(false);
@@ -428,13 +442,17 @@ export class EngineAuthService {
                     resolve();
                     delete this._promises.revoke_token;
                 } else {
-                    engine.ajax.post(`${token_uri}?token=${this.token}`, '').subscribe(null, err => {
-                        reject(err);
-                        delete this._promises.revoke_token;
-                    }, () => {
-                        resolve();
-                        delete this._promises.revoke_token;
-                    });
+                    engine.ajax.post(`${token_uri}?token=${this.token}`, '').subscribe(
+                        null,
+                        err => {
+                            reject(err);
+                            delete this._promises.revoke_token;
+                        },
+                        () => {
+                            resolve();
+                            delete this._promises.revoke_token;
+                        }
+                    );
                 }
             });
         }
