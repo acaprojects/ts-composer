@@ -1,6 +1,9 @@
+import { Composer } from '../../../composer';
 import { HashMap } from '../../../utilities/types.utilities';
+import { EngineDriver } from '../drivers/driver.class';
 import { EngineDriverRole } from '../drivers/drivers.enums';
 import { EngineResource } from '../resources/resource.class';
+import { EngineSystem } from '../systems/system.class';
 import { EngineModulePingOptions } from './module.interfaces';
 import { EngineModulesService } from './modules.service';
 
@@ -169,6 +172,10 @@ export class EngineModule extends EngineResource<EngineModulesService> {
     public readonly running: boolean;
     /** Timestamp of last update in ms since UTC epoch */
     public readonly updated_at: number;
+    /** System associated with the module */
+    public readonly system?: EngineSystem;
+    /** Driver/dependancy associated with the module */
+    public readonly driver?: EngineDriver;
 
     /** ID of the driver associated with the module */
     private _dependency_id: string;
@@ -218,6 +225,12 @@ export class EngineModule extends EngineResource<EngineModulesService> {
         this.connected = raw_data.connected;
         this.running = raw_data.running;
         this.updated_at = raw_data.updated_at;
+        if (raw_data.control_system || raw_data.system) {
+            this.system = new EngineSystem(Composer.systems, raw_data.control_system || raw_data.system);
+        }
+        if (raw_data.dependancy || raw_data.driver) {
+            this.driver = new EngineDriver(Composer.drivers, raw_data.dependancy || raw_data.driver);
+        }
     }
 
     /**
