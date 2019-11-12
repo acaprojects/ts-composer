@@ -18,7 +18,7 @@ describe('EngineWebsocket', () => {
         another_fake_socket = new Subject<any>();
         spy = jest.spyOn(engine_socket, 'websocket').mockReturnValue(fake_socket as any);
         log_spy = jest.spyOn(engine_socket, 'log');
-        auth = { token: 'test', refreshAuthority: () => null, invalidateToken: () => null };
+        auth = { token: 'test', refreshAuthority: () => null, invalidateToken: () => null, api_endpoint: '/api/engine/v2' };
         websocket = new EngineWebsocket(auth, {
             host: 'aca.test',
             fixed: true

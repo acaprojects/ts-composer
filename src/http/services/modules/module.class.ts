@@ -229,7 +229,7 @@ export class EngineModule extends EngineResource<EngineModulesService> {
             this.system = new EngineSystem(Composer.systems, raw_data.control_system || raw_data.system);
         }
         if (raw_data.dependancy || raw_data.driver) {
-            this.driver = new EngineDriver(Composer.drivers, raw_data.dependancy || raw_data.driver);
+            this.driver = new EngineDriver(Composer.drivers, raw_data.dependency || raw_data.driver);
         }
     }
 

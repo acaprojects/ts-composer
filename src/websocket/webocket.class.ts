@@ -11,7 +11,7 @@ import {
     EngineWebsocketOptions
 } from './websocket.interfaces';
 
-import { EngineAuthService } from '../auth/auth.service';
+import { engine, EngineAuthService } from '../auth/auth.service';
 import { log } from '../utilities/general.utilities';
 
 /** Time in seconds to ping the server to keep the websocket connection alive */
@@ -48,6 +48,12 @@ export class EngineWebsocket {
     constructor(protected auth: EngineAuthService, protected options: EngineWebsocketOptions) {
         REQUEST_COUNT = 0;
         this.connect();
+    }
+
+    public get route() {
+        return this.auth.api_endpoint.indexOf('control') >= 0
+            ? '/control'
+            : `${this.auth.route}/systems`;
     }
 
     /** Whether the websocket is connected */
@@ -264,9 +270,10 @@ export class EngineWebsocket {
         }
         const secure = this.options.secure || location.protocol.indexOf('https') >= 0;
         const host = this.options.host || location.host;
-        const url = `ws${secure ? 's' : ''}://${host}/control/websocket?bearer_token=${
+        const url = `ws${secure ? 's' : ''}://${host}${this.route}/websocket?bearer_token=${
             this.auth.token
-        }${this.options.fixed ? '&fixed_device=true' : ''}`;
+            }${this.options.fixed ? '&fixed_device=true' : ''}`;
+        engine.log('WS', `Connecting to ws${secure ? 's' : ''}://${host}${this.route}/websocket`);
         this.websocket = engine_socket.websocket({
             url,
             serializer: (data) => typeof data === 'object' ? JSON.stringify(data) : data,
