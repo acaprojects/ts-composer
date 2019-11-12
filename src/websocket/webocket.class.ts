@@ -52,8 +52,8 @@ export class EngineWebsocket {
 
     public get route() {
         return this.auth.api_endpoint.indexOf('control') >= 0
-            ? '/control'
-            : `${this.auth.route}/systems`;
+            ? '/control/websocket'
+            : `${this.auth.route}/systems/control`;
     }
 
     /** Whether the websocket is connected */
@@ -270,10 +270,10 @@ export class EngineWebsocket {
         }
         const secure = this.options.secure || location.protocol.indexOf('https') >= 0;
         const host = this.options.host || location.host;
-        const url = `ws${secure ? 's' : ''}://${host}${this.route}/websocket?bearer_token=${
+        const url = `ws${secure ? 's' : ''}://${host}${this.route}?bearer_token=${
             this.auth.token
             }${this.options.fixed ? '&fixed_device=true' : ''}`;
-        engine.log('WS', `Connecting to ws${secure ? 's' : ''}://${host}${this.route}/websocket`);
+        engine.log('WS', `Connecting to ws${secure ? 's' : ''}://${host}${this.route}`);
         this.websocket = engine_socket.websocket({
             url,
             serializer: (data) => typeof data === 'object' ? JSON.stringify(data) : data,
