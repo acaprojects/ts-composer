@@ -186,6 +186,7 @@ export class EngineAuthService {
                 };
                 const check_token = () => {
                     if (this.token) {
+                        engine.log('Auth', 'Valid token found.');
                         delete this._promises.authorise;
                         resolve(this.token);
                     } else {
@@ -202,6 +203,7 @@ export class EngineAuthService {
                             );
                         } else {
                             if (authority.session) {
+                                engine.log('Auth', 'Users has session. Authorising application...');
                                 // Generate tokens
                                 const login_url = this.createLoginURL(state);
                                 if (localStorage) {
@@ -210,7 +212,9 @@ export class EngineAuthService {
                                 setTimeout(() => window.location.assign(login_url), 300);
                                 delete this._promises.authorise;
                             } else {
+                                engine.log('Auth', 'No user session');
                                 if (this.options.handle_login !== false) {
+                                    engine.log('Auth', 'Redirecting to login page...');
                                     // Redirect to login form
                                     const url = (authority.login_url || '').replace(
                                         '{{url}}',
@@ -288,7 +292,7 @@ export class EngineAuthService {
                 if (authority) {
                     this._authority = authority;
                     this.authorise('').then(_ => null, _ => null);
-                    this._online.next(true);
+                    setTimeout(() => this._online.next(true), 100);
                 } else {
                     // Retry if authority fails to load
                     setTimeout(() => this.loadAuthority(tries), 300 * Math.min(20, ++tries));
@@ -314,6 +318,7 @@ export class EngineAuthService {
                     }
                     this._promises.check_token = undefined;
                 } else {
+                    engine.log('Auth', 'Waiting for authority before checking token...');
                     setTimeout(() => {
                         this._promises.check_token = undefined;
                         this.checkToken().then(_ => resolve(_), _ => reject(_));
@@ -404,7 +409,7 @@ export class EngineAuthService {
     private createLoginURL(state?: string): string {
         const nonce = this.createAndSaveNonce();
         state = state ? `${nonce};${state}` : nonce;
-        const has_query = this.options ? this.options.auth_uri.indexOf('?') >= 0 : false;
+        const has_query = this.options ? (this.options.auth_uri || '').indexOf('?') >= 0 : false;
         const login_url = (this.options ? this.options.auth_uri : null) || '/auth/oauth/authorize';
         const response_type = this.trusted ? 'code' : 'token';
         const url =
