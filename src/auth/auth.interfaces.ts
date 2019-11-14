@@ -1,5 +1,18 @@
 import { HashMap } from '../utilities/types.utilities';
 
+export const MOCK_AUTHORITY = {
+    id: 'mock-authority',
+    name: 'localhost:4200',
+    description: '',
+    dom: 'localhost:4200',
+    login_url: `/login?continue={{url}}`,
+    logout_url: `/logout`,
+    session: true,
+    production: false,
+    config: {},
+    version: `2.0.0`
+};
+
 export interface EngineAuthority {
     /** Engine ID for the Authority */
     id: string;

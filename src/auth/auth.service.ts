@@ -4,7 +4,7 @@ import { Md5 } from 'ts-md5/dist/md5';
 
 import { generateNonce, getFragments, log, removeFragment } from '../utilities/general.utilities';
 import { HashMap } from '../utilities/types.utilities';
-import { EngineAuthOptions, EngineAuthority, EngineTokenResponse } from './auth.interfaces';
+import { EngineAuthOptions, EngineAuthority, EngineTokenResponse, MOCK_AUTHORITY } from './auth.interfaces';
 
 import * as _dayjs from 'dayjs';
 // tslint:disable-next-line:no-duplicate-imports
@@ -224,6 +224,7 @@ export class EngineAuthService {
                                     delete this._promises.authorise;
                                 }
                             }
+                            reject();
                         }
                     }
                 };
@@ -257,48 +258,48 @@ export class EngineAuthService {
      * Load authority details from engine
      */
     private loadAuthority(tries: number = 0) {
-        if (this.options.mock) {
-            // Setup mock authority
-            this._authority = {
-                id: 'mock-authority',
-                name: 'localhost:4200',
-                description: '',
-                dom: 'localhost:4200',
-                login_url: `/login?continue={{url}}`,
-                logout_url: `/logout`,
-                session: true,
-                production: false,
-                config: {},
-                version: `2.0.0`
-            };
-            engine.log('Auth', `System in mock mode`);
-            this._online.next(true);
-            return;
-        }
-        engine.log('Auth', `Fixed: ${this.fixed_device} | Trusted: ${this.trusted}`);
-        engine.log('Auth', `Loading authority...`);
-        let authority: EngineAuthority;
-        engine.ajax.get('/auth/authority').subscribe(
-            resp =>
-                (authority =
-                    resp.response && typeof resp.response === 'object' ? resp.response : null),
-            err => {
-                engine.log('Auth', `Failed to load authority(${err})`);
-                this._online.next(false);
-                // Retry if authority fails to load
-                setTimeout(() => this.loadAuthority(tries), 300 * Math.min(20, ++tries));
-            },
-            () => {
-                if (authority) {
-                    this._authority = authority;
-                    this.authorise('').then(_ => null, _ => null);
-                    setTimeout(() => this._online.next(true), 100);
-                } else {
-                    // Retry if authority fails to load
-                    setTimeout(() => this.loadAuthority(tries), 300 * Math.min(20, ++tries));
+        if (!this._promises.load_authority) {
+            this._promises.load_authority = new Promise((resolve) => {
+                if (this.options.mock) {
+                    // Setup mock authority
+                    this._authority = MOCK_AUTHORITY;
+                    engine.log('Auth', `System in mock mode`);
+                    this._online.next(true);
+                    resolve();
+                    return;
                 }
-            }
-        );
+                engine.log('Auth', `Fixed: ${this.fixed_device} | Trusted: ${this.trusted}`);
+                engine.log('Auth', `Loading authority...`);
+                let authority: EngineAuthority;
+                engine.ajax.get('/auth/authority').subscribe(
+                    resp =>
+                        (authority =
+                            resp.response && typeof resp.response === 'object' ? resp.response : null),
+                    err => {
+                        engine.log('Auth', `Failed to load authority(${err})`);
+                        this._online.next(false);
+                        delete this._promises.load_authority;
+                        // Retry if authority fails to load
+                        setTimeout(() => this.loadAuthority(tries).then(_ => resolve()), 300 * Math.min(20, ++tries));
+                    },
+                    () => {
+                        if (authority) {
+                            this._authority = authority;
+                            const response = () => {
+                                this._online.next(true);
+                                setTimeout(() => delete this._promises.load_authority, 500);
+                                resolve();
+                            };
+                            this.authorise('').then(response, response);
+                        } else {
+                            // Retry if authority fails to load
+                            setTimeout(() => this.loadAuthority(tries).then(_ => resolve()), 300 * Math.min(20, ++tries));
+                        }
+                    }
+                );
+            });
+        }
+        return this._promises.load_authority;
     }
 
     /**
