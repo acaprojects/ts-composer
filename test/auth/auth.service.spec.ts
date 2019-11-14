@@ -197,16 +197,18 @@ describe('EngineAuthService', () => {
 
     it('should expose the online state of engine', done => {
         service = newService();
-        expect(service.is_online).toBeTruthy();
-        spy.mockImplementation(() =>
-            throwError({ status: 502, responseText: JSON.stringify(authority) })
-        );
-        service.refreshAuthority();
-        expect(service.is_online).toBeFalsy();
-        service.online_state.subscribe(state => {
-            // expect(state).toBeFalsy();
-            done();
-        });
+        setTimeout(() => {
+            expect(service.is_online).toBeTruthy();
+            spy.mockImplementation(() =>
+                throwError({ status: 502, responseText: JSON.stringify(authority) })
+            );
+            service.refreshAuthority();
+            expect(service.is_online).toBeFalsy();
+            service.online_state.subscribe(state => {
+                // expect(state).toBeFalsy();
+                done();
+            });
+        }, 101);
     });
 
     it('should allow logging out', done => {
