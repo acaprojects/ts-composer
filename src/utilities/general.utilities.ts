@@ -116,12 +116,12 @@ export function generateNonce(length: number = 40): string {
  */
 export function removeFragment(name: string) {
     const new_hash = (location.hash || '')
-        .replace(new RegExp(`${name}[a-zA-Z0-9\%\=]*&?`, 'g'), '')
+        .replace(new RegExp(`${name}[a-zA-Z0-9\_\-+\.\%\=]*&?`, 'g'), '')
         .replace(/&&/g, '&')
         .replace(/#&/g, '#')
         .replace(/&$/g, '#');
     const new_search = (location.search || '')
-        .replace(new RegExp(`${name}[a-zA-Z0-9\%\=]*&?`, 'g'), '')
+        .replace(new RegExp(`${name}[a-zA-Z0-9\_\-+\.\%\=]*&?`, 'g'), '')
         .replace(/&&/g, '&')
         .replace(/\?&/g, '#')
         .replace(/&$/g, '#');
