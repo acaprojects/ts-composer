@@ -47,6 +47,8 @@ export class EngineWebsocket {
     protected _status_obs = this._status.asObservable();
     /** Subscription to the online state of the auth service when reconnecting */
     private _online_sub: Subscription | undefined;
+    /** Number of connection attempts made before the session is established */
+    private _connection_attempts: number = 0;
 
     constructor(protected auth: EngineAuthService, protected options: EngineWebsocketOptions) {
         REQUEST_COUNT = 0;
@@ -156,7 +158,11 @@ export class EngineWebsocket {
                     req.resolve = d => resolve(d);
                     req.reject = e => reject(e);
                     const bind = `${request.sys}, ${request.mod}_${request.index}, ${request.name}`;
-                    engine_socket.log('WS', `[${request.cmd.toUpperCase()}](${request.id}) ${bind}`, request.args);
+                    engine_socket.log(
+                        'WS',
+                        `[${request.cmd.toUpperCase()}](${request.id}) ${bind}`,
+                        request.args
+                    );
                     this.websocket.next(request);
                 } else {
                     setTimeout(() => {
@@ -184,7 +190,8 @@ export class EngineWebsocket {
                 engine_socket.log('WS', `[DEBUG] ${message.mod}${message.klass} →`, message.msg);
             } else if (message.type === 'error') {
                 this.handleError(message);
-            } else if (!(message as any).cmd) { // Not mock message
+            } else if (!(message as any).cmd) {
+                // Not mock message
                 engine_socket.log('WS', 'Invalid websocket message', message, 'error');
             }
         }
@@ -235,7 +242,12 @@ export class EngineWebsocket {
                 type = 'UNKNOWN COMMAND';
                 break;
         }
-        engine_socket.log('WS', `[ERROR] ${type}(${message.id}): ${message.msg}`, undefined, 'error');
+        engine_socket.log(
+            'WS',
+            `[ERROR] ${type}(${message.id}): ${message.msg}`,
+            undefined,
+            'error'
+        );
         const request = Object.keys(this.requests)
             .map(i => this.requests[i])
             .find(i => i.id === message.id);
@@ -257,7 +269,11 @@ export class EngineWebsocket {
             this.observers[key] = this.binding[key].asObservable();
         }
         const bind = `${options.sys}, ${options.mod}_${options.index}, ${options.name}`;
-        engine_socket.log('WS', `[NOTIFY] ${bind} changed`, [this.binding[key].getValue(), '→', value]);
+        engine_socket.log('WS', `[NOTIFY] ${bind} changed`, [
+            this.binding[key].getValue(),
+            '→',
+            value
+        ]);
         this.binding[key].next(value);
     }
 
@@ -275,16 +291,17 @@ export class EngineWebsocket {
         if (!this.options) {
             throw new Error('No token is set for engine websocket');
         }
+        this._connection_attempts++;
         const secure = this.options.secure || location.protocol.indexOf('https') >= 0;
         const host = this.options.host || location.host;
-        const url = `ws${secure ? 's' : ''}://${host}${this.route}?bearer_token=${
-            this.auth.token
-            }${this.options.fixed ? '&fixed_device=true' : ''}`;
+        const url = `ws${secure ? 's' : ''}://${host}${this.route}?bearer_token=${this.auth.token}${
+            this.options.fixed ? '&fixed_device=true' : ''
+        }`;
         engine.log('WS', `Connecting to ws${secure ? 's' : ''}://${host}${this.route}`);
         this.websocket = engine_socket.websocket({
             url,
-            serializer: (data) => typeof data === 'object' ? JSON.stringify(data) : data,
-            deserializer: (data) => {
+            serializer: data => (typeof data === 'object' ? JSON.stringify(data) : data),
+            deserializer: data => {
                 let return_value = data.data;
                 try {
                     const obj = JSON.parse(data.data);
@@ -293,12 +310,15 @@ export class EngineWebsocket {
                     return_value = return_value;
                 }
                 return return_value;
-            },
+            }
         });
         if (this.websocket && this.auth.token) {
             this._status.next(true);
             this.websocket.subscribe(
-                (resp: EngineResponse) => this.onMessage(resp),
+                (resp: EngineResponse) => {
+                    this._connection_attempts = 0;
+                    this.onMessage(resp);
+                },
                 err => this.onWebSocketError(err),
                 () => this._status.next(false)
             );
@@ -309,7 +329,12 @@ export class EngineWebsocket {
         } else {
             /* istanbul ignore else */
             if (!this.websocket) {
-                engine_socket.log('WS', `Failed to create websocket(${tries}). Retrying...`, undefined, 'error');
+                engine_socket.log(
+                    'WS',
+                    `Failed to create websocket(${tries}). Retrying...`,
+                    undefined,
+                    'error'
+                );
             }
             setTimeout(() => this.connect(tries), 300 * ++tries);
         }
@@ -360,9 +385,12 @@ export class EngineWebsocket {
      */
     protected waitForServer() {
         if (!this._online_sub) {
-            this._online_sub = this.auth.online_state.subscribe((state) => {
+            this._online_sub = this.auth.online_state.subscribe(state => {
                 if (state) {
-                    setTimeout(() => this.connect(), 50);
+                    setTimeout(
+                        () => this.connect(),
+                        Math.min(3000, 100 * (this._connection_attempts || 1))
+                    );
                     if (this._online_sub) {
                         this._online_sub.unsubscribe();
                         delete this._online_sub;
