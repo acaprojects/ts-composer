@@ -49,6 +49,8 @@ export class EngineWebsocket {
     private _online_sub: Subscription | undefined;
     /** Number of connection attempts made before the session is established */
     private _connection_attempts: number = 0;
+    /** Timer to check the initial health of the websocket connection */
+    private _health_check: number | undefined;
 
     constructor(protected auth: EngineAuthService, protected options: EngineWebsocketOptions) {
         REQUEST_COUNT = 0;
@@ -317,6 +319,10 @@ export class EngineWebsocket {
             this.websocket.subscribe(
                 (resp: EngineResponse) => {
                     this._connection_attempts = 0;
+                    if (this._health_check) {
+                        clearTimeout(this._health_check);
+                        delete this._health_check;
+                    }
                     this.onMessage(resp);
                 },
                 err => this.onWebSocketError(err),
@@ -326,6 +332,10 @@ export class EngineWebsocket {
                 clearInterval(this.keep_alive);
             }
             this.keep_alive = setInterval(() => this.ping(), KEEP_ALIVE * 1000) as any;
+            this._health_check = setTimeout(() => {
+                engine.log('WS', 'Unhealthy connection. Reconnecting...');
+                this.reconnect();
+            }, 30 * 1000) as any;
         } else {
             /* istanbul ignore else */
             if (!this.websocket) {
@@ -372,6 +382,7 @@ export class EngineWebsocket {
     protected onWebSocketError(err: SimpleNetworkError) {
         this._status.next(false);
         engine_socket.log('WS', 'Websocket error:', err, undefined, 'error');
+        /* istanbul ignore else */
         if (err.status === 401) {
             this.auth.invalidateToken();
         }
@@ -384,13 +395,16 @@ export class EngineWebsocket {
      * Wait for a connection to the server before attempting to connect the websocket
      */
     protected waitForServer() {
+        /* istanbul ignore else */
         if (!this._online_sub) {
             this._online_sub = this.auth.online_state.subscribe(state => {
+                /* istanbul ignore else */
                 if (state) {
                     setTimeout(
                         () => this.connect(),
                         Math.min(3000, 100 * (this._connection_attempts || 1))
                     );
+                    /* istanbul ignore else */
                     if (this._online_sub) {
                         this._online_sub.unsubscribe();
                         delete this._online_sub;
