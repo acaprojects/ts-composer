@@ -84,3 +84,11 @@ export enum EngineErrorCodes {
     MOD_NOT_FOUND = 6,
     UNEXPECTED_FAILURE = 7
 }
+
+/** Simple interface for a network error response */
+export interface SimpleNetworkError {
+    /** Status code of the error */
+    status: number;
+    /** Details aboun the error */
+    message: string;
+}

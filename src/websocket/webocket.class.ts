@@ -8,7 +8,8 @@ import {
     EngineExecRequestOptions,
     EngineRequestOptions,
     EngineResponse,
-    EngineWebsocketOptions
+    EngineWebsocketOptions,
+    SimpleNetworkError
 } from './websocket.interfaces';
 
 import { engine, EngineAuthService } from '../auth/auth.service';
@@ -44,6 +45,8 @@ export class EngineWebsocket {
     protected _status = new BehaviorSubject<boolean>(false);
     /** Observable fo the connection status subject value */
     protected _status_obs = this._status.asObservable();
+    /** Subscription to the online state of the auth service when reconnecting */
+    private _online_sub: Subscription | undefined;
 
     constructor(protected auth: EngineAuthService, protected options: EngineWebsocketOptions) {
         REQUEST_COUNT = 0;
@@ -262,6 +265,10 @@ export class EngineWebsocket {
      * Connect to engine websocket
      */
     protected connect(tries: number = 0) {
+        if (!this.auth.is_online) {
+            this.waitForServer();
+            return;
+        }
         if (tries > 4) {
             return;
         }
@@ -292,14 +299,7 @@ export class EngineWebsocket {
             this._status.next(true);
             this.websocket.subscribe(
                 (resp: EngineResponse) => this.onMessage(resp),
-                err => {
-                    this._status.next(false);
-                    engine_socket.log('WS', 'Websocket error:', err, undefined, 'error');
-                    this.auth.invalidateToken();
-                    this.auth.refreshAuthority();
-                    // Try reconnecting after 1 second
-                    this.reconnect();
-                },
+                err => this.onWebSocketError(err),
                 () => this._status.next(false)
             );
             if (this.keep_alive) {
@@ -337,6 +337,38 @@ export class EngineWebsocket {
     protected ping() {
         if (this.websocket && this.is_connected) {
             this.websocket.next('ping');
+        }
+    }
+
+    /**
+     * Handle errors on the websocket
+     * @param err Network error response
+     */
+    protected onWebSocketError(err: SimpleNetworkError) {
+        this._status.next(false);
+        engine_socket.log('WS', 'Websocket error:', err, undefined, 'error');
+        if (err.status === 401) {
+            this.auth.invalidateToken();
+        }
+        this.auth.refreshAuthority();
+        // Try reconnecting after 1 second
+        this.reconnect();
+    }
+
+    /**
+     * Wait for a connection to the server before attempting to connect the websocket
+     */
+    protected waitForServer() {
+        if (!this._online_sub) {
+            this._online_sub = this.auth.online_state.subscribe((state) => {
+                if (state) {
+                    setTimeout(() => this.connect(), 50);
+                    if (this._online_sub) {
+                        this._online_sub.unsubscribe();
+                        delete this._online_sub;
+                    }
+                }
+            });
         }
     }
 }

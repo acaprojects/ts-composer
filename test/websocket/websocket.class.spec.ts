@@ -1,8 +1,8 @@
-import { Subject } from 'rxjs';
+import { of, Subject } from 'rxjs';
 
 import { HashMap } from '../../src/utilities/types.utilities';
 import { engine_socket, EngineWebsocket } from '../../src/websocket/webocket.class';
-import { EngineCommandRequest, EngineResponse } from '../../src/websocket/websocket.interfaces';
+import { EngineResponse } from '../../src/websocket/websocket.interfaces';
 
 describe('EngineWebsocket', () => {
     let websocket: EngineWebsocket;
@@ -18,11 +18,20 @@ describe('EngineWebsocket', () => {
         another_fake_socket = new Subject<any>();
         spy = jest.spyOn(engine_socket, 'websocket').mockReturnValue(fake_socket as any);
         log_spy = jest.spyOn(engine_socket, 'log');
-        auth = { token: 'test', refreshAuthority: () => null, invalidateToken: () => null, api_endpoint: '/api/engine/v2' };
+        auth = {
+            token: 'test',
+            refreshAuthority: () => null,
+            invalidateToken: () => null,
+            is_online: false,
+            api_endpoint: '/api/engine/v2',
+            online_state: of(true)
+        };
         websocket = new EngineWebsocket(auth, {
             host: 'aca.test',
             fixed: true
         });
+        setTimeout(() => auth.is_online = true);
+        jest.runOnlyPendingTimers();
         spy.mockReturnValue(another_fake_socket as any);
     });
 
@@ -169,7 +178,9 @@ describe('EngineWebsocket', () => {
             if (actions === 1) {
                 // Websocket connected
                 expect(connected).toBe(true);
-                fake_socket.error('Error');
+                fake_socket.error({ status: 401, message: 'Invalid auth token' });
+                spy.mockReturnValue(another_fake_socket);
+                jest.runOnlyPendingTimers();
                 jest.runOnlyPendingTimers();
             } else if (actions === 2) {
                 // Websocket disconnected
