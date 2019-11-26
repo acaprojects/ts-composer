@@ -315,9 +315,11 @@ export class EngineWebsocket {
             }
         });
         if (this.websocket && this.auth.token) {
-            this._status.next(true);
             this.websocket.subscribe(
                 (resp: EngineResponse) => {
+                    if (!this._status.getValue()) {
+                        this._status.next(true);
+                    }
                     this._connection_attempts = 0;
                     this.clearHealthCheck();
                     this.onMessage(resp);
@@ -372,7 +374,7 @@ export class EngineWebsocket {
      * Send ping through the websocket
      */
     protected ping() {
-        if (this.websocket && this.is_connected) {
+        if (this.websocket) {
             this.websocket.next('ping');
         }
     }

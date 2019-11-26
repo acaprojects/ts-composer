@@ -1,6 +1,6 @@
 import { Subscription } from 'rxjs';
 import { EngineBindingService } from '../binding.service';
-import { EngineCommandRequestMetadata, EngineRequestOptions } from '../websocket.interfaces';
+import { EngineRequestOptions } from '../websocket.interfaces';
 import { EngineModuleBinding } from './engine-module.class';
 
 export class EngineVariableBinding {
@@ -20,6 +20,7 @@ export class EngineVariableBinding {
         // Listen for state changes in the websocket connection
         this._service.engine.status(value => {
             if (value && this._stale_bindings) {
+
                 this.rebind();
             } else {
                 this._stale_bindings = this._binding_count || this._stale_bindings;
