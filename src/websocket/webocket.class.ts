@@ -324,7 +324,7 @@ export class EngineWebsocket {
                     this.clearHealthCheck();
                     this.onMessage(resp);
                 },
-                err => {
+                (err: SimpleNetworkError) => {
                     this.clearHealthCheck();
                     this.onWebSocketError(err);
                 },
@@ -333,6 +333,7 @@ export class EngineWebsocket {
             if (this.keep_alive) {
                 clearInterval(this.keep_alive);
             }
+            this.ping();
             this.keep_alive = setInterval(() => this.ping(), KEEP_ALIVE * 1000) as any;
             this.clearHealthCheck();
             this._health_check = setTimeout(() => {
