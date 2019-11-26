@@ -319,13 +319,13 @@ export class EngineWebsocket {
             this.websocket.subscribe(
                 (resp: EngineResponse) => {
                     this._connection_attempts = 0;
-                    if (this._health_check) {
-                        clearTimeout(this._health_check);
-                        delete this._health_check;
-                    }
+                    this.clearHealthCheck();
                     this.onMessage(resp);
                 },
-                err => this.onWebSocketError(err),
+                err => {
+                    this.clearHealthCheck();
+                    this.onWebSocketError(err);
+                },
                 () => this._status.next(false)
             );
             if (this.keep_alive) {
@@ -411,6 +411,16 @@ export class EngineWebsocket {
                     }
                 }
             });
+        }
+    }
+
+    /**
+     * Clear health check timer
+     */
+    protected clearHealthCheck() {
+        if (this._health_check) {
+            clearTimeout(this._health_check);
+            delete this._health_check;
         }
     }
 }
