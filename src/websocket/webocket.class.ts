@@ -332,8 +332,10 @@ export class EngineWebsocket {
                 clearInterval(this.keep_alive);
             }
             this.keep_alive = setInterval(() => this.ping(), KEEP_ALIVE * 1000) as any;
+            this.clearHealthCheck();
             this._health_check = setTimeout(() => {
                 engine.log('WS', 'Unhealthy connection. Reconnecting...');
+                this._status.next(false);
                 this.reconnect();
             }, 30 * 1000) as any;
         } else {

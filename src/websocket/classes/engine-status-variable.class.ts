@@ -22,7 +22,7 @@ export class EngineVariableBinding {
             if (value && this._stale_bindings) {
                 this.rebind();
             } else {
-                this._stale_bindings = this._binding_count;
+                this._stale_bindings = this._binding_count || this._stale_bindings;
                 this._binding_count = 0;
             }
         });
