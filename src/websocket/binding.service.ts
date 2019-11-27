@@ -1,7 +1,7 @@
 import { HashMap } from '../utilities/types.utilities';
 import { EngineModuleBinding } from './classes/engine-module.class';
 import { EngineSystemBinding } from './classes/engine-system.class';
-import { EngineWebsocket } from './webocket.class';
+import { EngineWebsocket } from './websocket.class';
 import { EngineExecRequestOptions } from './websocket.interfaces';
 
 export class EngineBindingService {

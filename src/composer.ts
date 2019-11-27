@@ -11,7 +11,7 @@ import { MockEngineHttpClient } from './http/mock/mock-http.service';
 import { EngineSystemsService } from './http/services/systems/systems.service';
 import { EngineBindingService } from './websocket/binding.service';
 import { MockEngineWebsocket } from './websocket/mock/mock-websocket.class';
-import { EngineWebsocket } from './websocket/webocket.class';
+import { EngineWebsocket } from './websocket/websocket.class';
 
 import { EngineApplicationsService } from './http/services/applications/applications.service';
 import { EngineAuthSourcesService } from './http/services/auth-sources/auth-sources.service';

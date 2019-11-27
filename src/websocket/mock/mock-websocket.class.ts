@@ -1,6 +1,6 @@
 import { Subject, Subscription } from 'rxjs';
 
-import { EngineWebsocket } from '../webocket.class';
+import { EngineWebsocket } from '../websocket.class';
 import {
     EngineCommandRequest,
     EngineErrorCodes,

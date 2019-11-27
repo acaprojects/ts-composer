@@ -1,7 +1,7 @@
 import { of, Subject } from 'rxjs';
 
 import { HashMap } from '../../src/utilities/types.utilities';
-import { engine_socket, EngineWebsocket } from '../../src/websocket/webocket.class';
+import { engine_socket, EngineWebsocket } from '../../src/websocket/websocket.class';
 import { EngineResponse } from '../../src/websocket/websocket.interfaces';
 
 describe('EngineWebsocket', () => {

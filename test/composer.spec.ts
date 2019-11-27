@@ -16,7 +16,7 @@ import { EngineUsersService } from '../src/http/services/users/users.service';
 import { EngineZonesService } from '../src/http/services/zones/zones.service';
 import { EngineBindingService } from '../src/websocket/binding.service';
 import { MockEngineWebsocket } from '../src/websocket/mock/mock-websocket.class';
-import { EngineWebsocket } from '../src/websocket/webocket.class';
+import { EngineWebsocket } from '../src/websocket/websocket.class';
 
 describe('Composer', () => {
     it('constuctor throws error', () => {

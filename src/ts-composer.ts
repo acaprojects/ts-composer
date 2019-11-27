@@ -50,7 +50,7 @@ export * from './http/services/resources/resource.class';
 export * from './http/services/resources/resources.interface';
 export * from './http/services/resources/resources.service';
 
-export * from './websocket/webocket.class';
+export * from './websocket/websocket.class';
 export * from './websocket/websocket.interfaces';
 export * from './websocket/mock/mock-websocket.class';
 export * from './websocket/mock/mock-engine-system.class';
