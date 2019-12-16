@@ -156,7 +156,6 @@ export class EngineAuthService {
      */
     public refreshAuthority() {
         this._authority = undefined;
-        this._online.next(false);
         this.loadAuthority();
     }
 
@@ -260,6 +259,7 @@ export class EngineAuthService {
     private loadAuthority(tries: number = 0) {
         if (!this._promises.load_authority) {
             this._promises.load_authority = new Promise((resolve) => {
+                this._online.next(false);
                 if (this.options.mock) {
                     // Setup mock authority
                     this._authority = MOCK_AUTHORITY;
