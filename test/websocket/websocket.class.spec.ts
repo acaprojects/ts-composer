@@ -224,7 +224,7 @@ describe('EngineWebsocket', () => {
         fake_socket.next({ id: 6, type: 'error', code: 6, msg: 'test error' } as EngineResponse);
         fake_socket.next({ id: 7, type: 'error', code: 7, msg: 'test error' } as EngineResponse);
         setTimeout(() => {
-            expect(engine_socket.log).toBeCalledTimes(11);
+            expect(engine_socket.log).toBeCalledTimes(8);
             done();
         });
         jest.runOnlyPendingTimers();
@@ -281,6 +281,6 @@ describe('EngineWebsocket', () => {
             jest.runOnlyPendingTimers();
         }
 
-        expect(engine_socket.log).toBeCalledTimes(10);
+        expect(engine_socket.log).toBeCalledTimes(7);
     });
 });
