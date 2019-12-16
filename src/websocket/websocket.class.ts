@@ -51,6 +51,8 @@ export class EngineWebsocket {
     private _connection_attempts: number = 0;
     /** Timer to check the initial health of the websocket connection */
     private _health_check: number | undefined;
+    /** Timer for waiting to retry connections */
+    private _retry_timer: number | undefined;
 
     constructor(protected auth: EngineAuthService, protected options: EngineWebsocketOptions) {
         REQUEST_COUNT = 0;
@@ -401,16 +403,15 @@ export class EngineWebsocket {
         /* istanbul ignore else */
         if (!this._online_sub) {
             engine_socket.log('WS', 'Listening for changes to server state...');
+            this._retry_timer = setTimeout(() => this.finishWaitingForServer(), 10 * 1000) as any;
             this._online_sub = this.auth.online_state.subscribe(state => {
                 /* istanbul ignore else */
                 if (state) {
                     engine_socket.log('WS', 'Connection established. Starting up websocket...');
+                    clearTimeout(this._retry_timer);
                     this.finishWaitingForServer();
                 }
             });
-            setTimeout(() => {
-                this.finishWaitingForServer();
-            }, 10 * 1000);
         }
     }
 
@@ -419,6 +420,7 @@ export class EngineWebsocket {
      */
     protected finishWaitingForServer() {
         this.reconnect();
+        this._retry_timer = undefined;
         /* istanbul ignore else */
         if (this._online_sub) {
             this._online_sub.unsubscribe();
