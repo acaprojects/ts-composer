@@ -287,9 +287,6 @@ export class EngineWebsocket {
             this.waitForServer();
             return;
         }
-        if (tries > 4) {
-            return;
-        }
         if (!this.options) {
             throw new Error('No token is set for engine websocket');
         }
@@ -351,7 +348,7 @@ export class EngineWebsocket {
                     'error'
                 );
             }
-            setTimeout(() => this.connect(tries), 300 * ++tries);
+            setTimeout(() => this.connect(tries), 300 * Math.min(20, ++tries));
         }
     }
 
