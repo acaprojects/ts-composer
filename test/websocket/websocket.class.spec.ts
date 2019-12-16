@@ -280,6 +280,7 @@ describe('EngineWebsocket', () => {
         for (let i = 0; i < 6; i++) {
             jest.runOnlyPendingTimers();
         }
+
         expect(engine_socket.log).toBeCalledTimes(10);
     });
 });
