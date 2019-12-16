@@ -285,35 +285,12 @@ export class EngineWebsocket {
      * Connect to engine websocket
      */
     protected connect(tries: number = 0) {
-        if (!this.auth.is_online) {
-            this.waitForServer();
-            return;
-        }
         if (!this.options) {
             throw new Error('No token is set for engine websocket');
         }
         this._connection_attempts++;
-        const secure = this.options.secure || location.protocol.indexOf('https') >= 0;
-        const host = this.options.host || location.host;
-        const url = `ws${secure ? 's' : ''}://${host}${this.route}?bearer_token=${this.auth.token}${
-            this.options.fixed ? '&fixed_device=true' : ''
-        }`;
-        engine.log('WS', `Connecting to ws${secure ? 's' : ''}://${host}${this.route}`);
-        this.websocket = engine_socket.websocket({
-            url,
-            serializer: data => (typeof data === 'object' ? JSON.stringify(data) : data),
-            deserializer: data => {
-                let return_value = data.data;
-                try {
-                    const obj = JSON.parse(data.data);
-                    return_value = obj;
-                } catch (e) {
-                    return_value = return_value;
-                }
-                return return_value;
-            }
-        });
-        if (this.websocket && this.auth.token) {
+        this.createWebsocket();
+        if (this.websocket && this.auth.token && this.auth.is_online) {
             this.websocket.subscribe(
                 (resp: EngineResponse) => {
                     if (!this._status.getValue()) {
@@ -355,6 +332,32 @@ export class EngineWebsocket {
     }
 
     /**
+     * Create websocket connection
+     */
+    protected createWebsocket() {
+        const secure = this.options.secure || location.protocol.indexOf('https') >= 0;
+        const host = this.options.host || location.host;
+        const url = `ws${secure ? 's' : ''}://${host}${this.route}?bearer_token=${this.auth.token}${
+            this.options.fixed ? '&fixed_device=true' : ''
+        }`;
+        engine.log('WS', `Connecting to ws${secure ? 's' : ''}://${host}${this.route}`);
+        this.websocket = engine_socket.websocket({
+            url,
+            serializer: data => (typeof data === 'object' ? JSON.stringify(data) : data),
+            deserializer: data => {
+                let return_value = data.data;
+                try {
+                    const obj = JSON.parse(data.data);
+                    return_value = obj;
+                } catch (e) {
+                    return_value = return_value;
+                }
+                return return_value;
+            }
+        });
+    }
+
+    /**
      * Close old websocket connect and open a new one
      */
     protected reconnect() {
@@ -393,39 +396,6 @@ export class EngineWebsocket {
         this.auth.refreshAuthority();
         // Try reconnecting after 1 second
         this.reconnect();
-    }
-
-    /**
-     * Wait for a connection to the server before attempting to connect the websocket
-     */
-    protected waitForServer() {
-        engine_socket.log('WS', 'Waiting for server...');
-        /* istanbul ignore else */
-        if (!this._online_sub) {
-            engine_socket.log('WS', 'Listening for changes to server state...');
-            this._retry_timer = setTimeout(() => this.finishWaitingForServer(), 10 * 1000) as any;
-            this._online_sub = this.auth.online_state.subscribe(state => {
-                /* istanbul ignore else */
-                if (state) {
-                    engine_socket.log('WS', 'Connection established. Starting up websocket...');
-                    clearTimeout(this._retry_timer);
-                    this.finishWaitingForServer();
-                }
-            });
-        }
-    }
-
-    /**
-     * Try to reconnect to server and cleanup listeners
-     */
-    protected finishWaitingForServer() {
-        this.reconnect();
-        this._retry_timer = undefined;
-        /* istanbul ignore else */
-        if (this._online_sub) {
-            this._online_sub.unsubscribe();
-            delete this._online_sub;
-        }
     }
 
     /**
