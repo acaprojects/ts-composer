@@ -365,7 +365,7 @@ export class EngineWebsocket {
                 this.keep_alive = undefined;
             }
         }
-        setTimeout(() => this.connect(), 1000);
+        setTimeout(() => this.connect(), Math.min(5000, this._connection_attempts * 300 || 1000));
     }
 
     /**
@@ -397,22 +397,32 @@ export class EngineWebsocket {
      * Wait for a connection to the server before attempting to connect the websocket
      */
     protected waitForServer() {
+        engine_socket.log('WS', 'Waiting for server...');
         /* istanbul ignore else */
         if (!this._online_sub) {
+            engine_socket.log('WS', 'Listening for changes to server state...');
             this._online_sub = this.auth.online_state.subscribe(state => {
                 /* istanbul ignore else */
                 if (state) {
-                    setTimeout(
-                        () => this.connect(),
-                        Math.min(3000, 100 * (this._connection_attempts || 1))
-                    );
-                    /* istanbul ignore else */
-                    if (this._online_sub) {
-                        this._online_sub.unsubscribe();
-                        delete this._online_sub;
-                    }
+                    engine_socket.log('WS', 'Connection established. Starting up websocket...');
+                    this.finishWaitingForServer();
                 }
             });
+            setTimeout(() => {
+                this.finishWaitingForServer();
+            }, 10 * 1000);
+        }
+    }
+
+    /**
+     * Try to reconnect to server and cleanup listeners
+     */
+    protected finishWaitingForServer() {
+        this.reconnect();
+        /* istanbul ignore else */
+        if (this._online_sub) {
+            this._online_sub.unsubscribe();
+            delete this._online_sub;
         }
     }
 
