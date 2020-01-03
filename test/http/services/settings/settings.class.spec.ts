@@ -1,7 +1,7 @@
 import { EngineSettings } from '../../../../src/http/services/settings/settings.class';
 
 import * as dayjs from 'dayjs';
-import { EncryptionLevel } from '../../../../src/http/services/settings/setttings.interfaces';
+import { EncryptionLevel } from '../../../../src/http/services/settings/settings.interfaces';
 
 describe('EngineSettings', () => {
     let settings: EngineSettings;

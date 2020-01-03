@@ -2,7 +2,7 @@ import { HashMap } from '../../../utilities/types.utilities';
 import { EngineHttpClient } from '../../http.service';
 import { EngineResourceService } from '../resources/resources.service';
 import { EngineSettings } from './settings.class';
-import { EngineSettingsQueryOptions } from './setttings.interfaces';
+import { EngineSettingsQueryOptions } from './settings.interfaces';
 
 export class EngineSettingsService extends EngineResourceService<EngineSettings> {
     constructor(protected http: EngineHttpClient) {

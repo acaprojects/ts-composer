@@ -1,9 +1,15 @@
 import { HashMap } from '../../../utilities/types.utilities';
 import { EngineResource } from '../resources/resource.class';
+import { EncryptionLevel } from './settings.interfaces';
 import { EngineSettingsService } from './settings.service';
-import { EncryptionLevel } from './setttings.interfaces';
 
-import * as dayjs from 'dayjs';
+import * as _dayjs from 'dayjs';
+// tslint:disable-next-line:no-duplicate-imports
+import { Dayjs, default as _rollupDayjs } from 'dayjs';
+/**
+ * @hidden
+ */
+const dayjs = _rollupDayjs || _dayjs;
 
 export class EngineSettings extends EngineResource<EngineSettingsService> {
     /** ID of the parent zone/system/module/driver */
