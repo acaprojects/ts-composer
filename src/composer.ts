@@ -18,6 +18,7 @@ import { EngineAuthSourcesService } from './http/services/auth-sources/auth-sour
 import { EngineDomainsService } from './http/services/domains/domains.service';
 import { EngineDriversService } from './http/services/drivers/drivers.service';
 import { EngineModulesService } from './http/services/modules/modules.service';
+import { EngineSettingsService } from './http/services/settings/settings.service';
 import { EngineUsersService } from './http/services/users/users.service';
 import { EngineZonesService } from './http/services/zones/zones.service';
 import { EngineWebsocketOptions } from './websocket/websocket.interfaces';
@@ -84,6 +85,11 @@ export class Composer {
         return this.checkProperty(this._users);
     }
 
+    /** HTTP service for engine settings */
+    public static get settings(): EngineSettingsService {
+        return this.checkProperty(this._settings);
+    }
+
     /** HTTP service for engine auth sources */
     public static get zones(): EngineZonesService {
         return this.checkProperty(this._zones);
@@ -132,6 +138,7 @@ export class Composer {
                 this._modules = new EngineModulesService(this._http);
                 this._systems = new EngineSystemsService(this._http);
                 this._users = new EngineUsersService(this._http);
+                this._settings = new EngineSettingsService(this._http);
                 this._zones = new EngineZonesService(this._http);
                 this._initialised.next(true);
                 if (this._sub) {
@@ -164,6 +171,8 @@ export class Composer {
     private static _systems: EngineSystemsService;
     /** HTTP service for engine users */
     private static _users: EngineUsersService;
+    /** HTTP service for engine settings */
+    private static _settings: EngineSettingsService;
     /** HTTP service for engine zones */
     private static _zones: EngineZonesService;
     /** Initialisation subscription */

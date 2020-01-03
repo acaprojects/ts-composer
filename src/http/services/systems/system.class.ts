@@ -1,5 +1,7 @@
+import { Composer } from '../../../composer';
 import { HashMap } from '../../../utilities/types.utilities';
 import { EngineResource } from '../resources/resource.class';
+import { EngineSettings } from '../settings/settings.class';
 import { EngineSystemsService } from './systems.service';
 
 export class EngineSystem extends EngineResource<EngineSystemsService> {
@@ -83,15 +85,8 @@ export class EngineSystem extends EngineResource<EngineSystemsService> {
     public get zones(): string[] {
         return [...this._zones];
     }
-
     /** Map of user settings for the system */
-    public get settings(): HashMap {
-        return JSON.parse(JSON.stringify(this._settings || {}));
-    }
-
-    public set settings(value: HashMap) {
-        this.change('settings', value);
-    }
+    public readonly settings: EngineSettings;
 
     /** ID of the engine node this system belongs */
     private _edge_id: string;
@@ -113,8 +108,6 @@ export class EngineSystem extends EngineResource<EngineSystemsService> {
     private _modules: string[];
     /** List of the zone IDs that the system belongs */
     private _zones: string[];
-    /** Map of user settings for the system */
-    private _settings: HashMap;
 
     constructor(protected _service: EngineSystemsService, raw_data: HashMap) {
         super(_service, raw_data);
@@ -128,7 +121,7 @@ export class EngineSystem extends EngineResource<EngineSystemsService> {
         this._support_url = raw_data.support_url;
         this._modules = raw_data.modules;
         this._zones = raw_data.zones;
-        this._settings = raw_data.settings;
+        this.settings = new EngineSettings(Composer.settings, raw_data.settings);
     }
 
     /**
