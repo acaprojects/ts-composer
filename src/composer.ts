@@ -193,6 +193,7 @@ export class Composer {
             '_drivers',
             '_modules',
             '_systems',
+            '_settings',
             '_users',
             '_zones'
         ];
