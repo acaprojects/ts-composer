@@ -214,6 +214,7 @@ describe('EngineAuthService', () => {
             spy.mockImplementation(() =>
                 throwError({ status: 502, responseText: JSON.stringify(authority) })
             );
+            (service as any)._promises.load_authority = null;
             service.refreshAuthority();
         }, 101);
     });
