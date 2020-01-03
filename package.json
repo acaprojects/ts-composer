@@ -1,6 +1,6 @@
 {
   "name": "@acaprojects/ts-composer",
-  "version": "1.0.0",
+  "version": "1.0.28",
   "description": "",
   "keywords": [],
   "main": "dist/ts-composer.umd.js",
