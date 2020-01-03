@@ -198,17 +198,23 @@ describe('EngineAuthService', () => {
 
     it('should expose the online state of engine', done => {
         service = newService();
-        expect(service.is_online).toBeFalsy();
+        let count = 0;
+        service.online_state.subscribe(state => {
+            if (count === 0) {
+                expect(state).toBeFalsy();
+            } else if (count === 1) {
+                expect(state).toBeTruthy();
+            } else if (count === 2) {
+                expect(state).toBeFalsy();
+                done();
+            }
+            count++;
+        });
         setTimeout(() => {
             spy.mockImplementation(() =>
                 throwError({ status: 502, responseText: JSON.stringify(authority) })
             );
             service.refreshAuthority();
-            expect(service.is_online).toBeFalsy();
-            service.online_state.subscribe(state => {
-                // expect(state).toBeFalsy();
-                done();
-            });
         }, 101);
     });
 
