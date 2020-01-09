@@ -1,11 +1,12 @@
 import { EngineSettings } from '../../../../src/http/services/settings/settings.class';
+import { generateMockSettings } from '../../../../src/http/services/settings/settings.utilities';
 
 import * as dayjs from 'dayjs';
-import { EncryptionLevel } from '../../../../src/http/services/settings/settings.interfaces';
 
 describe('EngineSettings', () => {
     let settings: EngineSettings;
     let service: any;
+    let item: any;
 
     beforeEach(() => {
         service = {
@@ -13,13 +14,8 @@ describe('EngineSettings', () => {
             remove: jest.fn(),
             update: jest.fn()
         };
-        settings = new EngineSettings(service, {
-            parent_id: 'sys-01',
-            updated_at: dayjs().unix(),
-            encryption_level: EncryptionLevel.Admin,
-            settings_string: `Test:\n    Here`,
-            keys: ['Test']
-        });
+        item = generateMockSettings();
+        settings = new EngineSettings(service, item);
     });
 
     it('should create instance', () => {
@@ -28,19 +24,19 @@ describe('EngineSettings', () => {
     });
 
     it('should expose parent ID', () => {
-        expect(settings.parent_id).toBe('sys-01');
+        expect(settings.parent_id).toBe(item.parent_id);
     });
 
     it('should expose last update time', () => {
-        expect(settings.updated_at).toBe(dayjs().unix());
+        expect(settings.updated_at).toBe(item.updated_at);
     });
 
     it('should expose encryption level', () => {
-        expect(settings.encryption_level).toBe(EncryptionLevel.Admin);
+        expect(settings.encryption_level).toBe(item.encryption_level);
     });
 
     it('should expose settings value', () => {
-        expect(settings.settings_string).toBe(`Test:\n    Here`);
+        expect(settings.settings_string).toBe(item.settings_string);
     });
 
     it('should allow changing the settings value', () => {
@@ -50,6 +46,6 @@ describe('EngineSettings', () => {
     });
 
     it('should expose top level keys', () => {
-        expect(settings.keys).toEqual(['Test']);
+        expect(settings.keys).toEqual(item.keys);
     });
 });
