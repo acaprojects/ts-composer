@@ -3,6 +3,7 @@ import { HashMap } from '../../../utilities/types.utilities';
 import { EngineDriver } from '../drivers/driver.class';
 import { EngineDriverRole } from '../drivers/drivers.enums';
 import { EngineResource } from '../resources/resource.class';
+import { EngineSettings } from '../settings/settings.class';
 import { EngineSystem } from '../systems/system.class';
 import { EngineModulePingOptions } from './module.interfaces';
 import { EngineModulesService } from './modules.service';
@@ -125,15 +126,6 @@ export class EngineModule extends EngineResource<EngineModulesService> {
         this.change('custom_name', value);
     }
 
-    /** Local settings for the module */
-    public get settings(): HashMap {
-        return JSON.parse(JSON.stringify(this._settings));
-    }
-
-    public set settings(value: HashMap) {
-        this.change('settings', value);
-    }
-
     /** Type of module */
     public get role(): EngineDriverRole {
         return this._role;
@@ -176,6 +168,8 @@ export class EngineModule extends EngineResource<EngineModulesService> {
     public readonly system?: EngineSystem;
     /** Driver/dependancy associated with the module */
     public readonly driver?: EngineDriver;
+    /** Map of user settings for the system */
+    public settings: EngineSettings;
 
     /** ID of the driver associated with the module */
     private _dependency_id: string;
@@ -197,8 +191,6 @@ export class EngineModule extends EngineResource<EngineModulesService> {
     private _uri: string;
     /** Custom name of the module */
     private _custom_name: string;
-    /** Local settings for the module */
-    private _settings: HashMap;
     /** Type of module */
     private _role: EngineDriverRole;
     /** Notes associated with the module */
@@ -218,13 +210,21 @@ export class EngineModule extends EngineResource<EngineModulesService> {
         this._makebreak = raw_data.makebreak;
         this._uri = raw_data.uri;
         this._custom_name = raw_data.custom_name;
-        this._settings = raw_data.settings;
         this._role = raw_data.role;
         this._notes = raw_data.notes;
         this._ignore_connected = raw_data.ignore_connected;
         this.connected = raw_data.connected;
         this.running = raw_data.running;
         this.updated_at = raw_data.updated_at;
+        this.settings = new EngineSettings({} as any, raw_data.settings || { parent_id: this.id });
+        this._init_sub = Composer.initialised.subscribe(intitialised => {
+            if (intitialised) {
+                this.settings = new EngineSettings(Composer.settings, raw_data.settings || { parent_id: this.id });
+                if (this._init_sub) {
+                    this._init_sub.unsubscribe();
+                }
+            }
+        });
         if (raw_data.control_system || raw_data.system) {
             this.system = new EngineSystem(Composer.systems, raw_data.control_system || raw_data.system);
         }

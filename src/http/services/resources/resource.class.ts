@@ -1,5 +1,6 @@
 import { HashMap } from '../../../utilities/types.utilities';
 
+import { Subscription } from 'rxjs';
 import { ResourceService } from './resources.interface';
 
 export abstract class EngineResource<T extends ResourceService<any>> {
@@ -31,6 +32,8 @@ export abstract class EngineResource<T extends ResourceService<any>> {
     protected _server_names: HashMap = {};
     /** Version of the data */
     protected _version: number;
+    /** Subscription for initialisation events */
+    protected _init_sub?: Subscription;
 
     constructor(protected _service: T, raw_data: HashMap) {
         this.id = raw_data.id;

@@ -5,6 +5,7 @@ import { EngineDriver } from './driver.class';
 import { EngineDriverQueryOptions } from './drivers.interfaces';
 
 export class EngineDriversService extends EngineResourceService<EngineDriver> {
+    /* istanbul ignore next */
     constructor(protected http: EngineHttpClient) {
         super(http);
         this._name = 'Driver';

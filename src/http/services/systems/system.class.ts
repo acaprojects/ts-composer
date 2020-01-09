@@ -2,6 +2,7 @@ import { Composer } from '../../../composer';
 import { HashMap } from '../../../utilities/types.utilities';
 import { EngineResource } from '../resources/resource.class';
 import { EngineSettings } from '../settings/settings.class';
+import { EncryptionLevel } from '../settings/settings.interfaces';
 import { EngineSystemsService } from './systems.service';
 
 export class EngineSystem extends EngineResource<EngineSystemsService> {
@@ -86,7 +87,7 @@ export class EngineSystem extends EngineResource<EngineSystemsService> {
         return [...this._zones];
     }
     /** Map of user settings for the system */
-    public readonly settings: EngineSettings;
+    public settings: EngineSettings;
 
     /** ID of the engine node this system belongs */
     private _edge_id: string;
@@ -121,7 +122,15 @@ export class EngineSystem extends EngineResource<EngineSystemsService> {
         this._support_url = raw_data.support_url;
         this._modules = raw_data.modules;
         this._zones = raw_data.zones;
-        this.settings = new EngineSettings(Composer.settings, raw_data.settings);
+        this.settings = new EngineSettings({} as any, raw_data.settings || { parent_id: this.id });
+        this._init_sub = Composer.initialised.subscribe(intitialised => {
+            if (intitialised) {
+                this.settings = new EngineSettings(Composer.settings, raw_data.settings || { parent_id: this.id });
+                if (this._init_sub) {
+                    this._init_sub.unsubscribe();
+                }
+            }
+        });
     }
 
     /**

@@ -181,9 +181,9 @@ export class Composer {
     private static _modules: EngineModulesService;
     /** HTTP service for engine systems */
     private static _systems: EngineSystemsService;
-    /** HTTP service for engine settings */
+    /** HTTP service for engine system triggers */
     private static _system_triggers: EngineSystemTriggersService;
-    /** HTTP service for engine settings */
+    /** HTTP service for engine triggers */
     private static _triggers: EngineTriggersService;
     /** HTTP service for engine users */
     private static _users: EngineUsersService;
