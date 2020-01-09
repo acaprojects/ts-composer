@@ -5,6 +5,7 @@ import { EngineZone } from './zone.class';
 import { EngineZoneQueryOptions, EngineZoneShowOptions } from './zone.interfaces';
 
 export class EngineZonesService extends EngineResourceService<EngineZone> {
+    /* istanbul ignore next */
     constructor(protected http: EngineHttpClient) {
         super(http);
         this._name = 'Zone';

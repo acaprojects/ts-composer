@@ -5,6 +5,7 @@ import { EngineResourceService } from '../resources/resources.service';
 import { EngineTrigger } from './trigger.class';
 
 export class EngineSystemTriggersService extends EngineResourceService<EngineTrigger> {
+    /* istanbul ignore next */
     constructor(protected http: EngineHttpClient) {
         super(http);
         this._name = 'Trigger';

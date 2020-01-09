@@ -42,6 +42,10 @@ export * from './http/services/triggers/triggers.service';
 export * from './http/services/triggers/trigger.class';
 export * from './http/services/triggers/trigger.interfaces';
 
+export * from './http/services/settings/settings.service';
+export * from './http/services/settings/settings.interfaces';
+export * from './http/services/settings/settings.class';
+
 export * from './http/services/zones/zones.service';
 export * from './http/services/zones/zone.interfaces';
 export * from './http/services/zones/zone.class';

@@ -1,5 +1,7 @@
+import { Composer } from '../../../composer';
 import { HashMap } from '../../../utilities/types.utilities';
 import { EngineResource } from '../resources/resource.class';
+import { EngineSettings } from '../settings/settings.class';
 import { EngineDriverRole } from './drivers.enums';
 import { EngineDriversService } from './drivers.service';
 
@@ -51,17 +53,10 @@ export class EngineDriver extends EngineResource<EngineDriversService> {
     public set ignore_connected(value: boolean) {
         this.change('ignore_connected', value);
     }
-
-    /** Local settings for the driver */
-    public get settings(): HashMap {
-        return JSON.parse(JSON.stringify(this._settings));
-    }
-
-    public set settings(value: HashMap) {
-        this.change('settings', value);
-    }
     /** Engine class name of the driver */
     public readonly class_name: string;
+    /** Map of user settings for the system */
+    public settings: EngineSettings;
     /** Description of the driver functionality */
     private _description: string;
     /** Name to use for modules that inherit this driver */
@@ -72,8 +67,6 @@ export class EngineDriver extends EngineResource<EngineDriversService> {
     private _default: string;
     /** Ignore connection issues */
     private _ignore_connected: boolean;
-    /** Local settings for the driver */
-    private _settings: HashMap;
 
     constructor(protected _service: EngineDriversService, raw_data: HashMap) {
         super(_service, raw_data);
@@ -82,7 +75,15 @@ export class EngineDriver extends EngineResource<EngineDriversService> {
         this._role = raw_data.role;
         this._default = raw_data.default;
         this._ignore_connected = raw_data.ignore_connected;
-        this._settings = raw_data.settings;
+        this.settings = new EngineSettings({} as any, raw_data.settings || { parent_id: this.id });
+        this._init_sub = Composer.initialised.subscribe(intitialised => {
+            if (intitialised) {
+                this.settings = new EngineSettings(Composer.settings, raw_data.settings || { parent_id: this.id });
+                if (this._init_sub) {
+                    this._init_sub.unsubscribe();
+                }
+            }
+        });
         this.class_name = raw_data.class_name;
     }
 

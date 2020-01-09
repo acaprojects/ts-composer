@@ -5,6 +5,7 @@ import { EngineModule } from './module.class';
 import { EngineModulePingOptions, EngineModuleQueryOptions } from './module.interfaces';
 
 export class EngineModulesService extends EngineResourceService<EngineModule> {
+    /* istanbul ignore next */
     constructor(protected http: EngineHttpClient) {
         super(http);
         this._name = 'Module';

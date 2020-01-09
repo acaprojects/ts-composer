@@ -1,5 +1,7 @@
+import { Composer } from '../../../composer';
 import { HashMap } from '../../../utilities/types.utilities';
 import { EngineResource } from '../resources/resource.class';
+import { EngineSettings } from '../settings/settings.class';
 import { EngineZonesService } from './zones.service';
 
 export class EngineZone extends EngineResource<EngineZonesService> {
@@ -12,30 +14,29 @@ export class EngineZone extends EngineResource<EngineZonesService> {
         this.change('description', value);
     }
 
-    /** Local settings for the zone */
-    public get settings(): HashMap {
-        return JSON.parse(JSON.stringify(this._settings));
-    }
-
-    public set settings(value: HashMap) {
-        this.change('settings', value);
-    }
-
     /** List of the trigger IDs associated with the zone */
     public get triggers(): string[] {
         return [...this._triggers];
     }
+    /** Map of user settings for the system */
+    public settings: EngineSettings;
     /** Description of the zone's purpose */
     private _description: string;
-    /** Local settings for the zone */
-    private _settings: HashMap;
     /** List of triggers associated with the zone */
     private _triggers: string[];
 
     constructor(protected _service: EngineZonesService, raw_data: HashMap) {
         super(_service, raw_data);
         this._description = raw_data.description;
-        this._settings = raw_data.settings;
         this._triggers = raw_data.triggers;
+        this.settings = new EngineSettings({} as any, raw_data.settings || { parent_id: this.id });
+        this._init_sub = Composer.initialised.subscribe(intitialised => {
+            if (intitialised) {
+                this.settings = new EngineSettings(Composer.settings, raw_data.settings || { parent_id: this.id });
+                if (this._init_sub) {
+                    this._init_sub.unsubscribe();
+                }
+            }
+        });
     }
 }

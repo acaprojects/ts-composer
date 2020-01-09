@@ -5,6 +5,7 @@ import { EngineResourceService } from '../resources/resources.service';
 import { EngineAuthSource } from './auth-source.class';
 
 export class EngineAuthSourcesService extends EngineResourceService<EngineAuthSource> {
+    /* istanbul ignore next */
     constructor(protected http: EngineHttpClient) {
         super(http);
         this._name = 'Authentication Source';

@@ -18,6 +18,7 @@ import { EngineAuthSourcesService } from './http/services/auth-sources/auth-sour
 import { EngineDomainsService } from './http/services/domains/domains.service';
 import { EngineDriversService } from './http/services/drivers/drivers.service';
 import { EngineModulesService } from './http/services/modules/modules.service';
+import { EngineSettingsService } from './http/services/settings/settings.service';
 import { EngineSystemTriggersService } from './http/services/triggers/system-triggers.service';
 import { EngineTriggersService } from './http/services/triggers/triggers.service';
 import { EngineUsersService } from './http/services/users/users.service';
@@ -94,6 +95,11 @@ export class Composer {
         return this.checkProperty(this._users);
     }
 
+    /** HTTP service for engine settings */
+    public static get settings(): EngineSettingsService {
+        return this.checkProperty(this._settings);
+    }
+
     /** HTTP service for engine auth sources */
     public static get zones(): EngineZonesService {
         return this.checkProperty(this._zones);
@@ -142,6 +148,7 @@ export class Composer {
                 this._modules = new EngineModulesService(this._http);
                 this._systems = new EngineSystemsService(this._http);
                 this._users = new EngineUsersService(this._http);
+                this._settings = new EngineSettingsService(this._http);
                 this._system_triggers = new EngineSystemTriggersService(this._http);
                 this._triggers = new EngineTriggersService(this._http);
                 this._zones = new EngineZonesService(this._http);
@@ -174,12 +181,14 @@ export class Composer {
     private static _modules: EngineModulesService;
     /** HTTP service for engine systems */
     private static _systems: EngineSystemsService;
-    /** HTTP service for engine settings */
+    /** HTTP service for engine system triggers */
     private static _system_triggers: EngineSystemTriggersService;
-    /** HTTP service for engine settings */
+    /** HTTP service for engine triggers */
     private static _triggers: EngineTriggersService;
     /** HTTP service for engine users */
     private static _users: EngineUsersService;
+    /** HTTP service for engine settings */
+    private static _settings: EngineSettingsService;
     /** HTTP service for engine zones */
     private static _zones: EngineZonesService;
     /** Initialisation subscription */
@@ -202,6 +211,7 @@ export class Composer {
             '_systems',
             '_triggers',
             '_system_triggers',
+            '_settings',
             '_users',
             '_zones'
         ];
