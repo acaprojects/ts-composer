@@ -5,6 +5,7 @@ import { EngineApplication } from './application.class';
 import { EngineApplicationQueryOptions } from './application.interfaces';
 
 export class EngineApplicationsService extends EngineResourceService<EngineApplication> {
+    /* istanbul ignore next */
     constructor(protected http: EngineHttpClient) {
         super(http);
         this._name = 'Application';

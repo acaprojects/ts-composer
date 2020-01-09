@@ -5,6 +5,7 @@ import { EngineSettings } from './settings.class';
 import { EngineSettingsQueryOptions } from './settings.interfaces';
 
 export class EngineSettingsService extends EngineResourceService<EngineSettings> {
+    /* istanbul ignore next */
     constructor(protected http: EngineHttpClient) {
         super(http);
         this._name = 'Settings';

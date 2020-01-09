@@ -5,6 +5,7 @@ import { EngineResourceService } from '../resources/resources.service';
 import { EngineDomain } from './domain.class';
 
 export class EngineDomainsService extends EngineResourceService<EngineDomain> {
+    /* istanbul ignore next */
     constructor(protected http: EngineHttpClient) {
         super(http);
         this._name = 'Domain';

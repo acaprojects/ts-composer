@@ -10,6 +10,7 @@ import {
 } from './system.interfaces';
 
 export class EngineSystemsService extends EngineResourceService<EngineSystem> {
+    /* istanbul ignore next */
     constructor(protected http: EngineHttpClient) {
         super(http);
         this._name = 'System';

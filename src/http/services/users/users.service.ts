@@ -5,6 +5,7 @@ import { EngineUser } from './user.class';
 import { EngineUserQueryOptions } from './user.interfaces';
 
 export class EngineUsersService extends EngineResourceService<EngineUser> {
+    /* istanbul ignore next */
     constructor(protected http: EngineHttpClient) {
         super(http);
         this._name = 'User';
