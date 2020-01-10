@@ -158,5 +158,6 @@ export class EngineUser extends EngineResource<EngineUsersService> {
         this._last_name = raw_data.last_name;
         this._support = !!raw_data.support;
         this._sys_admin = !!raw_data.sys_admin;
+
     }
 }
