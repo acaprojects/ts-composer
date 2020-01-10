@@ -26,7 +26,7 @@ describe('EngineDomainsService', () => {
     it('allow querying systems index', async () => {
         http.get.mockReturnValueOnce(of({ results: [{ id: 'test' }], total: 10 }));
         const result = await service.query();
-        expect(http.get).toBeCalledWith('/api/engine/v2/authsources');
+        expect(http.get).toBeCalledWith('/auth/api/authsources');
         expect(result).toBeInstanceOf(Array);
         expect(result[0]).toBeInstanceOf(EngineAuthSource);
     });
@@ -34,7 +34,7 @@ describe('EngineDomainsService', () => {
     it('allow querying systems show', async () => {
         http.get.mockReturnValueOnce(of({ id: 'test' }));
         const result = await service.show('test');
-        expect(http.get).toBeCalledWith('/api/engine/v2/authsources/test');
+        expect(http.get).toBeCalledWith('/auth/api/authsources/test');
         expect(result).toBeInstanceOf(EngineAuthSource);
     });
 });

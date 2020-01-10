@@ -12,6 +12,10 @@ export class EngineApplicationsService extends EngineResourceService<EngineAppli
         this._api_route = 'applications';
     }
 
+    public get api_route() {
+        return `/auth/api/${this._api_route}`;
+    }
+
     /**
      * Query the index of the API route associated with this service
      * @param query_params Map of query paramaters to add to the request URL
