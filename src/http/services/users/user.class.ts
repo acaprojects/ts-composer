@@ -98,6 +98,24 @@ export class EngineUser extends EngineResource<EngineUsersService> {
     public set last_name(value: string) {
         this.change('last_name', value);
     }
+
+    /** Whether user is a support role */
+    public get support(): boolean {
+        return this._support;
+    }
+
+    public set support(value: boolean) {
+        this.change('support', value);
+    }
+
+    /** Whether user is a system admin role */
+    public get sys_admin(): boolean {
+        return this._sys_admin;
+    }
+
+    public set sys_admin(value: boolean) {
+        this.change('sys_admin', value);
+    }
     /** Hash of the email address of the user */
     public readonly email_digest: string;
     /** ID of the authority associated with the user */
@@ -120,6 +138,10 @@ export class EngineUser extends EngineResource<EngineUsersService> {
     private _first_name: string;
     /** Last name of the user */
     private _last_name: string;
+    /** Whether user is a support role */
+    private _support: boolean;
+    /** Whether user is a system admin role */
+    private _sys_admin: boolean;
 
     constructor(protected _service: EngineUsersService, raw_data: HashMap) {
         super(_service, raw_data);
@@ -134,5 +156,7 @@ export class EngineUser extends EngineResource<EngineUsersService> {
         this._staff_id = raw_data.staff_id;
         this._first_name = raw_data.first_name;
         this._last_name = raw_data.last_name;
+        this._support = !!raw_data.support;
+        this._sys_admin = !!raw_data.sys_admin;
     }
 }
