@@ -44,9 +44,4 @@ describe('EngineUsersService', () => {
         expect(http.get).toBeCalledWith('/api/engine/v2/users/current');
         expect(result).toBeInstanceOf(EngineUser);
     });
-
-    it('should not allow creating new users', async () => {
-        expect.assertions(1);
-        service.add({}).catch(e => expect(e).toBeTruthy());
-    });
 });
