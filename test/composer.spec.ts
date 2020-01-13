@@ -11,7 +11,10 @@ import { EngineAuthSourcesService } from '../src/http/services/auth-sources/auth
 import { EngineDomainsService } from '../src/http/services/domains/domains.service';
 import { EngineDriversService } from '../src/http/services/drivers/drivers.service';
 import { EngineModulesService } from '../src/http/services/modules/modules.service';
+import { EngineRepositoriesService } from '../src/http/services/repositories/repositories.service';
+import { EngineSettingsService } from '../src/http/services/settings/settings.service';
 import { EngineSystemsService } from '../src/http/services/systems/systems.service';
+import { EngineTriggersService } from '../src/http/services/triggers/triggers.service';
 import { EngineUsersService } from '../src/http/services/users/users.service';
 import { EngineZonesService } from '../src/http/services/zones/zones.service';
 import { EngineBindingService } from '../src/websocket/binding.service';
@@ -83,7 +86,10 @@ describe('Composer', () => {
             expect(Composer.domains).toBeInstanceOf(EngineDomainsService);
             expect(Composer.drivers).toBeInstanceOf(EngineDriversService);
             expect(Composer.modules).toBeInstanceOf(EngineModulesService);
+            expect(Composer.repositories).toBeInstanceOf(EngineRepositoriesService);
+            expect(Composer.settings).toBeInstanceOf(EngineSettingsService);
             expect(Composer.systems).toBeInstanceOf(EngineSystemsService);
+            expect(Composer.triggers).toBeInstanceOf(EngineTriggersService);
             expect(Composer.users).toBeInstanceOf(EngineUsersService);
             expect(Composer.zones).toBeInstanceOf(EngineZonesService);
         });

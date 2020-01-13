@@ -18,6 +18,7 @@ import { EngineAuthSourcesService } from './http/services/auth-sources/auth-sour
 import { EngineDomainsService } from './http/services/domains/domains.service';
 import { EngineDriversService } from './http/services/drivers/drivers.service';
 import { EngineModulesService } from './http/services/modules/modules.service';
+import { EngineRepositoriesService } from './http/services/repositories/repositories.service';
 import { EngineSettingsService } from './http/services/settings/settings.service';
 import { EngineSystemTriggersService } from './http/services/triggers/system-triggers.service';
 import { EngineTriggersService } from './http/services/triggers/triggers.service';
@@ -75,6 +76,11 @@ export class Composer {
     /** HTTP service for engine modules */
     public static get modules(): EngineModulesService {
         return this.checkProperty(this._modules);
+    }
+
+    /** HTTP service for engine systems */
+    public static get repositories(): EngineRepositoriesService {
+        return this.checkProperty(this._repositories);
     }
 
     /** HTTP service for engine systems */
@@ -146,6 +152,7 @@ export class Composer {
                 this._domains = new EngineDomainsService(this._http);
                 this._drivers = new EngineDriversService(this._http);
                 this._modules = new EngineModulesService(this._http);
+                this._repositories = new EngineRepositoriesService(this._http);
                 this._systems = new EngineSystemsService(this._http);
                 this._users = new EngineUsersService(this._http);
                 this._settings = new EngineSettingsService(this._http);
@@ -179,6 +186,8 @@ export class Composer {
     private static _drivers: EngineDriversService;
     /** Http service for engine modules */
     private static _modules: EngineModulesService;
+    /** HTTP service for engine repositories */
+    private static _repositories: EngineRepositoriesService;
     /** HTTP service for engine systems */
     private static _systems: EngineSystemsService;
     /** HTTP service for engine system triggers */
@@ -208,6 +217,7 @@ export class Composer {
             '_domains',
             '_drivers',
             '_modules',
+            '_repositories',
             '_systems',
             '_triggers',
             '_system_triggers',

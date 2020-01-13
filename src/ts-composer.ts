@@ -42,6 +42,11 @@ export * from './http/services/triggers/triggers.service';
 export * from './http/services/triggers/trigger.class';
 export * from './http/services/triggers/trigger.interfaces';
 
+export * from './http/services/repositories/repositories.service';
+export * from './http/services/repositories/repository.class';
+export * from './http/services/repositories/repository.interfaces';
+export * from './http/services/repositories/repository.utilities';
+
 export * from './http/services/settings/settings.service';
 export * from './http/services/settings/settings.interfaces';
 export * from './http/services/settings/settings.class';
