@@ -34,6 +34,8 @@ export interface EngineAuthority {
     config: HashMap;
     /** Version of the ACAEngine API */
     version?: string;
+    /** URL to the metrics interface for Engine */
+    metrics?: string;
 }
 
 export interface EngineAuthOptions {
