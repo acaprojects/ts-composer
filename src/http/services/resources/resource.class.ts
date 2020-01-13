@@ -70,6 +70,7 @@ export abstract class EngineResource<T extends ResourceService<any>> {
         const obj: any = { ...this };
         delete obj._service;
         delete obj._changes;
+        delete obj._init_sub;
         delete obj._server_names;
         const keys = Object.keys(obj);
         for (const key of keys) {
