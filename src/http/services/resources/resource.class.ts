@@ -43,6 +43,14 @@ export abstract class EngineResource<T extends ResourceService<any>> {
     }
 
     /**
+     * Clear any pending changes on the object
+     */
+    public clearChanges(): void {
+        delete this._changes;
+        this._changes = {};
+    }
+
+    /**
      * Save any changes made to the server
      */
     public async save(): Promise<T> {
