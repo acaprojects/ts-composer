@@ -3,8 +3,7 @@ import {
     ConditionOperator,
     TimeConditionType,
     TriggerActions,
-    TriggerConditions,
-    TriggerWebhookType
+    TriggerConditions
 } from '../../../../src/http/services/triggers/trigger.interfaces';
 
 describe('EngineTrigger', () => {
@@ -17,7 +16,6 @@ describe('EngineTrigger', () => {
     const conditions: TriggerConditions = {
         comparisons: [],
         time_dependents: [{ type: TimeConditionType.AT, time: '' }],
-        webhooks: [{ type: TriggerWebhookType.ExecuteBefore, payload: '' }]
     };
 
     beforeEach(() => {
@@ -118,8 +116,7 @@ describe('EngineTrigger', () => {
         expect(old_conditions).not.toEqual(trigger.conditions);
         const new_conditions: any = {
             comparisons: [],
-            time_dependents: [],
-            webhooks: null
+            time_dependents: []
         };
         trigger.conditions = new_conditions;
         expect(trigger.conditions).not.toEqual(new_conditions);

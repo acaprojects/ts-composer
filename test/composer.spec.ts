@@ -14,6 +14,7 @@ import { EngineModulesService } from '../src/http/services/modules/modules.servi
 import { EngineRepositoriesService } from '../src/http/services/repositories/repositories.service';
 import { EngineSettingsService } from '../src/http/services/settings/settings.service';
 import { EngineSystemsService } from '../src/http/services/systems/systems.service';
+import { EngineSystemTriggersService } from '../src/http/services/triggers/system-triggers.service';
 import { EngineTriggersService } from '../src/http/services/triggers/triggers.service';
 import { EngineUsersService } from '../src/http/services/users/users.service';
 import { EngineZonesService } from '../src/http/services/zones/zones.service';
@@ -74,6 +75,10 @@ describe('Composer', () => {
             jest.useRealTimers();
         });
 
+        it('should initialise', () => {
+            expect(Composer.is_initialised).toBe(true);
+        });
+
         it('should expose realtime API services', () => {
             expect(Composer.bindings).toBeInstanceOf(EngineBindingService);
             expect(Composer.realtime).toBeInstanceOf(EngineWebsocket);
@@ -89,6 +94,7 @@ describe('Composer', () => {
             expect(Composer.repositories).toBeInstanceOf(EngineRepositoriesService);
             expect(Composer.settings).toBeInstanceOf(EngineSettingsService);
             expect(Composer.systems).toBeInstanceOf(EngineSystemsService);
+            expect(Composer.system_triggers).toBeInstanceOf(EngineSystemTriggersService);
             expect(Composer.triggers).toBeInstanceOf(EngineTriggersService);
             expect(Composer.users).toBeInstanceOf(EngineUsersService);
             expect(Composer.zones).toBeInstanceOf(EngineZonesService);
