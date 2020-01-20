@@ -32,6 +32,16 @@ describe('EngineRepository', () => {
         expect(repository.changes.name).toBe('big@hero.six');
     });
 
+    it('should expose commit hash', () => {
+        expect(repository.commit_hash).toBe(mock_data.commit_hash);
+    });
+
+    it('should allow setting commit_hash', () => {
+        repository.commit_hash = '~HEAD-2';
+        expect(repository.commit_hash).not.toBe('~HEAD-2');
+        expect(repository.changes.commit_hash).toBe('~HEAD-2');
+    });
+
     it('should expose folder name', () => {
         expect(repository.folder_name).toBe(mock_data.folder_name);
     });

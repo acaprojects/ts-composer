@@ -48,6 +48,14 @@ export class EngineRepository extends EngineResource<EngineRepositoriesService> 
         this.change('uri', value);
     }
 
+    /** URI that the repository can be pulled from */
+    public get commit_hash(): string {
+        return this._commit_hash;
+    }
+    public set commit_hash(value: string) {
+        this.change('commit_hash', value);
+    }
+
     /** Repository type */
     public get type(): EngineRepositoryType {
         return this._type;
