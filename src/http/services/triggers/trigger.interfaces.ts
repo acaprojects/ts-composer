@@ -1,4 +1,3 @@
-import { EngineRequestOptions } from '../../../websocket/websocket.interfaces';
 
 export interface Trigger {
     /** Name of the trigger */
@@ -40,7 +39,6 @@ export interface Args {
 export interface TriggerConditions {
     comparisons: TriggerComparison[];
     time_dependents: TimeCondition[];
-    webhooks: TriggerWebhook[];
 }
 
 export interface TriggerComparison {

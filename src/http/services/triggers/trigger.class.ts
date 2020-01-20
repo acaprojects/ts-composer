@@ -1,7 +1,8 @@
 import { HashMap } from '../../../utilities/types.utilities';
+import { HttpVerb } from '../../http.interfaces';
 import { EngineResource } from '../resources/resource.class';
 import { EngineSystemTriggersService } from './system-triggers.service';
-import { Args, TriggerActions, TriggerConditions } from './trigger.interfaces';
+import { TriggerActions, TriggerConditions } from './trigger.interfaces';
 import { EngineTriggersService } from './triggers.service';
 
 export class EngineTrigger extends EngineResource<
@@ -13,6 +14,20 @@ export class EngineTrigger extends EngineResource<
     }
     public set description(value: string) {
         this.change('description', value);
+    }
+    /** Description of the trigger */
+    public get enable_webhook(): boolean {
+        return this._enable_webhook;
+    }
+    public set enable_webhook(value: boolean) {
+        this.change('enable_webhook', value);
+    }
+    /** HTTP Verbs supported by the webhook */
+    public get supported_methods(): HttpVerb[] {
+        return this._supported_methods;
+    }
+    public set supported_methods(value: HttpVerb[]) {
+        this.change('supported_methods', value);
     }
 
     /** Actions to perform when the trigger is activated */
@@ -39,8 +54,7 @@ export class EngineTrigger extends EngineResource<
             right: typeof i.right === 'object' ? { ...i.right } : i.right
         }));
         const time_list = (conditions.time_dependents || []).map(i => ({ ...i }));
-        const hook_list = (conditions.webhooks || []).map(i => ({ ...i }));
-        return { comparisons: cmp_list, time_dependents: time_list, webhooks: hook_list };
+        return { comparisons: cmp_list, time_dependents: time_list };
     }
     public set conditions(value: TriggerConditions) {
         this.change('conditions', value);
@@ -73,14 +87,16 @@ export class EngineTrigger extends EngineResource<
     private _description: string;
     /** Actions to perform when the trigger is activated */
     private _actions: TriggerActions;
-    private _temp_actions?: TriggerActions;
     /** Conditions for activating the trigger */
     private _conditions: TriggerConditions;
-    private _temp_conditions?: TriggerConditions;
     /** Duration with which to ignore sequential activations of the trigger */
     private _debounce_period: number;
     /** Whether the trigger should take priority */
     private _important: boolean;
+    /** Whether the trigger can call webhooks */
+    private _enable_webhook: boolean;
+    /** HTTP verbs supported by the webhook */
+    private _supported_methods: HttpVerb[];
     /** System associated with the trigger */
     private _system_id: string;
 
@@ -95,5 +111,7 @@ export class EngineTrigger extends EngineResource<
         this._debounce_period = raw_data.debounce_period;
         this._important = raw_data.important;
         this._system_id = raw_data.system_id || raw_data.control_system_id;
+        this._enable_webhook = raw_data.enable_webhook || false;
+        this._supported_methods = raw_data.supported_methods || ['POST'];
     }
 }
