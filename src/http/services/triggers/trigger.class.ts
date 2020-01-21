@@ -8,6 +8,8 @@ import { EngineTriggersService } from './triggers.service';
 export class EngineTrigger extends EngineResource<
     EngineTriggersService | EngineSystemTriggersService
 > {
+    /** Name of the system assocaited with the trigger */
+    public readonly system_name: string;
     /** Description of the trigger */
     public get description(): string {
         return this._description;
@@ -111,6 +113,8 @@ export class EngineTrigger extends EngineResource<
         this._debounce_period = raw_data.debounce_period;
         this._important = raw_data.important;
         this._system_id = raw_data.system_id || raw_data.control_system_id;
+        this.system_name =
+            raw_data.system_name || raw_data.control_system ? raw_data.control_system.name : '';
         this._enable_webhook = raw_data.enable_webhook || false;
         this._supported_methods = raw_data.supported_methods || ['POST'];
     }
