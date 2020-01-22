@@ -17,18 +17,25 @@ export interface Trigger {
 }
 
 export interface TriggerActions {
+    /** List of functions to execute when the trigger is activated */
     functions: TriggerFunction[];
-    mailers: Mailer[];
+    /** List of emails to send when the trigger is activated */
+    mailers: TriggerMailer[];
 }
 
-export interface Mailer {
+export interface TriggerMailer {
+    /** List of email addresses to mail to */
     emails: string[];
+    /** Contents of the email to send */
     content: string;
 }
 
 export interface TriggerFunction {
+    /** Module to execute the function on */
     mod: string;
+    /** Name of the function to execute */
     method: string;
+    /** Map of arguments to pass to the function */
     args?: Args;
 }
 
@@ -37,17 +44,22 @@ export interface Args {
 }
 
 export interface TriggerConditions {
+    /** List of comparisions used to activate the trigger */
     comparisons: TriggerComparison[];
-    time_dependents: TimeCondition[];
+    /** List of time based activators for the trigger */
+    time_dependents: TriggerTimeCondition[];
 }
 
 export interface TriggerComparison {
-    left: ConditionValue;
-    operator: ConditionOperator;
-    right: ConditionValue;
+    /** Left hand side details for the comparision */
+    left: TriggerConditionValue;
+    /** Operator to use for comparing both sides */
+    operator: TriggerConditionOperator;
+    /** Right hand side details for the comparision */
+    right: TriggerConditionValue;
 }
 
-export enum ConditionOperator {
+export enum TriggerConditionOperator {
     EQ = 'equal',
     NEQ = 'not_equal',
     GT = 'greater_than',
@@ -59,23 +71,29 @@ export enum ConditionOperator {
     XOR = 'exclusive_or'
 }
 
-export type ConditionValue = TriggerStatusVariable | ConditionConstant;
+export type TriggerConditionValue = TriggerStatusVariable | TriggerConditionConstant;
 
-export type ConditionConstant = number | string | boolean;
+export type TriggerConditionConstant = number | string | boolean;
 
 export interface TriggerStatusVariable {
+    /** Module class name associated with the status variable */
     mod: string;
+    /** Name of the status variable */
     status: string;
+    /** Sub keys to look at in the status variable's data */
     keys: string[];
 }
 
-export interface TimeCondition {
-    type: TimeConditionType;
+export interface TriggerTimeCondition {
+    /** Type of time condition. Either a specific time or cron string */
+    type: TriggerTimeConditionType;
+    /** Unix epoch in seconds */
     time?: string;
+    /** CRON tab string */
     cron?: string;
 }
 
-export enum TimeConditionType {
+export enum TriggerTimeConditionType {
     AT = 'at',
     CRON = 'cron'
 }

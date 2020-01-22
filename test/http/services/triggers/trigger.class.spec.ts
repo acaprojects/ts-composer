@@ -1,9 +1,9 @@
 import { EngineTrigger } from '../../../../src/http/services/triggers/trigger.class';
 import {
-    ConditionOperator,
-    TimeConditionType,
     TriggerActions,
-    TriggerConditions
+    TriggerConditionOperator,
+    TriggerConditions,
+    TriggerTimeConditionType
 } from '../../../../src/http/services/triggers/trigger.interfaces';
 
 describe('EngineTrigger', () => {
@@ -15,7 +15,7 @@ describe('EngineTrigger', () => {
     };
     const conditions: TriggerConditions = {
         comparisons: [],
-        time_dependents: [{ type: TimeConditionType.AT, time: '' }],
+        time_dependents: [{ type: TriggerTimeConditionType.AT, time: '' }],
     };
 
     beforeEach(() => {
@@ -123,7 +123,7 @@ describe('EngineTrigger', () => {
         const old_conditions = trigger.conditions;
         conditions.comparisons.push({
             left: 'hello',
-            operator: ConditionOperator.AND,
+            operator: TriggerConditionOperator.AND,
             right: 'nope'
         });
         expect(old_conditions).not.toEqual(trigger.conditions);
