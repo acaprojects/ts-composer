@@ -22,8 +22,8 @@ export abstract class EngineResource<T extends ResourceService<any>> {
     }
     /** Unique Identifier of the object */
     public readonly id: string;
-    /** Unique Identifier of the object */
-    public readonly created_at: string;
+    /** Unix epoch in seconds of the creation time of the object */
+    public readonly created_at: number;
     /** Human readable name of the object */
     protected _name: string;
     /** Map of unsaved property changes */

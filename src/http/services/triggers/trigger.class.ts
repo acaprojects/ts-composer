@@ -10,12 +10,21 @@ export class EngineTrigger extends EngineResource<
 > {
     /** Name of the system assocaited with the trigger */
     public readonly system_name: string;
+    /** Number of times the trigger has been activated/triggered */
+    public readonly activated_count: string;
     /** Description of the trigger */
     public get description(): string {
         return this._description;
     }
     public set description(value: string) {
         this.change('description', value);
+    }
+    /** Whether trigger is enabled on the associated zone or system */
+    public get enabled(): boolean {
+        return this._enabled;
+    }
+    public set enabled(value: boolean) {
+        this.change('enabled', value);
     }
     /** Description of the trigger */
     public get enable_webhook(): boolean {
@@ -95,6 +104,8 @@ export class EngineTrigger extends EngineResource<
     private _debounce_period: number;
     /** Whether the trigger should take priority */
     private _important: boolean;
+    /** Whether trigger is enabled on the associated zone or system */
+    private _enabled: boolean;
     /** Whether the trigger can call webhooks */
     private _enable_webhook: boolean;
     /** HTTP verbs supported by the webhook */
@@ -112,10 +123,12 @@ export class EngineTrigger extends EngineResource<
         this._conditions = raw_data.conditions;
         this._debounce_period = raw_data.debounce_period;
         this._important = raw_data.important;
+        this._enabled = raw_data.enabled;
         this._system_id = raw_data.system_id || raw_data.control_system_id;
         this.system_name =
             raw_data.system_name || raw_data.control_system ? raw_data.control_system.name : '';
         this._enable_webhook = raw_data.enable_webhook || false;
         this._supported_methods = raw_data.supported_methods || ['POST'];
+        this.activated_count = raw_data.activated_count || raw_data.trigger_count;
     }
 }
