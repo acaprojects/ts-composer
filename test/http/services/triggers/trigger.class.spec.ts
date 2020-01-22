@@ -30,6 +30,8 @@ describe('EngineTrigger', () => {
             description: 'In a galaxy far far away...',
             debounce_period: 1000,
             important: true,
+            enabled: true,
+            activated_count: 22,
             settings: { today: false, future: 'Yeah!' },
             created_at: 999,
             actions,
@@ -78,6 +80,17 @@ describe('EngineTrigger', () => {
         trigger.important = false;
         expect(trigger.important).not.toBe(false);
         expect(trigger.changes.important).toBe(false);
+    });
+
+    it('should expose enabled', () => {
+        expect(trigger.enabled).toBe(true);
+        trigger.enabled = false;
+        expect(trigger.enabled).not.toBe(false);
+        expect(trigger.changes.enabled).toBe(false);
+    });
+
+    it('should expose activation count', () => {
+        expect(trigger.activated_count).toBe(22);
     });
 
     it('should expose actions', () => {
