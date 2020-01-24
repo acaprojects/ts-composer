@@ -21,6 +21,9 @@ export const USER_MUTABLE_FIELDS = [
 type UserMutableTuple = typeof USER_MUTABLE_FIELDS;
 export type UserMutableFields = UserMutableTuple[number];
 
+/** List of property keys that can only be set when creating a new object */
+const NON_EDITABLE_FIELDS = ['authority_id'];
+
 /**
  * Representation of the user model in Engine
  */
@@ -73,6 +76,9 @@ export class EngineUser extends EngineResource<EngineUsersService> {
         key: UserMutableFields,
         value: EngineUser[UserMutableFields]
     ): this {
+        if (this.id && NON_EDITABLE_FIELDS.indexOf(key) >= 0) {
+            throw new Error(`Property "${key}" is not editable.`);
+        }
         return super.storePendingChange(key as any, value);
     }
 }

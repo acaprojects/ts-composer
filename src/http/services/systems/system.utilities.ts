@@ -14,7 +14,6 @@ export function generateMockSystem(overrides: any = {}) {
     const id = `sys-${Math.floor(Math.random() * 999_999)}`;
     return {
         id,
-        edge_id: `edge-${Math.floor(Math.random() * 999_999)}`,
         name: `System ${Math.floor(Math.random() * 999_999)}`,
         description: ``,
         email: `${id}@acaprojects.com`,

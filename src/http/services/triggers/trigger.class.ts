@@ -20,6 +20,9 @@ export const TRIGGER_MUTABLE_FIELDS = [
 type TriggerMutableTuple = typeof TRIGGER_MUTABLE_FIELDS;
 export type TriggerMutableFields = TriggerMutableTuple[number];
 
+/** List of property keys that can only be set when creating a new object */
+const NON_EDITABLE_FIELDS = ['system_id'];
+
 export class EngineTrigger extends EngineResource<
     EngineTriggersService | EngineSystemTriggersService
 > {
@@ -93,6 +96,9 @@ export class EngineTrigger extends EngineResource<
         key: TriggerMutableFields,
         value: EngineTrigger[TriggerMutableFields]
     ): this {
+        if (this.id && NON_EDITABLE_FIELDS.indexOf(key) >= 0) {
+            throw new Error(`Property "${key}" is not editable.`);
+        }
         return super.storePendingChange(key as any, value);
     }
 }

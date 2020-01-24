@@ -27,7 +27,7 @@ describe('EngineResource', () => {
     });
 
     it('should allow changing the name', () => {
-        resource.name = 'Another Test';
+        resource.storePendingChange('name', 'Another Test');
         expect(resource.name).toBe('Test');
         expect(resource.changes.name).toBe('Another Test');
     });
@@ -40,7 +40,7 @@ describe('EngineResource', () => {
         } catch (e) {
             expect(e).toBe('No changes have been made');
         }
-        resource.name = 'Another Test';
+        resource.storePendingChange('name', 'Another Test');
         (resource as any).id = undefined;
         await resource.save();
         expect(service.add).toBeCalledWith(resource.toJSON());
@@ -48,7 +48,7 @@ describe('EngineResource', () => {
 
     it('should allow updating existing resource', async () => {
         expect.assertions(1);
-        resource.name = 'Another Test';
+        resource.storePendingChange('name', 'Another Test');
         await resource.save();
         expect(service.update).toBeCalledWith(resource.id, resource.toJSON());
     });
@@ -56,6 +56,13 @@ describe('EngineResource', () => {
     it('should allow deleting exisiting resource', async () => {
         await resource.delete();
         expect(service.delete).toBeCalledWith(resource.id);
+    });
+
+    it('should allow clearing pending changes', () => {
+        resource.storePendingChange('name', 'Another Test');
+        expect(Object.keys(resource.changes).length).toBe(1);
+        resource.clearPendingChanges();
+        expect(Object.keys(resource.changes).length).toBe(0);
     });
 
     it('should expose creation time', () => {

@@ -9,6 +9,9 @@ export const DRIVER_MUTABLE_FIELDS = ['name', 'description', 'module_name', 'rol
 type DriverMutableTuple = typeof DRIVER_MUTABLE_FIELDS;
 export type DriverMutableFields = DriverMutableTuple[number];
 
+/** List of property keys that can only be set when creating a new object */
+const NON_EDITABLE_FIELDS = ['role'];
+
 export class EngineDriver extends EngineResource<EngineDriversService> {
     /** Engine class name of the driver */
     public readonly class_name: string;

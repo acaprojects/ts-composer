@@ -19,7 +19,6 @@ describe('EngineSystem', () => {
         };
         system = new EngineSystem(service, {
             id: 'sys-test',
-            edge_id: 'edge-test',
             description: 'A description',
             email: 'system@acaengine.com',
             capacity: 10,
@@ -39,93 +38,58 @@ describe('EngineSystem', () => {
         expect(system).toBeInstanceOf(EngineSystem);
     });
 
-    it('should expose edge id', () => {
-        expect(system.edge_id).toBe('edge-test');
-    });
-
-    it('should allow setting edge id on new systems', () => {
-        try {
-            system.edge_id = 'new-edge-test';
-            throw Error('Failed to throw error');
-        } catch (e) {
-            expect(e).toEqual(new Error('Edge ID cannot be changed from it\'s initial value'));
-        }
-        const sys = new EngineSystem(service, {});
-        sys.edge_id = 'another-edge';
-        expect(sys.edge_id).not.toBe('another-edge');
-        expect(sys.changes.edge_id).toBe('another-edge');
-    });
-
     it('should expose description', () => {
         expect(system.description).toBe('A description');
-        system.description = 'New description';
+        system.storePendingChange('description', 'New description');
         expect(system.description).not.toBe('New description');
         expect(system.changes.description).toBe('New description');
     });
 
     it('should expose email', () => {
         expect(system.email).toBe('system@acaengine.com');
-        system.email = 'system@not.acaengine.com';
+        system.storePendingChange('email', 'system@not.acaengine.com');
         expect(system.email).not.toBe('system@not.acaengine.com');
         expect(system.changes.email).toBe('system@not.acaengine.com');
     });
 
     it('should expose capacity', () => {
         expect(system.capacity).toBe(10);
-        system.capacity = 8;
+        system.storePendingChange('capacity', 8);
         expect(system.capacity).not.toBe(8);
         expect(system.changes.capacity).toBe(8);
     });
 
     it('should expose features', () => {
         expect(system.features).toBe(features);
-        try {
-            (system as any).features = [];
-            throw Error('Failed to throw error');
-        } catch (e) {
-            expect(e).not.toEqual(new Error('Failed to throw error'));
-        }
     });
 
     it('should expose bookable', () => {
         expect(system.bookable).toBe(true);
-        system.bookable = false;
+        system.storePendingChange('bookable', false);
         expect(system.bookable).not.toBe(false);
         expect(system.changes.bookable).toBe(false);
     });
 
     it('should expose installed_ui_devices', () => {
         expect(system.installed_ui_devices).toBe(4);
-        system.installed_ui_devices = 8;
+        system.storePendingChange('installed_ui_devices', 8);
         expect(system.installed_ui_devices).not.toBe(8);
         expect(system.changes.installed_ui_devices).toBe(8);
     });
 
     it('should expose support_url', () => {
         expect(system.support_url).toBe('/support/test');
-        system.support_url = 'http://test.yesh';
+        system.storePendingChange('support_url', 'http://test.yesh');
         expect(system.support_url).not.toBe('http://test.yesh');
         expect(system.changes.support_url).toBe('http://test.yesh');
     });
 
     it('should expose module list', () => {
         expect(system.modules).toEqual(modules);
-        try {
-            (system as any).modules = [];
-            throw Error('Failed to throw error');
-        } catch (e) {
-            expect(e).not.toEqual(new Error('Failed to throw error'));
-        }
     });
 
     it('should expose zone list', () => {
         expect(system.zones).toEqual(zones);
-        try {
-            (system as any).zones = [];
-            throw Error('Failed to throw error');
-        } catch (e) {
-            expect(e).not.toEqual(new Error('Failed to throw error'));
-        }
     });
 
     it('should expose settings', () => {

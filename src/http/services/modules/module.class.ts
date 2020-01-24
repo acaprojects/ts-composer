@@ -12,7 +12,6 @@ export const MODULE_MUTABLE_FIELDS = [
     'name',
     'dependency_id',
     'control_system_id',
-    'edge_id',
     'ip',
     'tls',
     'udp',
@@ -26,6 +25,9 @@ export const MODULE_MUTABLE_FIELDS = [
 ] as const;
 type ModuleMutableTuple = typeof MODULE_MUTABLE_FIELDS;
 export type ModuleMutableFields = ModuleMutableTuple[number];
+
+/** List of property keys that can only be set when creating a new object */
+const NON_EDITABLE_FIELDS = ['dependency_id', 'control_system_id', 'role'];
 
 export class EngineModule extends EngineResource<EngineModulesService> {
     /** Whether the associated hardware is connected */
@@ -42,8 +44,6 @@ export class EngineModule extends EngineResource<EngineModulesService> {
     public readonly control_system_id: string;
     /** System associated with the module */
     public readonly system?: EngineSystem;
-    /** ID of the edge node associated with the module */
-    public readonly edge_id: string;
     /** IP address of the hardware associated with the module */
     public readonly ip: string;
     /** Whether the hardware connection requires TLS */
@@ -66,12 +66,13 @@ export class EngineModule extends EngineResource<EngineModulesService> {
     public readonly ignore_connected: boolean;
     /** Map of user settings for the system */
     public settings: EngineSettings;
+    /** ID of the system associated with the module */
+    public get system_id(): string { return this.control_system_id; }
 
     constructor(protected _service: EngineModulesService, raw_data: HashMap) {
         super(_service, raw_data);
         this.dependency_id = raw_data.dependency_id || '';
         this.control_system_id = raw_data.control_system_id || '';
-        this.edge_id = raw_data.edge_id || '';
         this.ip = raw_data.ip || '';
         this.tls = raw_data.tls || false;
         this.udp = raw_data.udp || false;
@@ -115,6 +116,9 @@ export class EngineModule extends EngineResource<EngineModulesService> {
         key: ModuleMutableFields,
         value: EngineModule[ModuleMutableFields]
     ): this {
+        if (this.id && NON_EDITABLE_FIELDS.indexOf(key) >= 0) {
+            throw new Error(`Property "${key}" is not editable.`);
+        }
         return super.storePendingChange(key as any, value);
     }
 

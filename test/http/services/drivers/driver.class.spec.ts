@@ -37,7 +37,7 @@ describe('EngineDriver', () => {
     });
 
     it('should allow setting description', () => {
-        driver.description = 'another-desc';
+        driver.storePendingChange('description', 'another-desc');
         expect(driver.description).not.toBe('another-desc');
         expect(driver.changes.description).toBe('another-desc');
     });
@@ -47,7 +47,7 @@ describe('EngineDriver', () => {
     });
 
     it('should allow setting module name', () => {
-        driver.module_name = 'a_mod_name';
+        driver.storePendingChange('module_name', 'a_mod_name');
         expect(driver.module_name).not.toBe('a_mod_name');
         expect(driver.changes.module_name).toBe('a_mod_name');
     });
@@ -57,16 +57,9 @@ describe('EngineDriver', () => {
     });
 
     it('should allow setting role on new modules', () => {
-        try {
-            driver.role = EngineDriverRole.Service;
-            throw Error('Failed to throw error');
-        } catch (e) {
-            expect(e).not.toEqual(new Error('Failed to throw error'));
-        }
-        const new_mod = new EngineDriver(service, {});
-        new_mod.role = EngineDriverRole.Service;
-        expect(new_mod.role).not.toBe(EngineDriverRole.Service);
-        expect(new_mod.changes.role).toBe(EngineDriverRole.Service);
+        driver.storePendingChange('role', EngineDriverRole.Service);
+        expect(driver.role).not.toBe(EngineDriverRole.Service);
+        expect(driver.changes.role).toBe(EngineDriverRole.Service);
     });
 
     it('should expose default', () => {
@@ -74,7 +67,7 @@ describe('EngineDriver', () => {
     });
 
     it('should allow setting default', () => {
-        driver.default = 'No default today';
+        driver.storePendingChange('default', 'No default today');
         expect(driver.default).not.toBe('No default today');
         expect(driver.changes.default).toBe('No default today');
     });
@@ -84,7 +77,7 @@ describe('EngineDriver', () => {
     });
 
     it('should allow setting default', () => {
-        driver.ignore_connected = true;
+        driver.storePendingChange('ignore_connected', true);
         expect(driver.ignore_connected).not.toBe(true);
         expect(driver.changes.ignore_connected).toBe(true);
     });

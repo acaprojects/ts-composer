@@ -32,7 +32,7 @@ describe('EngineZone', () => {
     });
 
     it('should allow setting description', () => {
-        zone.description = 'another-desc';
+        zone.storePendingChange('description', 'another-desc');
         expect(zone.description).not.toBe('another-desc');
         expect(zone.changes.description).toBe('another-desc');
     });

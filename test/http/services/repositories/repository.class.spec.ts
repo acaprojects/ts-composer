@@ -22,22 +22,12 @@ describe('EngineRepository', () => {
         expect(repository).toBeInstanceOf(EngineRepository);
     });
 
-    it('should expose name', () => {
-        expect(repository.name).toBe(mock_data.name);
-    });
-
-    it('should allow setting name', () => {
-        repository.name = 'big@hero.six';
-        expect(repository.name).not.toBe('big@hero.six');
-        expect(repository.changes.name).toBe('big@hero.six');
-    });
-
     it('should expose commit hash', () => {
         expect(repository.commit_hash).toBe(mock_data.commit_hash);
     });
 
     it('should allow setting commit_hash', () => {
-        repository.commit_hash = '~HEAD-2';
+        repository.storePendingChange('commit_hash', '~HEAD-2');
         expect(repository.commit_hash).not.toBe('~HEAD-2');
         expect(repository.changes.commit_hash).toBe('~HEAD-2');
     });
@@ -47,7 +37,7 @@ describe('EngineRepository', () => {
     });
 
     it('should allow setting Phone', () => {
-        repository.folder_name = 'test/this/folder';
+        repository.storePendingChange('folder_name', 'test/this/folder');
         expect(repository.folder_name).not.toBe('test/this/folder');
         expect(repository.changes.folder_name).toBe('test/this/folder');
     });
@@ -57,7 +47,7 @@ describe('EngineRepository', () => {
     });
 
     it('should allow setting description', () => {
-        repository.description = 'Antartica';
+        repository.storePendingChange('description', 'Antartica');
         expect(repository.description).not.toBe('Antartica');
         expect(repository.changes.description).toBe('Antartica');
     });
@@ -67,7 +57,7 @@ describe('EngineRepository', () => {
     });
 
     it('should allow setting URI', () => {
-        repository.uri = '/cat.jpeg';
+        repository.storePendingChange('uri', '/cat.jpeg');
         expect(repository.uri).not.toBe('/cat.jpeg');
         expect(repository.changes.uri).toBe('/cat.jpeg');
     });
@@ -77,7 +67,7 @@ describe('EngineRepository', () => {
     });
 
     it('should allow setting type', () => {
-        repository.type = EngineRepositoryType.Interface;
+        repository.storePendingChange('type', EngineRepositoryType.Interface);
         expect(repository.type).not.toBe(EngineRepositoryType.Interface);
         expect(repository.changes.type).toBe(EngineRepositoryType.Interface);
     });

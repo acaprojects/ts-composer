@@ -40,8 +40,8 @@ describe('EngineSettings', () => {
     });
 
     it('should allow changing the settings value', () => {
-        settings.value = 'another-setting';
-        expect(settings.value).not.toBe('another-setting');
+        settings.storePendingChange('settings_string', 'another-setting');
+        expect(settings.settings_string).not.toBe('another-setting');
         expect(settings.changes.settings_string).toBe('another-setting');
     });
 

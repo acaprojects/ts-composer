@@ -50,41 +50,41 @@ describe('EngineTrigger', () => {
 
     it('should allow setting system id on new systems', () => {
         try {
-            trigger.system_id = 'life';
+            trigger.storePendingChange('system_id', 'life');
             throw Error('Failed to throw error');
         } catch (e) {
-            expect(e).toEqual(new Error('System ID cannot be changed from it\'s initial value'));
+            expect(e).toEqual(new Error('Property "system_id" is not editable.'));
         }
         const trig = new EngineTrigger(service, {});
-        trig.system_id = 'life-is-42';
+        trig.storePendingChange('system_id', 'life-is-42');
         expect(trig.system_id).not.toBe('life-is-42');
         expect(trig.changes.system_id).toBe('life-is-42');
     });
 
     it('should expose description', () => {
         expect(trigger.description).toBe('In a galaxy far far away...');
-        trigger.description = 'In a not so distant galaxy...';
+        trigger.storePendingChange('description', 'In a not so distant galaxy...');
         expect(trigger.description).not.toBe('In a not so distant galaxy...');
         expect(trigger.changes.description).toBe('In a not so distant galaxy...');
     });
 
     it('should expose debounce period', () => {
         expect(trigger.debounce_period).toBe(1000);
-        trigger.debounce_period = 9999;
+        trigger.storePendingChange('debounce_period', 9999);
         expect(trigger.debounce_period).not.toBe(9999);
         expect(trigger.changes.debounce_period).toBe(9999);
     });
 
     it('should expose important', () => {
         expect(trigger.important).toBe(true);
-        trigger.important = false;
+        trigger.storePendingChange('important', false);
         expect(trigger.important).not.toBe(false);
         expect(trigger.changes.important).toBe(false);
     });
 
     it('should expose enabled', () => {
         expect(trigger.enabled).toBe(true);
-        trigger.enabled = false;
+        trigger.storePendingChange('enabled', false);
         expect(trigger.enabled).not.toBe(false);
         expect(trigger.changes.enabled).toBe(false);
     });
@@ -113,7 +113,7 @@ describe('EngineTrigger', () => {
             ],
             mailers: null
         };
-        trigger.actions = new_actions;
+        trigger.storePendingChange('actions', new_actions);
         expect(trigger.actions).not.toEqual(new_actions);
         expect(trigger.changes.actions).toEqual(new_actions);
     });
@@ -131,7 +131,7 @@ describe('EngineTrigger', () => {
             comparisons: [],
             time_dependents: []
         };
-        trigger.conditions = new_conditions;
+        trigger.storePendingChange('conditions', new_conditions);
         expect(trigger.conditions).not.toEqual(new_conditions);
         expect(trigger.changes.conditions).toEqual(new_conditions);
     });

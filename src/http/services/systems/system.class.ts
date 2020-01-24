@@ -7,7 +7,6 @@ import { EngineSystemsService } from './systems.service';
 export const SYSTEM_MUTABLE_FIELDS = [
     'name',
     'email',
-    'edge_id',
     'description',
     'email',
     'capacity',
@@ -24,9 +23,6 @@ export type SystemMutableFields = SystemMutableTuple[number];
 export class EngineSystem extends EngineResource<EngineSystemsService> {
     /** Map of user settings for the system */
     public settings: EngineSettings;
-
-    /** ID of the engine node this system belongs */
-    public readonly edge_id: string;
     /** Description of the system */
     public readonly description: string;
     /** Email address associated with the system */
@@ -48,7 +44,6 @@ export class EngineSystem extends EngineResource<EngineSystemsService> {
 
     constructor(protected _service: EngineSystemsService, raw_data: HashMap) {
         super(_service, raw_data);
-        this.edge_id = raw_data.edge_id || '';
         this.description = raw_data.description || '';
         this.email = raw_data.email || '';
         this.capacity = raw_data.capacity || '';

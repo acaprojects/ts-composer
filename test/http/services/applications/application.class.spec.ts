@@ -32,7 +32,7 @@ describe('EngineApplication', () => {
     });
 
     it('should allow setting owner ID', () => {
-        application.owner_id = 'the-man';
+        application.storePendingChange('owner_id', 'the-man');
         expect(application.owner_id).not.toBe('the-man');
         expect(application.changes.owner_id).toBe('the-man');
     });
@@ -42,7 +42,7 @@ describe('EngineApplication', () => {
     });
 
     it('should allow setting scope', () => {
-        application.scopes = 'new,scope,that,is,cool';
+        application.storePendingChange('scopes', 'new,scope,that,is,cool');
         expect(application.scopes).not.toBe('new,scope,that,is,cool');
         expect(application.changes.scopes).toBe('new,scope,that,is,cool');
     });
@@ -52,7 +52,7 @@ describe('EngineApplication', () => {
     });
 
     it('should allow setting redirect_uri', () => {
-        application.redirect_uri = 'http://in.secure/oauth.html';
+        application.storePendingChange('redirect_uri', 'http://in.secure/oauth.html');
         expect(application.redirect_uri).not.toBe('http://in.secure/oauth.html');
         expect(application.changes.redirect_uri).toBe('http://in.secure/oauth.html');
     });
@@ -62,7 +62,7 @@ describe('EngineApplication', () => {
     });
 
     it('should allow setting skip_authorization', () => {
-        application.skip_authorization = false;
+        application.storePendingChange('skip_authorization', false);
         expect(application.skip_authorization).not.toBe(false);
         expect(application.changes.skip_authorization).toBe(false);
     });

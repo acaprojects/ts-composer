@@ -27,6 +27,11 @@ export class EngineSettings extends EngineResource<EngineSettingsService> {
     /** Top level keys for the parsed settings */
     public readonly keys: string[];
 
+    /** Contents of the settings */
+    public get value(): string {
+        return this.settings_string;
+    }
+
     constructor(protected _service: EngineSettingsService, raw_data: HashMap) {
         super(_service, raw_data);
         this.parent_id = raw_data.parent_id || '';

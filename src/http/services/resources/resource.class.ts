@@ -52,7 +52,9 @@ export abstract class EngineResource<T extends ResourceService<any>> {
             this._changes[key as any] = value;
             this.emit('value_change', { key, value });
         } else {
-            throw new Error(`Invalid type for value "${value}" set for key "${key}"`);
+            throw new Error(
+                `Invalid type for value "${value}" set for key "${key}". Expected ${type} | Received ${typeof value}`
+            );
         }
         return this;
     }

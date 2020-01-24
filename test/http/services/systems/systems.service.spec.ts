@@ -65,6 +65,13 @@ describe('EngineSystemsService', () => {
         });
     });
 
+    it('allow counting system modules', async () => {
+        http.get.mockReturnValueOnce(of({ count: 0 }));
+        const value = await service.count('test', 'Booking');
+        expect(http.get).toBeCalledWith('/api/engine/v2/systems/test/count?module=Booking');
+        expect(value).toEqual({ count: 0 });
+    });
+
     it('allow executing methods on modules', async () => {
         http.post.mockReturnValueOnce(of('test')).mockReturnValueOnce(of('test2'));
         let resp = await service.execute('test', 'module');
