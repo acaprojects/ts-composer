@@ -15,27 +15,29 @@ export const MOCK_AUTHORITY = {
 
 export interface EngineAuthority {
     /** Engine ID for the Authority */
-    id: string;
+    readonly id: string;
     /** Authority name */
-    name: string;
+    readonly name: string;
     /** Description of the authority site */
-    description: string;
+    readonly description: string;
     /** Domain of the authority */
-    dom: string;
+    readonly dom: string;
     /** URL for user to login for authentication */
-    login_url: string;
+    readonly login_url: string;
     /** URL for user to clear authentication details */
-    logout_url: string;
+    readonly logout_url: string;
     /** Whether the engine instance is a production build */
-    production: boolean;
+    readonly production: boolean;
     /** Whether the user has an authentication session */
-    session: boolean;
+    readonly session: boolean;
     /** Configuration metadata for the authority */
-    config: HashMap;
+    readonly config: HashMap;
     /** Version of the ACAEngine API */
-    version?: string;
+    readonly version?: string;
     /** URL to the metrics interface for Engine */
-    metrics?: string;
+    readonly metrics?: string;
+    /** DSN for Sentry integration */
+    readonly sentry_dsn?: string;
 }
 
 export interface EngineAuthOptions {
