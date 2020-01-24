@@ -2,162 +2,77 @@ import { HashMap } from '../../../utilities/types.utilities';
 import { EngineResource } from '../resources/resource.class';
 import { EngineUsersService } from './users.service';
 
+export const USER_MUTABLE_FIELDS = [
+    'name',
+    'email',
+    'authority_id',
+    'email',
+    'phone',
+    'country',
+    'image',
+    'metadata',
+    'login_name',
+    'staff_id',
+    'first_name',
+    'last_name',
+    'support',
+    'sys_admin'
+] as const;
+type UserMutableTuple = typeof USER_MUTABLE_FIELDS;
+export type UserMutableFields = UserMutableTuple[number];
+
 /**
  * Representation of the user model in Engine
  */
 export class EngineUser extends EngineResource<EngineUsersService> {
-    /** ID of the authority associated with the user */
-    public get authority_id(): string {
-        return this._authority_id;
-    }
-
-    public set authority_id(value: string) {
-        if (this.id) {
-            throw new Error('Authority ID cannot be changed from it\'s initial value');
-        }
-        this.change('authority_id', value);
-    }
-
-    /** Email address of the user */
-    public get email(): string {
-        return this._email;
-    }
-
-    public set email(value: string) {
-        this.change('email', value);
-    }
-
-    /** Phone number of the user */
-    public get phone(): string {
-        return this._phone;
-    }
-
-    public set phone(value: string) {
-        this.change('phone', value);
-    }
-
-    /** Country where the user resides */
-    public get country(): string {
-        return this._country;
-    }
-
-    public set country(value: string) {
-        this.change('country', value);
-    }
-
-    /** Avatar image for the user */
-    public get image(): string {
-        return this._image;
-    }
-
-    public set image(value: string) {
-        this.change('image', value);
-    }
-
-    /** Additional metadata associated with the user */
-    public get metadata(): string {
-        return this._metadata;
-    }
-
-    public set metadata(value: string) {
-        this.change('metadata', value);
-    }
-
-    /** Username credential of the user */
-    public get login_name(): string {
-        return this._login_name;
-    }
-
-    public set login_name(value: string) {
-        this.change('login_name', value);
-    }
-
-    /** Organisation ID of the user */
-    public get staff_id(): string {
-        return this._staff_id;
-    }
-
-    public set staff_id(value: string) {
-        this.change('staff_id', value);
-    }
-
-    /** First name of the user */
-    public get first_name(): string {
-        return this._first_name;
-    }
-
-    public set first_name(value: string) {
-        this.change('first_name', value);
-    }
-
-    /** Last name of the user */
-    public get last_name(): string {
-        return this._last_name;
-    }
-
-    public set last_name(value: string) {
-        this.change('last_name', value);
-    }
-
-    /** Whether user is a support role */
-    public get support(): boolean {
-        return this._support;
-    }
-
-    public set support(value: boolean) {
-        this.change('support', value);
-    }
-
-    /** Whether user is a system admin role */
-    public get sys_admin(): boolean {
-        return this._sys_admin;
-    }
-
-    public set sys_admin(value: boolean) {
-        this.change('sys_admin', value);
-    }
     /** Hash of the email address of the user */
     public readonly email_digest: string;
     /** ID of the authority associated with the user */
-    private _authority_id: string;
+    public readonly authority_id: string;
     /** Email address of the user */
-    private _email: string;
+    public readonly email: string;
     /** Phone number of the user */
-    private _phone: string;
+    public readonly phone: string;
     /** Country that the user resides in */
-    private _country: string;
+    public readonly country: string;
     /** Avatar image for the user */
-    private _image: string;
+    public readonly image: string;
     /** Additional metadata associated with the user */
-    private _metadata: string;
+    public readonly metadata: string;
     /** Username credential of the user */
-    private _login_name: string;
+    public readonly login_name: string;
     /** Organisation ID of the user */
-    private _staff_id: string;
+    public readonly staff_id: string;
     /** First name of the user */
-    private _first_name: string;
+    public readonly first_name: string;
     /** Last name of the user */
-    private _last_name: string;
+    public readonly last_name: string;
     /** Whether user is a support role */
-    private _support: boolean;
+    public readonly support: boolean;
     /** Whether user is a system admin role */
-    private _sys_admin: boolean;
+    public readonly sys_admin: boolean;
 
     constructor(protected _service: EngineUsersService, raw_data: HashMap) {
         super(_service, raw_data);
-        this._authority_id = raw_data.authority_id;
-        this._email = raw_data.email;
-        this.email_digest = raw_data.email_digest;
-        this._phone = raw_data.phone;
-        this._country = raw_data.country;
-        this._image = raw_data.image;
-        this._metadata = raw_data.metadata;
-        this._login_name = raw_data.login_name;
-        this._staff_id = raw_data.staff_id;
-        this._first_name = raw_data.first_name;
-        this._last_name = raw_data.last_name;
-        this._support = !!raw_data.support;
-        this._sys_admin = !!raw_data.sys_admin;
+        this.authority_id = raw_data.authority_id || '';
+        this.email = raw_data.email || '';
+        this.email_digest = raw_data.email_digest || '';
+        this.phone = raw_data.phone || '';
+        this.country = raw_data.country || '';
+        this.image = raw_data.image || '';
+        this.metadata = raw_data.metadata || '';
+        this.login_name = raw_data.login_name || '';
+        this.staff_id = raw_data.staff_id || '';
+        this.first_name = raw_data.first_name || '';
+        this.last_name = raw_data.last_name || '';
+        this.support = !!raw_data.support;
+        this.sys_admin = !!raw_data.sys_admin;
+    }
 
+    public storePendingChange(
+        key: UserMutableFields,
+        value: EngineUser[UserMutableFields]
+    ): this {
+        return super.storePendingChange(key as any, value);
     }
 }

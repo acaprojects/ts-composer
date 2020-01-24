@@ -5,76 +5,34 @@ import { EngineSettings } from '../settings/settings.class';
 import { EngineDriverRole } from './drivers.enums';
 import { EngineDriversService } from './drivers.service';
 
+export const DRIVER_MUTABLE_FIELDS = ['name', 'description', 'module_name', 'role', 'default', 'ignore_connected'] as const;
+type DriverMutableTuple = typeof DRIVER_MUTABLE_FIELDS;
+export type DriverMutableFields = DriverMutableTuple[number];
+
 export class EngineDriver extends EngineResource<EngineDriversService> {
-    /** Description of the driver functionality */
-    public get description(): string {
-        return this._description;
-    }
-
-    public set description(value: string) {
-        this.change('description', value);
-    }
-
-    /** Name to use for modules that inherit this driver */
-    public get module_name(): string {
-        return this._module_name;
-    }
-
-    public set module_name(value: string) {
-        this.change('module_name', value);
-    }
-
-    /** Role of the driver in engine */
-    public get role(): EngineDriverRole {
-        return this._role;
-    }
-
-    public set role(value: EngineDriverRole) {
-        if (this.id) {
-            throw new Error('Role cannot be changed from it\'s initial value');
-        }
-        this.change('role', value);
-    }
-
-    /**  */
-    public get default(): string {
-        return this._default;
-    }
-
-    public set default(value: string) {
-        this.change('default', value);
-    }
-
-    /** Ignore connection issues */
-    public get ignore_connected(): boolean {
-        return this._ignore_connected;
-    }
-
-    public set ignore_connected(value: boolean) {
-        this.change('ignore_connected', value);
-    }
     /** Engine class name of the driver */
     public readonly class_name: string;
+    /** Description of the driver functionality */
+    public readonly description: string;
+    /** Name to use for modules that inherit this driver */
+    public readonly module_name: string;
+    /** Role of the driver in engine */
+    public readonly role: EngineDriverRole;
+    /**  */
+    public readonly default: string;
+    /** Ignore connection issues */
+    public readonly ignore_connected: boolean;
     /** Map of user settings for the system */
     public settings: EngineSettings;
-    /** Description of the driver functionality */
-    private _description: string;
-    /** Name to use for modules that inherit this driver */
-    private _module_name: string;
-    /** Role of the driver in engine */
-    private _role: EngineDriverRole;
-    /**  */
-    private _default: string;
-    /** Ignore connection issues */
-    private _ignore_connected: boolean;
 
     constructor(protected _service: EngineDriversService, raw_data: HashMap) {
         super(_service, raw_data);
-        this._description = raw_data.description;
-        this._module_name = raw_data.module_name;
-        this._role = raw_data.role;
-        this._default = raw_data.default;
-        this._ignore_connected = raw_data.ignore_connected;
+        this.description = raw_data.description || '';
+        this.module_name = raw_data.module_name || '';
+        this.role = raw_data.role || EngineDriverRole.Logic;
+        this.default = raw_data.default || '';
+        this.ignore_connected = raw_data.ignore_connected || false;
+        this.class_name = raw_data.class_name || '';
         this.settings = new EngineSettings({} as any, raw_data.settings || { parent_id: this.id });
         this._init_sub = Composer.initialised.subscribe(intitialised => {
             if (intitialised) {
@@ -84,7 +42,13 @@ export class EngineDriver extends EngineResource<EngineDriversService> {
                 }
             }
         });
-        this.class_name = raw_data.class_name;
+    }
+
+    public storePendingChange(
+        key: DriverMutableFields,
+        value: EngineDriver[DriverMutableFields]
+    ): this {
+        return super.storePendingChange(key as any, value);
     }
 
     /**

@@ -4,31 +4,22 @@ import { EngineResource } from '../resources/resource.class';
 import { EngineSettings } from '../settings/settings.class';
 import { EngineZonesService } from './zones.service';
 
+export const ZONE_MUTABLE_FIELDS = ['name', 'description', 'triggers'] as const;
+type ZoneMutableTuple = typeof ZONE_MUTABLE_FIELDS;
+export type ZoneMutableFields = ZoneMutableTuple[number];
+
 export class EngineZone extends EngineResource<EngineZonesService> {
-    /** Description of the driver functionality */
-    public get description(): string {
-        return this._description;
-    }
-
-    public set description(value: string) {
-        this.change('description', value);
-    }
-
-    /** List of the trigger IDs associated with the zone */
-    public get triggers(): string[] {
-        return [...this._triggers];
-    }
     /** Map of user settings for the system */
     public settings: EngineSettings;
     /** Description of the zone's purpose */
-    private _description: string;
+    public readonly description: string;
     /** List of triggers associated with the zone */
-    private _triggers: string[];
+    public readonly triggers: readonly string[];
 
     constructor(protected _service: EngineZonesService, raw_data: HashMap) {
         super(_service, raw_data);
-        this._description = raw_data.description;
-        this._triggers = raw_data.triggers;
+        this.description = raw_data.description || '';
+        this.triggers = raw_data.triggers || [];
         this.settings = new EngineSettings({} as any, raw_data.settings || { parent_id: this.id });
         this._init_sub = Composer.initialised.subscribe(intitialised => {
             if (intitialised) {
@@ -38,5 +29,12 @@ export class EngineZone extends EngineResource<EngineZonesService> {
                 }
             }
         });
+    }
+
+    public storePendingChange(
+        key: ZoneMutableFields,
+        value: EngineZone[ZoneMutableFields]
+    ): this {
+        return super.storePendingChange(key as any, value);
     }
 }

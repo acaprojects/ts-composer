@@ -24,3 +24,12 @@ export interface ResourceService<T = any> {
     update: (id: string, data: HashMap) => Promise<T>;
     delete: (id: string) => Promise<void>;
 }
+
+export type EngineDataEventType = 'value_change' | 'item_saved' | 'reset' | 'other';
+
+export interface EngineDataClassEvent {
+    /** Type of event that has occurred on the object */
+    type: EngineDataEventType;
+    /** Associated metadata with the event */
+    metadata: HashMap;
+}

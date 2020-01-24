@@ -8,229 +8,114 @@ import { EngineSystem } from '../systems/system.class';
 import { EngineModulePingOptions } from './module.interfaces';
 import { EngineModulesService } from './modules.service';
 
+export const MODULE_MUTABLE_FIELDS = [
+    'name',
+    'dependency_id',
+    'control_system_id',
+    'edge_id',
+    'ip',
+    'tls',
+    'udp',
+    'port',
+    'makebreak',
+    'uri',
+    'custom_name',
+    'role',
+    'notes',
+    'ignore_connected'
+] as const;
+type ModuleMutableTuple = typeof MODULE_MUTABLE_FIELDS;
+export type ModuleMutableFields = ModuleMutableTuple[number];
+
 export class EngineModule extends EngineResource<EngineModulesService> {
-    /** ID of the driver associated with the module */
-    public get dependency_id(): string {
-        return this._dependency_id;
-    }
-
-    public set dependency_id(value: string) {
-        if (this.id) {
-            throw new Error('Dependency ID cannot be changed from it\'s initial value');
-        }
-        this.change('dependency_id', value);
-    }
-
-    /** ID of the system associated with the module */
-    public get system_id(): string {
-        return this._control_system_id;
-    }
-
-    public set system_id(value: string) {
-        if (this.id) {
-            throw new Error('System ID cannot be changed from it\'s initial value');
-        }
-        this.change('control_system_id', value);
-    }
-
-    /** ID of the edge node associated with the module */
-    public get edge_id(): string {
-        return this._edge_id;
-    }
-
-    public set edge_id(value: string) {
-        if (this.id) {
-            throw new Error('Edge ID cannot be changed from it\'s initial value');
-        }
-        this.change('edge_id', value);
-    }
-
-    /** IP address of the hardware associated with the module */
-    public get ip(): string {
-        return this._ip;
-    }
-
-    public set ip(value: string) {
-        if (this.id) {
-            throw new Error('IP Address cannot be changed from it\'s initial value');
-        }
-        this.change('ip', value);
-    }
-
-    /** Whether the hardware connection requires TLS */
-    public get tls(): boolean {
-        return this._tls;
-    }
-
-    public set tls(value: boolean) {
-        if (this.id) {
-            throw new Error('TLS cannot be changed from it\'s initial value');
-        }
-        this.change('tls', value);
-    }
-
-    /** Whether the hardware connection is over UDP */
-    public get udp(): boolean {
-        return this._udp;
-    }
-
-    public set udp(value: boolean) {
-        if (this.id) {
-            throw new Error('UDP cannot be changed from it\'s initial value');
-        }
-        this.change('udp', value);
-    }
-
-    /** Port number connections to the hardware are made on */
-    public get port(): number {
-        return this._port;
-    }
-
-    public set port(value: number) {
-        if (this.id) {
-            throw new Error('Port number cannot be changed from it\'s initial value');
-        }
-        this.change('port', value);
-    }
-
-    /**  */
-    public get makebreak(): boolean {
-        return this._makebreak;
-    }
-
-    public set makebreak(value: boolean) {
-        if (this.id) {
-            throw new Error('Makebreak cannot be changed from it\'s initial value');
-        }
-        this.change('makebreak', value);
-    }
-
-    /** URI associated with the module */
-    public get uri(): string {
-        return this._uri;
-    }
-
-    public set uri(value: string) {
-        if (this.id) {
-            throw new Error('URI cannot be changed from it\'s initial value');
-        }
-        this.change('uri', value);
-    }
-
-    /** Custom name of the module */
-    public get custom_name(): string {
-        return this._custom_name;
-    }
-
-    public set custom_name(value: string) {
-        this.change('custom_name', value);
-    }
-
-    /** Type of module */
-    public get role(): EngineDriverRole {
-        return this._role;
-    }
-
-    public set role(value: EngineDriverRole) {
-        if (this.id) {
-            throw new Error('Role cannot be changed from it\'s initial value');
-        }
-        this.change('role', value);
-    }
-
-    /** Notes associated with the module */
-    public get notes(): string {
-        return this._notes;
-    }
-
-    public set notes(value: string) {
-        this.change('notes', value);
-    }
-
-    /** Ignore connection issues */
-    public get ignore_connected(): boolean {
-        return this._ignore_connected;
-    }
-
-    public set ignore_connected(value: boolean) {
-        if (this.id) {
-            throw new Error('Ignore connected cannot be changed from it\'s initial value');
-        }
-        this.change('ignore_connected', value);
-    }
     /** Whether the associated hardware is connected */
     public readonly connected: boolean;
     /** Whether the module driver is running */
     public readonly running: boolean;
     /** Timestamp of last update in ms since UTC epoch */
     public readonly updated_at: number;
-    /** System associated with the module */
-    public readonly system?: EngineSystem;
+    /** ID of the driver associated with the module */
+    public readonly dependency_id: string;
     /** Driver/dependancy associated with the module */
     public readonly driver?: EngineDriver;
+    /** ID of the system associated with the module */
+    public readonly control_system_id: string;
+    /** System associated with the module */
+    public readonly system?: EngineSystem;
+    /** ID of the edge node associated with the module */
+    public readonly edge_id: string;
+    /** IP address of the hardware associated with the module */
+    public readonly ip: string;
+    /** Whether the hardware connection requires TLS */
+    public readonly tls: boolean;
+    /** Whether the hardware connection is over UDP */
+    public readonly udp: boolean;
+    /** Port number connections to the hardware are made on */
+    public readonly port: number;
+    /**  */
+    public readonly makebreak: boolean;
+    /** URI associated with the module */
+    public readonly uri: string;
+    /** Custom name of the module */
+    public readonly custom_name: string;
+    /** Type of module */
+    public readonly role: EngineDriverRole;
+    /** Notes associated with the module */
+    public readonly notes: string;
+    /** Ignore connection issues */
+    public readonly ignore_connected: boolean;
     /** Map of user settings for the system */
     public settings: EngineSettings;
 
-    /** ID of the driver associated with the module */
-    private _dependency_id: string;
-    /** ID of the system associated with the module */
-    private _control_system_id: string;
-    /** ID of the edge node associated with the module */
-    private _edge_id: string;
-    /** IP address of the hardware associated with the module */
-    private _ip: string;
-    /** Whether the hardware connection requires TLS */
-    private _tls: boolean;
-    /** Whether the hardware connection is over UDP */
-    private _udp: boolean;
-    /** Port number connections to the hardware are made on */
-    private _port: number;
-    /**  */
-    private _makebreak: boolean;
-    /** URI associated with the module */
-    private _uri: string;
-    /** Custom name of the module */
-    private _custom_name: string;
-    /** Type of module */
-    private _role: EngineDriverRole;
-    /** Notes associated with the module */
-    private _notes: string;
-    /** Ignore connection issues */
-    private _ignore_connected: boolean;
-
     constructor(protected _service: EngineModulesService, raw_data: HashMap) {
         super(_service, raw_data);
-        this._dependency_id = raw_data.dependency_id;
-        this._control_system_id = raw_data.control_system_id;
-        this._edge_id = raw_data.edge_id;
-        this._ip = raw_data.ip;
-        this._tls = raw_data.tls;
-        this._udp = raw_data.udp;
-        this._port = raw_data.port;
-        this._makebreak = raw_data.makebreak;
-        this._uri = raw_data.uri;
-        this._custom_name = raw_data.custom_name;
-        this._role = raw_data.role;
-        this._notes = raw_data.notes;
-        this._ignore_connected = raw_data.ignore_connected;
-        this.connected = raw_data.connected;
-        this.running = raw_data.running;
-        this.updated_at = raw_data.updated_at;
+        this.dependency_id = raw_data.dependency_id || '';
+        this.control_system_id = raw_data.control_system_id || '';
+        this.edge_id = raw_data.edge_id || '';
+        this.ip = raw_data.ip || '';
+        this.tls = raw_data.tls || false;
+        this.udp = raw_data.udp || false;
+        this.port = raw_data.port || -1;
+        this.makebreak = raw_data.makebreak || false;
+        this.uri = raw_data.uri || '';
+        this.custom_name = raw_data.custom_name || '';
+        this.role = raw_data.role || EngineDriverRole.Logic;
+        this.notes = raw_data.notes || '';
+        this.ignore_connected = raw_data.ignore_connected || false;
+        this.connected = raw_data.connected || false;
+        this.running = raw_data.running || false;
+        this.updated_at = raw_data.updated_at || 0;
         this.settings = new EngineSettings({} as any, raw_data.settings || { parent_id: this.id });
         this._init_sub = Composer.initialised.subscribe(intitialised => {
             if (intitialised) {
-                this.settings = new EngineSettings(Composer.settings, raw_data.settings || { parent_id: this.id });
+                this.settings = new EngineSettings(
+                    Composer.settings,
+                    raw_data.settings || { parent_id: this.id }
+                );
                 if (this._init_sub) {
                     this._init_sub.unsubscribe();
                 }
             }
         });
         if (raw_data.control_system || raw_data.system) {
-            this.system = new EngineSystem(Composer.systems, raw_data.control_system || raw_data.system);
+            this.system = new EngineSystem(
+                Composer.systems,
+                raw_data.control_system || raw_data.system
+            );
         }
         if (raw_data.dependancy || raw_data.driver) {
-            this.driver = new EngineDriver(Composer.drivers, raw_data.dependency || raw_data.driver);
+            this.driver = new EngineDriver(
+                Composer.drivers,
+                raw_data.dependency || raw_data.driver
+            );
         }
+    }
+
+    public storePendingChange(
+        key: ModuleMutableFields,
+        value: EngineModule[ModuleMutableFields]
+    ): this {
+        return super.storePendingChange(key as any, value);
     }
 
     /**

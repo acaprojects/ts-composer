@@ -11,6 +11,10 @@ import { Dayjs, default as _rollupDayjs } from 'dayjs';
  */
 const dayjs = _rollupDayjs || _dayjs;
 
+export const SETTINGS_MUTABLE_FIELDS = ['settings_string'] as const;
+type SettingsMutableTuple = typeof SETTINGS_MUTABLE_FIELDS;
+export type SettingsMutableFields = SettingsMutableTuple[number];
+
 export class EngineSettings extends EngineResource<EngineSettingsService> {
     /** ID of the parent zone/system/module/driver */
     public readonly parent_id: string;
@@ -23,14 +27,6 @@ export class EngineSettings extends EngineResource<EngineSettingsService> {
     /** Top level keys for the parsed settings */
     public readonly keys: string[];
 
-    /** Content of the settings */
-    public get value(): string {
-        return this.settings_string || '';
-    }
-    public set value(value: string) {
-        this.change('settings_string', value);
-    }
-
     constructor(protected _service: EngineSettingsService, raw_data: HashMap) {
         super(_service, raw_data);
         this.parent_id = raw_data.parent_id || '';
@@ -38,5 +34,12 @@ export class EngineSettings extends EngineResource<EngineSettingsService> {
         this.settings_string = raw_data.settings_string || '';
         this.encryption_level = raw_data.encryption_level || EncryptionLevel.None;
         this.keys = raw_data.keys || [];
+    }
+
+    public storePendingChange(
+        key: SettingsMutableFields,
+        value: EngineSettings[SettingsMutableFields]
+    ): this {
+        return super.storePendingChange(key as any, value);
     }
 }
