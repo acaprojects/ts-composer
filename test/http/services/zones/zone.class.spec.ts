@@ -1,4 +1,4 @@
-import { Composer } from '../../../../src/composer';
+import { ACAEngine } from '../../../../src/acaengine';
 import { EngineSettings } from '../../../../src/http/services/settings/settings.class';
 import { EngineZone } from '../../../../src/http/services/zones/zone.class';
 
@@ -19,7 +19,7 @@ describe('EngineZone', () => {
             triggers: ['trig-001'],
             created_at: 999
         });
-        (Composer as any)._initialised.next(true);
+        (ACAEngine as any)._initialised.next(true);
     });
 
     it('should create instance', () => {

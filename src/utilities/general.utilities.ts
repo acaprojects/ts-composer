@@ -31,15 +31,15 @@ export function log(
         const COLOURS = ['color: #0288D1', `color:${clr}`, 'color: default'];
         if (args) {
             if (consoleHasColours()) {
-                console[out](`%c[COMPOSER]%c[${type}] %c${msg}`, ...COLOURS, args);
+                console[out](`%c[ACAEngine]%c[${type}] %c${msg}`, ...COLOURS, args);
             } else {
-                console[out](`[COMPOSER][${type}] ${msg}`, args);
+                console[out](`[ACAEngine][${type}] ${msg}`, args);
             }
         } else {
             if (consoleHasColours()) {
-                console[out](`%c[COMPOSER]%c[${type}] %c${msg}`, ...COLOURS);
+                console[out](`%c[ACAEngine]%c[${type}] %c${msg}`, ...COLOURS);
             } else {
-                console[out](`[COMPOSER][${type}] ${msg}`);
+                console[out](`[ACAEngine][${type}] ${msg}`);
             }
         }
     }

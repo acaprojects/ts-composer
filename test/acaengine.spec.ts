@@ -1,7 +1,7 @@
 import { of } from 'rxjs';
 
+import { ACAEngine } from '../src/acaengine';
 import { engine } from '../src/auth/auth.service';
-import { Composer } from '../src/composer';
 
 import { EngineAuthority } from '../src/auth/auth.interfaces';
 import { EngineHttpClient } from '../src/http/http.service';
@@ -22,24 +22,24 @@ import { EngineBindingService } from '../src/websocket/binding.service';
 import { MockEngineWebsocket } from '../src/websocket/mock/mock-websocket.class';
 import { EngineWebsocket } from '../src/websocket/websocket.class';
 
-describe('Composer', () => {
+describe('ACAEngine', () => {
     it('constuctor throws error', () => {
-        expect(() => new Composer()).toThrow();
+        expect(() => new ACAEngine()).toThrow();
     });
 
     it('services throw errors before intialisation', () => {
-        expect(() => Composer.auth).toThrow();
-        expect(() => Composer.applications).toThrow();
-        expect(() => Composer.auth_sources).toThrow();
-        expect(() => Composer.bindings).toThrow();
-        expect(() => Composer.domains).toThrow();
-        expect(() => Composer.drivers).toThrow();
-        expect(() => Composer.http).toThrow();
-        expect(() => Composer.modules).toThrow();
-        expect(() => Composer.realtime).toThrow();
-        expect(() => Composer.systems).toThrow();
-        expect(() => Composer.users).toThrow();
-        expect(() => Composer.zones).toThrow();
+        expect(() => ACAEngine.auth).toThrow();
+        expect(() => ACAEngine.applications).toThrow();
+        expect(() => ACAEngine.auth_sources).toThrow();
+        expect(() => ACAEngine.bindings).toThrow();
+        expect(() => ACAEngine.domains).toThrow();
+        expect(() => ACAEngine.drivers).toThrow();
+        expect(() => ACAEngine.http).toThrow();
+        expect(() => ACAEngine.modules).toThrow();
+        expect(() => ACAEngine.realtime).toThrow();
+        expect(() => ACAEngine.systems).toThrow();
+        expect(() => ACAEngine.users).toThrow();
+        expect(() => ACAEngine.zones).toThrow();
     });
 
     describe('services', () => {
@@ -58,11 +58,11 @@ describe('Composer', () => {
                 production: false,
                 config: {}
             };
-            window.history.pushState({}, 'Test Composer', '?access_token=hello&expires_in=3600');
+            window.history.pushState({}, 'Test ACAEngine', '?access_token=hello&expires_in=3600');
             spy = jest.spyOn(engine.ajax, 'get');
             spy.mockImplementation(() => of({ response: authority }));
             jest.useFakeTimers();
-            Composer.init({
+            ACAEngine.init({
                 auth_uri: '/auth/oauth/authorize',
                 token_uri: '/auth/token',
                 redirect_uri: 'http://localhost:8080/oauth-resp.html',
@@ -76,28 +76,28 @@ describe('Composer', () => {
         });
 
         it('should initialise', () => {
-            expect(Composer.is_initialised).toBe(true);
+            expect(ACAEngine.is_initialised).toBe(true);
         });
 
         it('should expose realtime API services', () => {
-            expect(Composer.bindings).toBeInstanceOf(EngineBindingService);
-            expect(Composer.realtime).toBeInstanceOf(EngineWebsocket);
+            expect(ACAEngine.bindings).toBeInstanceOf(EngineBindingService);
+            expect(ACAEngine.realtime).toBeInstanceOf(EngineWebsocket);
         });
 
         it('should expose HTTP API services', () => {
-            expect(Composer.http).toBeInstanceOf(EngineHttpClient);
-            expect(Composer.applications).toBeInstanceOf(EngineApplicationsService);
-            expect(Composer.auth_sources).toBeInstanceOf(EngineAuthSourcesService);
-            expect(Composer.domains).toBeInstanceOf(EngineDomainsService);
-            expect(Composer.drivers).toBeInstanceOf(EngineDriversService);
-            expect(Composer.modules).toBeInstanceOf(EngineModulesService);
-            expect(Composer.repositories).toBeInstanceOf(EngineRepositoriesService);
-            expect(Composer.settings).toBeInstanceOf(EngineSettingsService);
-            expect(Composer.systems).toBeInstanceOf(EngineSystemsService);
-            expect(Composer.system_triggers).toBeInstanceOf(EngineSystemTriggersService);
-            expect(Composer.triggers).toBeInstanceOf(EngineTriggersService);
-            expect(Composer.users).toBeInstanceOf(EngineUsersService);
-            expect(Composer.zones).toBeInstanceOf(EngineZonesService);
+            expect(ACAEngine.http).toBeInstanceOf(EngineHttpClient);
+            expect(ACAEngine.applications).toBeInstanceOf(EngineApplicationsService);
+            expect(ACAEngine.auth_sources).toBeInstanceOf(EngineAuthSourcesService);
+            expect(ACAEngine.domains).toBeInstanceOf(EngineDomainsService);
+            expect(ACAEngine.drivers).toBeInstanceOf(EngineDriversService);
+            expect(ACAEngine.modules).toBeInstanceOf(EngineModulesService);
+            expect(ACAEngine.repositories).toBeInstanceOf(EngineRepositoriesService);
+            expect(ACAEngine.settings).toBeInstanceOf(EngineSettingsService);
+            expect(ACAEngine.systems).toBeInstanceOf(EngineSystemsService);
+            expect(ACAEngine.system_triggers).toBeInstanceOf(EngineSystemTriggersService);
+            expect(ACAEngine.triggers).toBeInstanceOf(EngineTriggersService);
+            expect(ACAEngine.users).toBeInstanceOf(EngineUsersService);
+            expect(ACAEngine.zones).toBeInstanceOf(EngineZonesService);
         });
     });
 
@@ -117,11 +117,11 @@ describe('Composer', () => {
                 production: false,
                 config: {}
             };
-            window.history.pushState({}, 'Test Composer', '?access_token=hello&expires_in=3600');
+            window.history.pushState({}, 'Test ACAEngine', '?access_token=hello&expires_in=3600');
             spy = jest.spyOn(engine.ajax, 'get');
             spy.mockImplementation(() => of({ response: authority }));
             jest.useFakeTimers();
-            Composer.init({
+            ACAEngine.init({
                 auth_uri: '/auth/oauth/authorize',
                 token_uri: '/auth/token',
                 redirect_uri: 'http://localhost:8080/oauth-resp.html',
@@ -136,8 +136,8 @@ describe('Composer', () => {
         });
 
         it('should be using mock services', () => {
-            expect(Composer.http).toBeInstanceOf(MockEngineHttpClient);
-            expect(Composer.realtime).toBeInstanceOf(MockEngineWebsocket);
+            expect(ACAEngine.http).toBeInstanceOf(MockEngineHttpClient);
+            expect(ACAEngine.realtime).toBeInstanceOf(MockEngineWebsocket);
         });
     });
 });

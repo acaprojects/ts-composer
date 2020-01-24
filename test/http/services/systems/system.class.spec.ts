@@ -1,4 +1,4 @@
-import { Composer } from '../../../../src/composer';
+import { ACAEngine } from '../../../../src/acaengine';
 import { EngineSettings } from '../../../../src/http/services/settings/settings.class';
 import { EngineSystem } from '../../../../src/http/services/systems/system.class';
 
@@ -30,7 +30,7 @@ describe('EngineSystem', () => {
             zones,
             settings: { settings_string: '{ test: 1 }' }
         });
-        (Composer as any)._initialised.next(true);
+        (ACAEngine as any)._initialised.next(true);
     });
 
     it('should create instance', () => {

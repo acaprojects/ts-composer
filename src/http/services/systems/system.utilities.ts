@@ -16,7 +16,7 @@ export function generateMockSystem(overrides: any = {}) {
         id,
         name: `System ${Math.floor(Math.random() * 999_999)}`,
         description: ``,
-        email: `${id}@acaprojects.com`,
+        email: `${id}@acaengine.com`,
         capacity: Math.floor(Math.random() * 11 + 1) * 2,
         features: 'VC',
         bookable: Math.floor(Math.random() * 99999999) % 2 === 0,

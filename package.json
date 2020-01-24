@@ -1,16 +1,16 @@
 {
-  "name": "@acaprojects/ts-composer",
+  "name": "@acaengine/ts-client",
   "version": "0.0.0-development",
   "description": "",
   "keywords": [],
-  "main": "dist/ts-composer.umd.js",
-  "module": "dist/ts-composer.es5.js",
-  "typings": "dist/types/ts-composer.d.ts",
+  "main": "dist/ts-client.umd.js",
+  "module": "dist/ts-client.es5.js",
+  "typings": "dist/types/ts-client.d.ts",
   "files": [
     "dist"
   ],
   "private": false,
-  "author": "Alex Sorafumo <alex@acaprojects.com>",
+  "author": "Alex Sorafumo <alex@acaengine.com>",
   "repository": {
     "type": "git",
     "url": "https://github.com/acaengine/ts-client.git"

@@ -11,7 +11,7 @@ describe('EngineTrigger', () => {
     let service: any;
     const actions: TriggerActions = {
         functions: [{ mod: 'mod-42', method: 'meaning', args: { purpose: 'what' } }],
-        mailers: [{ emails: ['support@acaprojects.net'], content: 'Here be some contents' }]
+        mailers: [{ emails: ['support@acaengine.net'], content: 'Here be some contents' }]
     };
     const conditions: TriggerConditions = {
         comparisons: [],

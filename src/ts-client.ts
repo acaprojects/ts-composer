@@ -1,6 +1,6 @@
 /* istanbul ignore file */
 
-export * from './composer';
+export * from './acaengine';
 
 export * from './auth/auth.service';
 export * from './auth/auth.interfaces';

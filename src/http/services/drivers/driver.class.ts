@@ -1,4 +1,4 @@
-import { Composer } from '../../../composer';
+import { ACAEngine } from '../../../acaengine';
 import { HashMap } from '../../../utilities/types.utilities';
 import { EngineResource } from '../resources/resource.class';
 import { EngineSettings } from '../settings/settings.class';
@@ -37,9 +37,9 @@ export class EngineDriver extends EngineResource<EngineDriversService> {
         this.ignore_connected = raw_data.ignore_connected || false;
         this.class_name = raw_data.class_name || '';
         this.settings = new EngineSettings({} as any, raw_data.settings || { parent_id: this.id });
-        this._init_sub = Composer.initialised.subscribe(intitialised => {
+        this._init_sub = ACAEngine.initialised.subscribe(intitialised => {
             if (intitialised) {
-                this.settings = new EngineSettings(Composer.settings, raw_data.settings || { parent_id: this.id });
+                this.settings = new EngineSettings(ACAEngine.settings, raw_data.settings || { parent_id: this.id });
                 if (this._init_sub) {
                     this._init_sub.unsubscribe();
                 }

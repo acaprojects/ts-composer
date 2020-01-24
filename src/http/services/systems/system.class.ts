@@ -1,4 +1,5 @@
-import { Composer } from '../../../composer';
+
+import { ACAEngine } from '../../../acaengine';
 import { HashMap } from '../../../utilities/types.utilities';
 import { EngineResource } from '../resources/resource.class';
 import { EngineSettings } from '../settings/settings.class';
@@ -54,10 +55,10 @@ export class EngineSystem extends EngineResource<EngineSystemsService> {
         this.modules = raw_data.modules || [];
         this.zones = raw_data.zones || [];
         this.settings = new EngineSettings({} as any, raw_data.settings || { parent_id: this.id });
-        this._init_sub = Composer.initialised.subscribe(intitialised => {
+        this._init_sub = ACAEngine.initialised.subscribe(intitialised => {
             if (intitialised) {
                 this.settings = new EngineSettings(
-                    Composer.settings,
+                    ACAEngine.settings,
                     raw_data.settings || { parent_id: this.id }
                 );
                 if (this._init_sub) {

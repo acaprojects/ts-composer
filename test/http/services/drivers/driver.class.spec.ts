@@ -1,4 +1,4 @@
-import { Composer } from '../../../../src/composer';
+import { ACAEngine } from '../../../../src/acaengine';
 import { EngineDriver } from '../../../../src/http/services/drivers/driver.class';
 import { EngineDriverRole } from '../../../../src/http/services/drivers/drivers.enums';
 import { EngineSettings } from '../../../../src/http/services/settings/settings.class';
@@ -24,7 +24,7 @@ describe('EngineDriver', () => {
             class_name: '::ACA::SolveProblem',
             created_at: 999
         });
-        (Composer as any)._initialised.next(true);
+        (ACAEngine as any)._initialised.next(true);
     });
 
     it('should create instance', () => {

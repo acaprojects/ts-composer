@@ -1,4 +1,4 @@
-import { Composer } from '../../../../src/composer';
+import { ACAEngine } from '../../../../src/acaengine';
 import { EngineDriverRole } from '../../../../src/http/services/drivers/drivers.enums';
 import { EngineModule } from '../../../../src/http/services/modules/module.class';
 import { EngineSettings } from '../../../../src/http/services/settings/settings.class';
@@ -37,7 +37,7 @@ describe('EngineModule', () => {
             notes: 'Clone wars',
             ignore_connected: false
         });
-        (Composer as any)._initialised.next(true);
+        (ACAEngine as any)._initialised.next(true);
     });
 
     it('should create instance', () => {

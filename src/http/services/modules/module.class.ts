@@ -1,4 +1,4 @@
-import { Composer } from '../../../composer';
+import { ACAEngine } from '../../../acaengine';
 import { HashMap } from '../../../utilities/types.utilities';
 import { EngineDriver } from '../drivers/driver.class';
 import { EngineDriverRole } from '../drivers/drivers.enums';
@@ -87,10 +87,10 @@ export class EngineModule extends EngineResource<EngineModulesService> {
         this.running = raw_data.running || false;
         this.updated_at = raw_data.updated_at || 0;
         this.settings = new EngineSettings({} as any, raw_data.settings || { parent_id: this.id });
-        this._init_sub = Composer.initialised.subscribe(intitialised => {
+        this._init_sub = ACAEngine.initialised.subscribe(intitialised => {
             if (intitialised) {
                 this.settings = new EngineSettings(
-                    Composer.settings,
+                    ACAEngine.settings,
                     raw_data.settings || { parent_id: this.id }
                 );
                 if (this._init_sub) {
@@ -100,13 +100,13 @@ export class EngineModule extends EngineResource<EngineModulesService> {
         });
         if (raw_data.control_system || raw_data.system) {
             this.system = new EngineSystem(
-                Composer.systems,
+                ACAEngine.systems,
                 raw_data.control_system || raw_data.system
             );
         }
         if (raw_data.dependancy || raw_data.driver) {
             this.driver = new EngineDriver(
-                Composer.drivers,
+                ACAEngine.drivers,
                 raw_data.dependency || raw_data.driver
             );
         }

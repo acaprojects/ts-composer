@@ -26,19 +26,19 @@ import { EngineUsersService } from './http/services/users/users.service';
 import { EngineZonesService } from './http/services/zones/zones.service';
 import { EngineWebsocketOptions } from './websocket/websocket.interfaces';
 
-export interface ComposerOptions extends EngineAuthOptions {
+export interface ACAEngineOptions extends EngineAuthOptions {
     /** Whether to use https/wss protocols */
     secure?: boolean;
 }
 
-export class Composer {
+export class ACAEngine {
 
-    /** HTTP Client for making request with composer credentials */
+    /** HTTP Client for making request with ACAEngine credentials */
     public static get http(): EngineHttpClient {
         return this.checkProperty(this._http);
     }
 
-    /** Authentication service for Composer */
+    /** Authentication service for ACAEngine */
     public static get auth(): EngineAuthService {
         return this.checkProperty(this._auth_service);
     }
@@ -111,21 +111,21 @@ export class Composer {
         return this.checkProperty(this._zones);
     }
 
-    /** Observable for the intialised state of composer */
+    /** Observable for the intialised state of ACAEngine */
     public static get initialised(): Observable<boolean> {
         return this._initialised.asObservable();
     }
 
-    /** Intialised state of composer */
+    /** Intialised state of ACAEngine */
     public static get is_initialised(): boolean {
         return this._initialised.getValue();
     }
 
     /**
-     * Initialise composer services
+     * Initialise ACAEngine services
      * @param options
      */
-    public static init(options: ComposerOptions) {
+    public static init(options: ACAEngineOptions) {
         this.clear();
         this._auth_service = new EngineAuthService(options);
         this._sub = this._auth_service.online_state.subscribe(state => {
@@ -166,11 +166,11 @@ export class Composer {
             }
         });
     }
-    /** Subject for the initialised state of composer */
+    /** Subject for the initialised state of ACAEngine */
     private static _initialised = new BehaviorSubject(false);
-    /** HTTP Client for request with composer credentials */
+    /** HTTP Client for request with ACAEngine credentials */
     private static _http: EngineHttpClient;
-    /** Authentication service for Composer */
+    /** Authentication service for ACAEngine */
     private static _auth_service: EngineAuthService;
     /** Service for binding to engine's realtime API */
     private static _binding_service: EngineBindingService;
@@ -239,7 +239,7 @@ export class Composer {
     private static checkProperty<T>(prop: T) {
         if (!prop) {
             throw new Error(
-                'Composer hasn\'t been initialised yet. Call `Composer.init` to initialise composer'
+                'ACAEngine hasn\'t been initialised yet. Call `ACAEngine.init` to initialise ACAEngine'
             );
         }
         return prop;
