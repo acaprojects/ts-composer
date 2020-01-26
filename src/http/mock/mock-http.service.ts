@@ -62,7 +62,7 @@ export class MockEngineHttpClient extends EngineHttpClient {
         path: string,
         data: any,
         method: HttpVerb = 'GET',
-        callback?: (handler: MockHttpRequest<T>) => T
+        callback?: (handler: MockHttpRequest<T>) => any
     ) {
         const key = `${method}|${path}`;
         if (this._handlers[key]) {
