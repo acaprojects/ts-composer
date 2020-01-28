@@ -11,9 +11,12 @@ import { Dayjs, default as _rollupDayjs } from 'dayjs';
  */
 const dayjs = _rollupDayjs || _dayjs;
 
-export const SETTINGS_MUTABLE_FIELDS = ['settings_string'] as const;
+export const SETTINGS_MUTABLE_FIELDS = ['settings_string', 'encryption_level'] as const;
 type SettingsMutableTuple = typeof SETTINGS_MUTABLE_FIELDS;
 export type SettingsMutableFields = SettingsMutableTuple[number];
+
+/** List of property keys that can only be set when creating a new object */
+const NON_EDITABLE_FIELDS = ['encryption_level'];
 
 export class EngineSettings extends EngineResource<EngineSettingsService> {
     /** ID of the parent zone/system/module/driver */
@@ -45,6 +48,9 @@ export class EngineSettings extends EngineResource<EngineSettingsService> {
         key: SettingsMutableFields,
         value: EngineSettings[SettingsMutableFields]
     ): this {
+        if (this.id && this.parent_id && NON_EDITABLE_FIELDS.indexOf(key) >= 0) {
+            throw new Error(`Property "${key}" is not editable.`);
+        }
         return super.storePendingChange(key as any, value);
     }
 }
