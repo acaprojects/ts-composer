@@ -55,7 +55,7 @@ export class EngineVariableBinding {
         if (this._binding_count <= 0) {
             this._service.engine.bind(this.binding()).then(() => {
                 this._binding_count++;
-            });
+            }, _ => null);
         }
         return () => this.unbind();
     }
@@ -67,7 +67,7 @@ export class EngineVariableBinding {
         if (this._binding_count === 1) {
             this._service.engine.unbind(this.binding()).then(() => {
                 this._binding_count--;
-            });
+            }, _ => null);
         } else {
             this._binding_count--;
             if (this._binding_count < 0) {
