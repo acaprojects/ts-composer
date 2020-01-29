@@ -3,6 +3,7 @@ import { first } from 'rxjs/operators';
 
 import { ACAEngine } from '../../../acaengine';
 import { HashMap } from '../../../utilities/types.utilities';
+import { EngineModule } from '../modules/module.class';
 import { EngineResource } from '../resources/resource.class';
 import { EngineSettings } from '../settings/settings.class';
 import { EngineSystemsService } from './systems.service';
@@ -44,6 +45,8 @@ export class EngineSystem extends EngineResource<EngineSystemsService> {
     public readonly modules: readonly string[];
     /** List of the zone IDs that the system belongs */
     public readonly zones: readonly string[];
+    /** List of modules associated with the system. Only available from the show method with the `complete` query parameter */
+    public module_list: readonly EngineModule[] = [];
 
     constructor(protected _service: EngineSystemsService, raw_data: HashMap) {
         super(_service, raw_data);
@@ -62,6 +65,9 @@ export class EngineSystem extends EngineResource<EngineSystemsService> {
                 ACAEngine.settings,
                 raw_data.settings || { parent_id: this.id }
             );
+            if (raw_data.module_data && raw_data.module_data instanceof Array) {
+                this.module_list = raw_data.module_data.map(mod => new EngineModule(ACAEngine.modules, mod));
+            }
         });
     }
 

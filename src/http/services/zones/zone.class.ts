@@ -5,6 +5,7 @@ import { ACAEngine } from '../../../acaengine';
 import { HashMap } from '../../../utilities/types.utilities';
 import { EngineResource } from '../resources/resource.class';
 import { EngineSettings } from '../settings/settings.class';
+import { EngineTrigger } from '../triggers/trigger.class';
 import { EngineZonesService } from './zones.service';
 
 export const ZONE_MUTABLE_FIELDS = ['name', 'description', 'triggers', 'tags'] as const;
@@ -20,6 +21,8 @@ export class EngineZone extends EngineResource<EngineZonesService> {
     public readonly triggers: readonly string[];
     /** List of tags associated with the zone */
     public readonly tags: string;
+    /** List of modules associated with the system. Only available from the show method with the `complete` query parameter */
+    public trigger_list: readonly EngineTrigger[] = [];
 
     constructor(protected _service: EngineZonesService, raw_data: HashMap) {
         super(_service, raw_data);
@@ -32,6 +35,9 @@ export class EngineZone extends EngineResource<EngineZonesService> {
                 ACAEngine.settings,
                 raw_data.settings || { parent_id: this.id }
             );
+            if (raw_data.trigger_data && raw_data.trigger_data instanceof Array) {
+                this.trigger_list = raw_data.trigger_data.map(trigger => new EngineTrigger(ACAEngine.triggers, trigger));
+            }
         });
     }
 
