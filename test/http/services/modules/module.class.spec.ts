@@ -64,6 +64,7 @@ describe('EngineModule', () => {
 
     it('should expose system id', () => {
         expect(module.control_system_id).toBe('sys-001');
+        expect(module.system_id).toBe('sys-001');
     });
 
     it('should allow setting system id on new modules', () => {

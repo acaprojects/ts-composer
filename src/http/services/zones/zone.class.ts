@@ -1,3 +1,6 @@
+
+import { first } from 'rxjs/operators';
+
 import { ACAEngine } from '../../../acaengine';
 import { HashMap } from '../../../utilities/types.utilities';
 import { EngineResource } from '../resources/resource.class';
@@ -24,20 +27,15 @@ export class EngineZone extends EngineResource<EngineZonesService> {
         this.tags = raw_data.tags || '';
         this.triggers = raw_data.triggers || [];
         this.settings = new EngineSettings({} as any, raw_data.settings || { parent_id: this.id });
-        this._init_sub = ACAEngine.initialised.subscribe(intitialised => {
-            if (intitialised) {
-                this.settings = new EngineSettings(ACAEngine.settings, raw_data.settings || { parent_id: this.id });
-                if (this._init_sub) {
-                    this._init_sub.unsubscribe();
-                }
-            }
+        ACAEngine.initialised.pipe(first(has_inited => has_inited)).subscribe(() => {
+            this.settings = new EngineSettings(
+                ACAEngine.settings,
+                raw_data.settings || { parent_id: this.id }
+            );
         });
     }
 
-    public storePendingChange(
-        key: ZoneMutableFields,
-        value: EngineZone[ZoneMutableFields]
-    ): this {
+    public storePendingChange(key: ZoneMutableFields, value: EngineZone[ZoneMutableFields]): this {
         return super.storePendingChange(key as any, value);
     }
 }

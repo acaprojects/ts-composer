@@ -1,3 +1,6 @@
+
+import { first } from 'rxjs/operators';
+
 import { ACAEngine } from '../../../acaengine';
 import { HashMap } from '../../../utilities/types.utilities';
 import { EngineResource } from '../resources/resource.class';
@@ -5,7 +8,14 @@ import { EngineSettings } from '../settings/settings.class';
 import { EngineDriverRole } from './drivers.enums';
 import { EngineDriversService } from './drivers.service';
 
-export const DRIVER_MUTABLE_FIELDS = ['name', 'description', 'module_name', 'role', 'default', 'ignore_connected'] as const;
+export const DRIVER_MUTABLE_FIELDS = [
+    'name',
+    'description',
+    'module_name',
+    'role',
+    'default',
+    'ignore_connected'
+] as const;
 type DriverMutableTuple = typeof DRIVER_MUTABLE_FIELDS;
 export type DriverMutableFields = DriverMutableTuple[number];
 
@@ -37,13 +47,11 @@ export class EngineDriver extends EngineResource<EngineDriversService> {
         this.ignore_connected = raw_data.ignore_connected || false;
         this.class_name = raw_data.class_name || '';
         this.settings = new EngineSettings({} as any, raw_data.settings || { parent_id: this.id });
-        this._init_sub = ACAEngine.initialised.subscribe(intitialised => {
-            if (intitialised) {
-                this.settings = new EngineSettings(ACAEngine.settings, raw_data.settings || { parent_id: this.id });
-                if (this._init_sub) {
-                    this._init_sub.unsubscribe();
-                }
-            }
+        ACAEngine.initialised.pipe(first(has_inited => has_inited)).subscribe(() => {
+            this.settings = new EngineSettings(
+                ACAEngine.settings,
+                raw_data.settings || { parent_id: this.id }
+            );
         });
     }
 

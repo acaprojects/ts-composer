@@ -205,6 +205,7 @@ export class EngineAuthService {
                                 engine.log('Auth', 'Users has session. Authorising application...');
                                 // Generate tokens
                                 const login_url = this.createLoginURL(state);
+                                /* istanbul ignore else */
                                 if (localStorage) {
                                     localStorage.setItem('oauth_redirect', location.href);
                                 }
@@ -212,10 +213,11 @@ export class EngineAuthService {
                                 delete this._promises.authorise;
                             } else {
                                 engine.log('Auth', 'No user session');
+                                /* istanbul ignore else */
                                 if (this.options.handle_login !== false) {
                                     engine.log('Auth', 'Redirecting to login page...');
                                     // Redirect to login form
-                                    const url = (authority.login_url || '').replace(
+                                    const url = authority.login_url.replace(
                                         '{{url}}',
                                         encodeURIComponent(location.href)
                                     );

@@ -1,3 +1,6 @@
+
+import { first } from 'rxjs/operators';
+
 import { ACAEngine } from '../../../acaengine';
 import { HashMap } from '../../../utilities/types.utilities';
 import { EngineDriver } from '../drivers/driver.class';
@@ -87,16 +90,11 @@ export class EngineModule extends EngineResource<EngineModulesService> {
         this.running = raw_data.running || false;
         this.updated_at = raw_data.updated_at || 0;
         this.settings = new EngineSettings({} as any, raw_data.settings || { parent_id: this.id });
-        this._init_sub = ACAEngine.initialised.subscribe(intitialised => {
-            if (intitialised) {
-                this.settings = new EngineSettings(
-                    ACAEngine.settings,
-                    raw_data.settings || { parent_id: this.id }
-                );
-                if (this._init_sub) {
-                    this._init_sub.unsubscribe();
-                }
-            }
+        ACAEngine.initialised.pipe(first(has_inited => has_inited)).subscribe(() => {
+            this.settings = new EngineSettings(
+                ACAEngine.settings,
+                raw_data.settings || { parent_id: this.id }
+            );
         });
         if (raw_data.control_system || raw_data.system) {
             this.system = new EngineSystem(
