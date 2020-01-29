@@ -22,6 +22,10 @@ describe('EngineResource', () => {
         expect(resource.id).toBe('test');
     });
 
+    it('should error if changes to invalid property stored', () => {
+        expect(() => resource.storePendingChange('id', true)).toThrowError();
+    });
+
     it('should expose name', () => {
         expect(resource.name).toBe('Test');
     });

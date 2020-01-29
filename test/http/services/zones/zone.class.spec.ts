@@ -12,12 +12,15 @@ describe('EngineZone', () => {
             remove: jest.fn(),
             update: jest.fn()
         };
+        jest.spyOn(ACAEngine, 'settings', 'get').mockReturnValue(null as any);
+        jest.spyOn(ACAEngine, 'triggers', 'get').mockReturnValue(null as any);
         zone = new EngineZone(service, {
             id: 'dep-test',
             description: 'In a galaxy far far away...',
             settings: { settings_string: '{ today: false, future: \'Yeah!\' }' },
             triggers: ['trig-001'],
-            created_at: 999
+            created_at: 999,
+            trigger_data: [{ id: 'trig-01', name: 'A trigger' }]
         });
         (ACAEngine as any)._initialised.next(true);
     });
@@ -25,6 +28,14 @@ describe('EngineZone', () => {
     it('should create instance', () => {
         expect(zone).toBeTruthy();
         expect(zone).toBeInstanceOf(EngineZone);
+    });
+
+    it('should have trigger data', (done) => {
+        setTimeout(() => {
+            expect(zone.trigger_list).toBeTruthy();
+            expect(zone.trigger_list.length).toBe(1);
+            done();
+        }, 1);
     });
 
     it('should expose description', () => {

@@ -21,6 +21,8 @@ describe('EngineModule', () => {
             state: jest.fn(),
             internalState: jest.fn()
         };
+        jest.spyOn(ACAEngine, 'systems', 'get').mockReturnValue(null as any);
+        jest.spyOn(ACAEngine, 'drivers', 'get').mockReturnValue(null as any);
         module = new EngineModule(service, {
             id: 'mod_test',
             dependency_id: 'dep-001',
@@ -35,7 +37,9 @@ describe('EngineModule', () => {
             settings: { settings_string: '{ star: \'death\' }' },
             role: EngineDriverRole.Device,
             notes: 'Clone wars',
-            ignore_connected: false
+            ignore_connected: false,
+            control_system: { id: 'sys-001', name: 'A System' },
+            driver: { id: 'dep-001', name: 'A Driver' }
         });
         (ACAEngine as any)._initialised.next(true);
     });

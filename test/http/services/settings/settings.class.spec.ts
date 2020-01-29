@@ -2,6 +2,7 @@ import { EngineSettings } from '../../../../src/http/services/settings/settings.
 import { generateMockSettings } from '../../../../src/http/services/settings/settings.utilities';
 
 import * as dayjs from 'dayjs';
+import { EncryptionLevel } from '../../../../src/http/services/settings/settings.interfaces';
 
 describe('EngineSettings', () => {
     let settings: EngineSettings;
@@ -37,12 +38,17 @@ describe('EngineSettings', () => {
 
     it('should expose settings value', () => {
         expect(settings.settings_string).toBe(item.settings_string);
+        expect(settings.value).toBe(item.settings_string);
     });
 
     it('should allow changing the settings value', () => {
         settings.storePendingChange('settings_string', 'another-setting');
         expect(settings.settings_string).not.toBe('another-setting');
         expect(settings.changes.settings_string).toBe('another-setting');
+    });
+
+    it('should error when trying to change non-editable fields', () => {
+        expect(() => settings.storePendingChange('encryption_level', EncryptionLevel.Admin)).toThrowError();
     });
 
     it('should expose top level keys', () => {
