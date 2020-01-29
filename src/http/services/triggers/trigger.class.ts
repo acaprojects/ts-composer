@@ -42,8 +42,15 @@ export class EngineTrigger extends EngineResource<
     public readonly enable_webhook: boolean;
     /** HTTP verbs supported by the webhook */
     public readonly supported_methods: readonly HttpVerb[];
-    /** System associated with the trigger */
-    public readonly system_id: string;
+    /** ID of the system associated with the trigger */
+    public readonly control_system_id: string;
+    /** ID of the zone associated with the trigger */
+    public readonly zone_id: string;
+
+    /** ID of the system associated with the trigger */
+    public get system_id(): string {
+        return this.control_system_id;
+    }
 
     /** Actions to perform when the trigger is activated */
     public get actions(): TriggerActions {
@@ -84,7 +91,8 @@ export class EngineTrigger extends EngineResource<
         this.debounce_period = raw_data.debounce_period || -1;
         this.important = raw_data.important || false;
         this.enabled = raw_data.enabled || false;
-        this.system_id = raw_data.system_id || raw_data.control_system_id || '';
+        this.control_system_id = raw_data.system_id || raw_data.control_system_id || '';
+        this.zone_id = raw_data.zone_id || '';
         this.system_name =
             raw_data.system_name || (raw_data.control_system ? raw_data.control_system.name : '');
         this.enable_webhook = raw_data.enable_webhook || false;

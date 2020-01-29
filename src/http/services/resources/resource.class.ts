@@ -122,6 +122,8 @@ export abstract class EngineResource<T extends ResourceService<any>> {
         delete obj._changes;
         delete obj._init_sub;
         delete obj._server_names;
+        /** Remove not data public members */
+        delete obj.changeEvents;
         const keys = Object.keys(obj);
         for (const key of keys) {
             if (key[0] === '_') {
