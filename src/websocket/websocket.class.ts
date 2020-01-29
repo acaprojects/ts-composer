@@ -1,11 +1,13 @@
-import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 
 import {
     EngineCommandRequest,
     EngineCommandRequestMetadata,
+    EngineDebugEvent,
     EngineErrorCodes,
     EngineExecRequestOptions,
+    EngineLogLevel,
     EngineRequestOptions,
     EngineResponse,
     EngineWebsocketOptions,
@@ -27,6 +29,8 @@ let REQUEST_COUNT = 0;
 export let engine_socket = { websocket: webSocket, log };
 
 export class EngineWebsocket {
+    /** Listener for debugging events */
+    public readonly debug_events = new Subject<EngineDebugEvent>();
     /** Websocket for connecting to engine */
     protected websocket: WebSocketSubject<any> | undefined;
     /** Request promises */
@@ -192,6 +196,12 @@ export class EngineWebsocket {
                 this.handleSuccess(message);
             } else if (message.type === 'debug') {
                 engine_socket.log('WS', `[DEBUG] ${message.mod}${message.klass} →`, message.msg);
+                this.debug_events.next({
+                    module: message.mod || '<empty>',
+                    class_name: message.klass || '<empty>',
+                    message: message.msg || '<empty>',
+                    level: message.level || EngineLogLevel.Debug
+                });
             } else if (message.type === 'error') {
                 this.handleError(message);
             } else if (!(message as any).cmd) {

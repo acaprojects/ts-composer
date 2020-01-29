@@ -6,6 +6,7 @@ import { EngineSettings } from '../../../../src/http/services/settings/settings.
 describe('EngineModule', () => {
     let module: EngineModule;
     let service: any;
+    let realtime: any;
     const features: string[] = ['test', 'device', 'here'];
     const modules: string[] = ['test', 'device', 'here'];
     const zones: string[] = ['test', 'device', 'here'];
@@ -21,6 +22,8 @@ describe('EngineModule', () => {
             state: jest.fn(),
             internalState: jest.fn()
         };
+        realtime = { debug: jest.fn(), ignore: jest.fn() };
+        jest.spyOn(ACAEngine, 'realtime', 'get').mockReturnValue(realtime);
         jest.spyOn(ACAEngine, 'systems', 'get').mockReturnValue(null as any);
         jest.spyOn(ACAEngine, 'drivers', 'get').mockReturnValue(null as any);
         module = new EngineModule(service, {
@@ -264,5 +267,14 @@ describe('EngineModule', () => {
         } catch (e) {
             expect(e).not.toEqual(new Error('Failed to error'));
         }
+    });
+
+    it('should allow debugging', () => {
+        const end_fn = module.debug();
+        expect(realtime.debug).toBeCalled();
+        expect(end_fn).toBeInstanceOf(Function);
+        expect(realtime.ignore).not.toBeCalled();
+        end_fn();
+        expect(realtime.ignore).toBeCalled();
     });
 });

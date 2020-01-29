@@ -69,7 +69,7 @@ export interface EngineResponse {
     /** Debug module */
     klass?: string;
     /** Log message level */
-    level?: string;
+    level?: EngineLogLevel;
     /** Debug message */
     msg?: string;
 }
@@ -90,5 +90,23 @@ export interface SimpleNetworkError {
     /** Status code of the error */
     status: number;
     /** Details aboun the error */
+    message: string;
+}
+
+export enum EngineLogLevel {
+    Info = 'info',
+    Debug = 'debug',
+    Warning = 'warn',
+    Error = 'error'
+}
+
+export interface EngineDebugEvent {
+    /** Module associated with the event */
+    module: string;
+    /** Logically class name of the module driver */
+    class_name: string;
+    /** Logging level of the message */
+    level: EngineLogLevel;
+    /** Contents of the debug event */
     message: string;
 }

@@ -17,6 +17,8 @@ describe('EngineSystem', () => {
             remove: jest.fn(),
             update: jest.fn()
         };
+        jest.spyOn(ACAEngine, 'settings', 'get').mockReturnValue(null as any);
+        jest.spyOn(ACAEngine, 'modules', 'get').mockReturnValue(null as any);
         system = new EngineSystem(service, {
             id: 'sys-test',
             description: 'A description',
@@ -28,9 +30,18 @@ describe('EngineSystem', () => {
             support_url: '/support/test',
             modules,
             zones,
+            module_data: [{ id: 'mod-001', name: 'A Module' }],
             settings: { settings_string: '{ test: 1 }' }
         });
         (ACAEngine as any)._initialised.next(true);
+    });
+
+    it('should have module data', (done) => {
+        setTimeout(() => {
+            expect(system.module_list).toBeTruthy();
+            expect(system.module_list.length).toBe(1);
+            done();
+        }, 1);
     });
 
     it('should create instance', () => {

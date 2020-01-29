@@ -32,6 +32,9 @@ export type ModuleMutableFields = ModuleMutableTuple[number];
 /** List of property keys that can only be set when creating a new object */
 const NON_EDITABLE_FIELDS = ['dependency_id', 'control_system_id', 'role'];
 
+/** Function to request the server to stop emitting debug events */
+export type EndDebugFn = () => void;
+
 export class EngineModule extends EngineResource<EngineModulesService> {
     /** Whether the associated hardware is connected */
     public readonly connected: boolean;
@@ -169,5 +172,14 @@ export class EngineModule extends EngineResource<EngineModulesService> {
             throw new Error('You must save the module before it\'s internal state can be grabbed');
         }
         return this._service.internalState(this.id);
+    }
+
+    /**
+     * Request server to start emitting debug events through the realtime API
+     */
+    public debug(): EndDebugFn {
+        const binding_details = { sys: this.control_system_id, mod: this.id, index: 1, name: 'debug' };
+        ACAEngine.realtime.debug(binding_details);
+        return () => ACAEngine.realtime.ignore({ ...binding_details, name: 'ignore' });
     }
 }
