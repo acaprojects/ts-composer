@@ -14,8 +14,14 @@ export * from './http/services/applications/applications.service';
 export * from './http/services/applications/application.interfaces';
 export * from './http/services/applications/application.class';
 
-export * from './http/services/auth-sources/auth-sources.service';
-export * from './http/services/auth-sources/auth-source.class';
+export * from './http/services/oauth-sources/oauth-sources.service';
+export * from './http/services/oauth-sources/oauth-source.class';
+
+export * from './http/services/saml-sources/saml-sources.service';
+export * from './http/services/saml-sources/saml-source.class';
+
+export * from './http/services/ldap-sources/ldap-sources.service';
+export * from './http/services/ldap-sources/ldap-source.class';
 
 export * from './http/services/domains/domains.service';
 export * from './http/services/domains/domain.class';

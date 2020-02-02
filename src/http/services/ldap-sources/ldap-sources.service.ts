@@ -1,22 +1,22 @@
 import { HashMap } from '../../../utilities/types.utilities';
 import { EngineHttpClient } from '../../http.service';
-import { EngineResourceQueryOptions } from '../resources/resources.interface';
+import { EngineAuthSourceQueryOptions } from '../auth-sources/auth-source.interfaces';
 import { EngineResourceService } from '../resources/resources.service';
-import { EngineAuthSource } from './auth-source.class';
+import { EngineLDAPSource } from './ldap-source.class';
 
-export class EngineAuthSourcesService extends EngineResourceService<EngineAuthSource> {
+export class EngineLDAPSourcesService extends EngineResourceService<EngineLDAPSource> {
     /* istanbul ignore next */
     constructor(protected http: EngineHttpClient) {
         super(http);
-        this._name = 'Authentication Source';
-        this._api_route = 'authsources';
+        this._name = 'LDAP Authentication Source';
+        this._api_route = 'ldap_auths';
     }
 
     /**
      * Query the index of the API route associated with this service
      * @param query_params Map of query paramaters to add to the request URL
      */
-    public query(query_params?: EngineResourceQueryOptions) {
+    public query(query_params?: EngineAuthSourceQueryOptions) {
         return super.query(query_params);
     }
 
@@ -25,6 +25,6 @@ export class EngineAuthSourcesService extends EngineResourceService<EngineAuthSo
      * @param item Raw API data
      */
     protected process(item: HashMap) {
-        return new EngineAuthSource(this, item);
+        return new EngineLDAPSource(this, item);
     }
 }

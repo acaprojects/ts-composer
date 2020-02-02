@@ -1,10 +1,10 @@
 import { of } from 'rxjs';
 
-import { EngineAuthSource } from '../../../../src/http/services/auth-sources/auth-source.class';
-import { EngineAuthSourcesService } from '../../../../src/http/services/auth-sources/auth-sources.service';
+import { EngineOAuthSource } from '../../../../src/http/services/oauth-sources/oauth-source.class';
+import { EngineOAuthSourcesService } from '../../../../src/http/services/oauth-sources/oauth-sources.service';
 
 describe('EngineDomainsService', () => {
-    let service: EngineAuthSourcesService;
+    let service: EngineOAuthSourcesService;
     let http: any;
 
     beforeEach(() => {
@@ -15,26 +15,26 @@ describe('EngineDomainsService', () => {
             delete: jest.fn(),
             api_endpoint: '/api/engine/v2'
         };
-        service = new EngineAuthSourcesService(http);
+        service = new EngineOAuthSourcesService(http);
     });
 
     it('should create instance', () => {
         expect(service).toBeTruthy();
-        expect(service).toBeInstanceOf(EngineAuthSourcesService);
+        expect(service).toBeInstanceOf(EngineOAuthSourcesService);
     });
 
     it('allow querying systems index', async () => {
         http.get.mockReturnValueOnce(of({ results: [{ id: 'test' }], total: 10 }));
         const result = await service.query();
-        expect(http.get).toBeCalledWith('/api/engine/v2/authsources');
+        expect(http.get).toBeCalledWith('/api/engine/v2/oauth_auths');
         expect(result).toBeInstanceOf(Array);
-        expect(result[0]).toBeInstanceOf(EngineAuthSource);
+        expect(result[0]).toBeInstanceOf(EngineOAuthSource);
     });
 
     it('allow querying systems show', async () => {
         http.get.mockReturnValueOnce(of({ id: 'test' }));
         const result = await service.show('test');
-        expect(http.get).toBeCalledWith('/api/engine/v2/authsources/test');
-        expect(result).toBeInstanceOf(EngineAuthSource);
+        expect(http.get).toBeCalledWith('/api/engine/v2/oauth_auths/test');
+        expect(result).toBeInstanceOf(EngineOAuthSource);
     });
 });

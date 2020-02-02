@@ -14,7 +14,6 @@ import { MockEngineWebsocket } from './websocket/mock/mock-websocket.class';
 import { EngineWebsocket } from './websocket/websocket.class';
 
 import { EngineApplicationsService } from './http/services/applications/applications.service';
-import { EngineAuthSourcesService } from './http/services/auth-sources/auth-sources.service';
 import { EngineDomainsService } from './http/services/domains/domains.service';
 import { EngineDriversService } from './http/services/drivers/drivers.service';
 import { EngineModulesService } from './http/services/modules/modules.service';
@@ -25,6 +24,10 @@ import { EngineTriggersService } from './http/services/triggers/triggers.service
 import { EngineUsersService } from './http/services/users/users.service';
 import { EngineZonesService } from './http/services/zones/zones.service';
 import { EngineWebsocketOptions } from './websocket/websocket.interfaces';
+
+import { EngineLDAPSourcesService } from './http/services/ldap-sources/ldap-sources.service';
+import { EngineOAuthSourcesService } from './http/services/oauth-sources/oauth-sources.service';
+import { EngineSAMLSourcesService } from './http/services/saml-sources/saml-sources.service';
 
 export interface ACAEngineOptions extends EngineAuthOptions {
     /** Whether to use https/wss protocols */
@@ -58,9 +61,19 @@ export class ACAEngine {
         return this.checkProperty(this._applications);
     }
 
-    /** HTTP service for engine auth sources */
-    public static get auth_sources(): EngineAuthSourcesService {
-        return this.checkProperty(this._auth_sources);
+    /** HTTP service for engine OAuth authentication sources */
+    public static get oauth_sources(): EngineOAuthSourcesService {
+        return this.checkProperty(this._oauth_sources);
+    }
+
+    /** HTTP service for engine SAML authentication sources */
+    public static get saml_sources(): EngineSAMLSourcesService {
+        return this.checkProperty(this._saml_sources);
+    }
+
+    /** HTTP service for engine LDAP authentication sources */
+    public static get ldap_sources(): EngineLDAPSourcesService {
+        return this.checkProperty(this._ldap_sources);
     }
 
     /** HTTP service for engine domains */
@@ -148,7 +161,9 @@ export class ACAEngine {
                         : new MockEngineHttpClient(this._auth_service);
                 // Initialise HTTP services
                 this._applications = new EngineApplicationsService(this._http);
-                this._auth_sources = new EngineAuthSourcesService(this._http);
+                this._oauth_sources = new EngineOAuthSourcesService(this._http);
+                this._saml_sources = new EngineSAMLSourcesService(this._http);
+                this._ldap_sources = new EngineLDAPSourcesService(this._http);
                 this._domains = new EngineDomainsService(this._http);
                 this._drivers = new EngineDriversService(this._http);
                 this._modules = new EngineModulesService(this._http);
@@ -178,8 +193,12 @@ export class ACAEngine {
     private static _websocket: EngineWebsocket;
     /** HTTP service for engine applications */
     private static _applications: EngineApplicationsService;
-    /** HTTP service for engine auth sources */
-    private static _auth_sources: EngineAuthSourcesService;
+    /** HTTP service for engine OAuth authentication sources */
+    private static _oauth_sources: EngineOAuthSourcesService;
+    /** HTTP service for engine SAML authentication sources */
+    private static _saml_sources: EngineSAMLSourcesService;
+    /** HTTP service for engine LDAP authentication sources */
+    private static _ldap_sources: EngineLDAPSourcesService;
     /** HTTP service for engine domains */
     private static _domains: EngineDomainsService;
     /** HTTP service for engine drivers */

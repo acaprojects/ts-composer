@@ -88,7 +88,7 @@ export interface TriggerTimeCondition {
     /** Type of time condition. Either a specific time or cron string */
     type: TriggerTimeConditionType;
     /** Unix epoch in seconds */
-    time?: string;
+    time?: number;
     /** CRON tab string */
     cron?: string;
 }

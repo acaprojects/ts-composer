@@ -15,7 +15,7 @@ describe('EngineTrigger', () => {
     };
     const conditions: TriggerConditions = {
         comparisons: [],
-        time_dependents: [{ type: TriggerTimeConditionType.AT, time: '' }],
+        time_dependents: [{ type: TriggerTimeConditionType.AT, time: 0 }],
     };
 
     beforeEach(() => {

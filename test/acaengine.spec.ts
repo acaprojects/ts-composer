@@ -7,7 +7,6 @@ import { EngineAuthority } from '../src/auth/auth.interfaces';
 import { EngineHttpClient } from '../src/http/http.service';
 import { MockEngineHttpClient } from '../src/http/mock/mock-http.service';
 import { EngineApplicationsService } from '../src/http/services/applications/applications.service';
-import { EngineAuthSourcesService } from '../src/http/services/auth-sources/auth-sources.service';
 import { EngineDomainsService } from '../src/http/services/domains/domains.service';
 import { EngineDriversService } from '../src/http/services/drivers/drivers.service';
 import { EngineModulesService } from '../src/http/services/modules/modules.service';
@@ -22,6 +21,10 @@ import { EngineBindingService } from '../src/websocket/binding.service';
 import { MockEngineWebsocket } from '../src/websocket/mock/mock-websocket.class';
 import { EngineWebsocket } from '../src/websocket/websocket.class';
 
+import { EngineLDAPSourcesService } from '../src/http/services/ldap-sources/ldap-sources.service';
+import { EngineOAuthSourcesService } from '../src/http/services/oauth-sources/oauth-sources.service';
+import { EngineSAMLSourcesService } from '../src/http/services/saml-sources/saml-sources.service';
+
 describe('ACAEngine', () => {
     it('constuctor throws error', () => {
         expect(() => new ACAEngine()).toThrow();
@@ -30,7 +33,9 @@ describe('ACAEngine', () => {
     it('services throw errors before intialisation', () => {
         expect(() => ACAEngine.auth).toThrow();
         expect(() => ACAEngine.applications).toThrow();
-        expect(() => ACAEngine.auth_sources).toThrow();
+        expect(() => ACAEngine.oauth_sources).toThrow();
+        expect(() => ACAEngine.saml_sources).toThrow();
+        expect(() => ACAEngine.ldap_sources).toThrow();
         expect(() => ACAEngine.bindings).toThrow();
         expect(() => ACAEngine.domains).toThrow();
         expect(() => ACAEngine.drivers).toThrow();
@@ -87,7 +92,9 @@ describe('ACAEngine', () => {
         it('should expose HTTP API services', () => {
             expect(ACAEngine.http).toBeInstanceOf(EngineHttpClient);
             expect(ACAEngine.applications).toBeInstanceOf(EngineApplicationsService);
-            expect(ACAEngine.auth_sources).toBeInstanceOf(EngineAuthSourcesService);
+            expect(ACAEngine.oauth_sources).toBeInstanceOf(EngineOAuthSourcesService);
+            expect(ACAEngine.saml_sources).toBeInstanceOf(EngineSAMLSourcesService);
+            expect(ACAEngine.ldap_sources).toBeInstanceOf(EngineLDAPSourcesService);
             expect(ACAEngine.domains).toBeInstanceOf(EngineDomainsService);
             expect(ACAEngine.drivers).toBeInstanceOf(EngineDriversService);
             expect(ACAEngine.modules).toBeInstanceOf(EngineModulesService);
