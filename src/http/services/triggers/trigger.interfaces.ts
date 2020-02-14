@@ -84,13 +84,20 @@ export interface TriggerStatusVariable {
     keys: string[];
 }
 
-export interface TriggerTimeCondition {
+export type TriggerTimeCondition = TriggerAtTimeCondition | TriggerCronTimeCondition;
+
+export interface TriggerAtTimeCondition {
     /** Type of time condition. Either a specific time or cron string */
-    type: TriggerTimeConditionType;
+    type: TriggerTimeConditionType.AT;
     /** Unix epoch in seconds */
-    time?: number;
+    time: number;
+}
+
+export interface TriggerCronTimeCondition {
+    /** Type of time condition. Either a specific time or cron string */
+    type: TriggerTimeConditionType.CRON;
     /** CRON tab string */
-    cron?: string;
+    cron: string;
 }
 
 export enum TriggerTimeConditionType {
