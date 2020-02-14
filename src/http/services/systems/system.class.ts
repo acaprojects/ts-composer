@@ -54,7 +54,7 @@ export class EngineSystem extends EngineResource<EngineSystemsService> {
         this.email = raw_data.email || '';
         this.capacity = raw_data.capacity || 0;
         this.features = raw_data.features || '';
-        this.bookable = raw_data.bookable || '';
+        this.bookable = raw_data.bookable || false;
         this.installed_ui_devices = raw_data.installed_ui_devices || 0;
         this.support_url = raw_data.support_url || '';
         this.modules = raw_data.modules || [];
