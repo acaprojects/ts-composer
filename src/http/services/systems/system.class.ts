@@ -52,7 +52,7 @@ export class EngineSystem extends EngineResource<EngineSystemsService> {
         super(_service, raw_data);
         this.description = raw_data.description || '';
         this.email = raw_data.email || '';
-        this.capacity = raw_data.capacity || '';
+        this.capacity = raw_data.capacity || 0;
         this.features = raw_data.features || '';
         this.bookable = raw_data.bookable || '';
         this.installed_ui_devices = raw_data.installed_ui_devices || 0;
