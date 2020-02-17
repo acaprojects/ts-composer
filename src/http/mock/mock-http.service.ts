@@ -30,11 +30,6 @@ if (!window.control) {
     window.control = {};
 }
 
-/* istanbul ignore else */
-if (!window.control.handlers) {
-    window.control.handlers = {};
-}
-
 export class MockEngineHttpClient extends EngineHttpClient {
     /** Mapping of handlers for http requests */
     private _handlers: HashMap<MockHttpRequestHandler> = {};
@@ -44,7 +39,7 @@ export class MockEngineHttpClient extends EngineHttpClient {
         // Register global space mock request handlers
         /* istanbul ignore else */
         if (window.control && window.control.handlers) {
-            const handlers: MockHttpRequestHandlerOptions[] = window.control.handlers;
+            const handlers: MockHttpRequestHandlerOptions[] = window.control.handlers || [];
             for (const handler of handlers) {
                 this.register(handler.path, handler.metadata, handler.method, handler.callback);
             }
