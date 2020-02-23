@@ -253,7 +253,7 @@ export abstract class EngineResourceService<T extends EngineResource<any>> exten
      * @param form_data New values for the item
      * @param query_params Map of query paramaters to add to the request URL
      */
-    public update(id: string, form_data: HashMap, query_params: HashMap = {}): Promise<T> {
+    public update(id: string, form_data: HashMap, query_params: HashMap = {}, type: 'put' | 'patch' = 'patch'): Promise<T> {
         const key = `update|${id}`;
         /* istanbul ignore else */
         if (!this._promises[key]) {
@@ -261,7 +261,7 @@ export abstract class EngineResourceService<T extends EngineResource<any>> exten
                 const query = toQueryString(query_params);
                 const url = `${this.api_route}/${id}${query ? '?' + query : ''}`;
                 let result: T;
-                this.http.put(url, form_data).subscribe(
+                this.http[type](url, form_data).subscribe(
                     (d: HashMap) => (result = this.process(d)),
                     (e: HttpError) => {
                         reject(e);

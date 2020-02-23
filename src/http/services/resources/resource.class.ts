@@ -80,12 +80,12 @@ export abstract class EngineResource<T extends ResourceService<any>> {
     /**
      * Save any changes made to the server
      */
-    public save(): Promise<T> {
+    public save(type: 'put' | 'patch' = 'patch'): Promise<T> {
         const me: HashMap = this.toJSON();
         if (Object.keys(this._changes).length > 0) {
             return new Promise((resolve, reject) => {
                 this.id
-                    ? this._service.update(this.id, me, { version: this._version }).then(
+                    ? this._service.update(this.id, me, { version: this._version }, type).then(
                           updated_item => {
                               this.emit('item_saved', updated_item);
                               resolve(updated_item);

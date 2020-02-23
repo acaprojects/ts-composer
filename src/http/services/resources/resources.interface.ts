@@ -21,7 +21,7 @@ export interface ResourceService<T = any> {
     query: (fields?: HashMap) => Promise<T[]>;
     show: (id: string, fields?: HashMap) => Promise<T>;
     add: (data: HashMap) => Promise<T>;
-    update: (id: string, data: HashMap, fields?: HashMap) => Promise<T>;
+    update: (id: string, data: HashMap, fields?: HashMap, type?: 'put' | 'patch') => Promise<T>;
     delete: (id: string) => Promise<void>;
 }
 
