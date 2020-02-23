@@ -85,7 +85,7 @@ export abstract class EngineResource<T extends ResourceService<any>> {
         if (Object.keys(this._changes).length > 0) {
             return new Promise((resolve, reject) => {
                 this.id
-                    ? this._service.update(this.id, me).then(
+                    ? this._service.update(this.id, me, { version: this._version }).then(
                           updated_item => {
                               this.emit('item_saved', updated_item);
                               resolve(updated_item);

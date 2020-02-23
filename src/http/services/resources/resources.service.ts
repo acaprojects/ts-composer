@@ -203,7 +203,7 @@ export abstract class EngineResourceService<T extends EngineResource<any>> exten
      * @param query_params Map of query paramaters to add to the polled URL
      * @param delay Delay between each poll event. Defaults to `5000` ms
      */
-    public poll(id?: string, query_params?: HashMap, delay: number = 5000): Observable<T | T[]> {
+    public poll(id?: string, query_params: HashMap = {}, delay: number = 5000): Observable<T | T[]> {
         const key = `poll|${id || ''}|${toQueryString(query_params || {}) || ''}`;
         this.stopPoll(id, query_params);
         this._subjects[key] = new Subject<T | T[]>();
