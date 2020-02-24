@@ -10,7 +10,7 @@ describe('EngineResourceService', () => {
     let http: any;
 
     async function testRequest(
-        method: 'get' | 'post' | 'put' | 'delete',
+        method: 'get' | 'post' | 'patch' | 'put' | 'delete',
         fn: any,
         result: any,
         test1: any[],
@@ -47,6 +47,7 @@ describe('EngineResourceService', () => {
             get: jest.fn(),
             post: jest.fn(),
             put: jest.fn(),
+            patch: jest.fn(),
             delete: jest.fn(),
             api_endpoint: '/api/engine/v2'
         };
@@ -189,9 +190,9 @@ describe('EngineResourceService', () => {
     it('should allow updating items', async () => {
         expect.assertions(4);
         const item = { id: 'test', name: 'Test' };
-        await testRequest('put', 'update', item, ['test', item], ['test', item, { test: true }]);
-        expect(http.put).toBeCalledWith('/api/engine/v2/base/test', item);
-        expect(http.put).toBeCalledWith('/api/engine/v2/base/test?test=true', item);
+        await testRequest('patch', 'update', item, ['test', item], ['test', item, { test: true }]);
+        expect(http.patch).toBeCalledWith('/api/engine/v2/base/test', item);
+        expect(http.patch).toBeCalledWith('/api/engine/v2/base/test?test=true', item);
     });
 
     it('should allow deleting items', async () => {

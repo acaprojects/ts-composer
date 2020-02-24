@@ -54,7 +54,7 @@ describe('EngineResource', () => {
         expect.assertions(1);
         resource.storePendingChange('name', 'Another Test');
         await resource.save();
-        expect(service.update).toBeCalledWith(resource.id, resource.toJSON());
+        expect(service.update).toBeCalledWith(resource.id, resource.toJSON(), { version: 0 }, 'patch');
     });
 
     it('should allow deleting exisiting resource', async () => {
