@@ -22,7 +22,10 @@ describe('EngineDriver', () => {
             ignore_connected: false,
             settings: { settings_string: '{ today: false, future: \'Yeah!\' }' },
             class_name: '::ACA::SolveProblem',
-            created_at: 999
+            created_at: 999,
+            repository_id: 'my-repo',
+            file_name: 'fancy-driver.cr',
+            commit: 'some-hash'
         });
         (ACAEngine as any)._initialised.next(true);
     });
@@ -84,6 +87,18 @@ describe('EngineDriver', () => {
 
     it('should expose settings', () => {
         expect(driver.settings).toBeInstanceOf(EngineSettings);
+    });
+
+    it('should expose repository ID', () => {
+        expect(driver.repository_id).toBe('my-repo');
+    });
+
+    it('should expose file name', () => {
+        expect(driver.file_name).toBe('fancy-driver.cr');
+    });
+
+    it('should expose commit hash', () => {
+        expect(driver.commit).toBe('some-hash');
     });
 
     it('should allow reloading the driver', async () => {

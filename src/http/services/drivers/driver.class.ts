@@ -14,13 +14,16 @@ export const DRIVER_MUTABLE_FIELDS = [
     'module_name',
     'role',
     'default',
-    'ignore_connected'
+    'ignore_connected',
+    'repository_id',
+    'file_name',
+    'commit'
 ] as const;
 type DriverMutableTuple = typeof DRIVER_MUTABLE_FIELDS;
 export type DriverMutableFields = DriverMutableTuple[number];
 
 /** List of property keys that can only be set when creating a new object */
-const NON_EDITABLE_FIELDS = ['role'];
+const NON_EDITABLE_FIELDS = ['role', 'repository_id', 'file_name'];
 
 export class EngineDriver extends EngineResource<EngineDriversService> {
     /** Engine class name of the driver */
@@ -31,8 +34,14 @@ export class EngineDriver extends EngineResource<EngineDriversService> {
     public readonly module_name: string;
     /** Role of the driver in engine */
     public readonly role: EngineDriverRole;
-    /**  */
+    /** Default settings for the driver */
     public readonly default: string;
+    /** ID of the repository the driver is from */
+    public readonly repository_id: string;
+    /** Name of the file from the repository to load the driver logic from */
+    public readonly file_name: string;
+    /** Version of the driver logic to use */
+    public readonly commit: string;
     /** Ignore connection issues */
     public readonly ignore_connected: boolean;
     /** Map of user settings for the system */
@@ -46,6 +55,9 @@ export class EngineDriver extends EngineResource<EngineDriversService> {
         this.default = raw_data.default || '';
         this.ignore_connected = raw_data.ignore_connected || false;
         this.class_name = raw_data.class_name || '';
+        this.repository_id = raw_data.repository_id || '';
+        this.file_name = raw_data.file_name || '';
+        this.commit = raw_data.commit || '';
         this.settings = new EngineSettings({} as any, raw_data.settings || { parent_id: this.id });
         ACAEngine.initialised.pipe(first(has_inited => has_inited)).subscribe(() => {
             this.settings = new EngineSettings(
